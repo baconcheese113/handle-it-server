@@ -2,6 +2,8 @@ import { makeSchema, mutationType, objectType, queryType } from "nexus"
 import path from 'path'
 import { nexusPrisma } from "nexus-plugin-prisma"
 
+const rootDir = __dirname || process.cwd()
+
 const schema = makeSchema({
     types: [
         queryType({
@@ -70,8 +72,8 @@ const schema = makeSchema({
         ]
     },
     outputs: {
-        typegen: path.join(process.cwd(), 'generated', 'nexus-typegen.ts'),
-        schema: path.join(process.cwd(), 'generated', 'schema.graphql'),
+        typegen: path.join(rootDir, 'generated', 'nexus-typegen.ts'),
+        schema: path.join(rootDir, 'generated', 'schema.graphql'),
     },
 })
 

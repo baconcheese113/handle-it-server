@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Server code for handleit",
   "main": "index.ts",
+  "engines": {
+    "node": "14"
+  },
   "scripts": {
     "start": "node dist",
     "dev": "ts-node-dev --transpile-only --no-notify index.ts",
