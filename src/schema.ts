@@ -62,7 +62,7 @@ const schema = makeSchema({
             }
         })
     ],
-    plugins: [nexusPrisma({ experimentalCRUD: true })],
+    plugins: [nexusPrisma({shouldGenerateArtifacts: true, experimentalCRUD: true })],
     sourceTypes: {
         modules: [
             {
