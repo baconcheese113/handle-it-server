@@ -2,10 +2,14 @@
   "name": "server",
   "version": "1.0.0",
   "description": "Server code for handleit",
-  "main": "server.ts",
+  "main": "index.ts",
   "scripts": {
-    "start": "ts-node src/server.ts",
-    "dev": "ts-node-dev --transpile-only --no-notify src/server.ts"
+    "start": "node dist",
+    "dev": "ts-node-dev --transpile-only --no-notify index.ts",
+    "build": "npm -s run generate && tsc",
+    "generate": "npm -s run generate:prisma && npm -s run generate:nexus",
+    "generate:prisma": "npx prisma generate",
+    "generate:nexus": "ts-node --transpile-only src/schema"
   },
   "keywords": [],
   "author": "",
