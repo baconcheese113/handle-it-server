@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  email     String   @unique
+  firstName String   @db.VarChar(255)
+  lastName  String   @db.VarChar(255)
+  hubs      Hub[]
+}
+
+model Hub {
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+  serial       String   @unique
+  batteryLevel Int?
+  isCharging   Boolean?
+  owner        User     @relation(fields: [ownerId], references: [id])
+  ownerId      Int
+}
+
+model Event {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  time      DateTime @default(now())
+  sensor    Sensor   @relation(fields: [sensorId], references: [id])
+  sensorId  Int
+}
+
+model Sensor {
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+  serial       String   @unique
+  batteryLevel Int?
+  isOpen       Boolean
+  isConnected  Boolean
+  isArmed      Boolean
+  doorColumn   Int
+  doorRow      Int
+  events       Event[]
+}
