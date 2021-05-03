@@ -6,5 +6,6 @@ tmp
 
 .env*
 .prisma
+serviceAccountKey.json
 
 .vscode

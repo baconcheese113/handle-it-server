@@ -1,7 +1,16 @@
 import { makeSchema, mutationType, objectType, queryType } from "nexus"
 import path from 'path'
 import { nexusPrisma } from "nexus-plugin-prisma"
+import * as admin from 'firebase-admin'
+import * as serviceAccount from '../serviceAccountKey.json'
 
+admin.initializeApp({
+    credential: admin.credential.cert({
+        projectId: serviceAccount.project_id,
+        clientEmail: serviceAccount.client_email,
+        privateKey: serviceAccount.private_key    
+    })
+})
 const rootDir = __dirname || process.cwd()
 
 const schema = makeSchema({
@@ -17,6 +26,26 @@ const schema = makeSchema({
                 t.crud.createOneHub()
                 t.crud.createOneSensor()
                 t.crud.createOneEvent()
+                t.field('sendNotification', {
+                    type: 'Boolean',
+                    async resolve(_root, args, { prisma }) {
+                        try{
+                            const msgId = await admin.messaging().send({
+                                data: {
+                                    type: 'alert',
+                                },
+                                android: {
+                                    priority: 'high',
+                                },
+                                token: 'myToken'
+                            })
+                            console.log('Successfully sent message: ', msgId)
+                        } catch (err) {
+                            console.log('Error sending message: ', err)
+                        }
+                        return true;
+                    }
+                })
             }
         }),
         objectType({
