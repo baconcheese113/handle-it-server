@@ -15,6 +15,5 @@ class BasicLogging {
     }
 }
 
-const server = new ApolloServer({ schema, context: createContext, extensions: [() => new BasicLogging()] });
+export const server = new ApolloServer({ schema, context: createContext, extensions: [() => new BasicLogging()] })
 
-server.listen(process.env.PORT || 4000).then(({ url }) => { console.log(`🚀  Server ready at ${url}`)})

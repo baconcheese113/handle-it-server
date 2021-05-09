@@ -1,8 +1,18 @@
-import { makeSchema, mutationType, objectType, queryType } from "nexus"
+import { makeSchema, mutationType, queryType } from "nexus"
 import path from 'path'
 import { nexusPrisma } from "nexus-plugin-prisma"
 import * as admin from 'firebase-admin'
 import * as serviceAccount from '../serviceAccountKey.json'
+import { IContext } from "./context"
+import bcrypt from 'bcrypt'
+import { AuthenticationError } from "apollo-server-errors"
+import jwt from 'jsonwebtoken'
+import { GraphQLNonNull, GraphQLString } from "graphql"
+import viewerGraphField from "./resolvers/query/viewerGraphType"
+import hubGraphType from "./resolvers/query/hubGraphType"
+import userGraphType from "./resolvers/query/userGraphType"
+import sensorGraphType from "./resolvers/query/sensorGraphType"
+import eventGraphType from "./resolvers/query/eventGraphType"
 
 admin.initializeApp({
     credential: admin.credential.cert({
@@ -17,18 +27,37 @@ const schema = makeSchema({
     types: [
         queryType({
             definition(t) {
-                t.crud.user()
+                t.nonNull.field('viewer', {
+                    type: viewerGraphField,
+                    resolve(_root, _args, { user }: IContext) {
+                        if(!user) throw new AuthenticationError("User does not have permission")
+                        return user
+                    }
+                })
             }
         }),
         mutationType({
             definition(t) {
-                t.crud.createOneUser()
                 t.crud.createOneHub()
                 t.crud.createOneSensor()
                 t.crud.createOneEvent()
+                t.field('updateUser', {
+                    type: 'User',
+                    args: {
+                        firstName: GraphQLString,
+                        lastName: GraphQLString
+                    },
+                    async resolve(_root, { firstName, lastName }, { prisma, user }:IContext) {
+                        if(!user) throw new AuthenticationError("User does not have access")
+                        const data: { firstName?: string, lastName?: string } = {}
+                        if(firstName) data.firstName = firstName
+                        if(lastName) data.lastName = lastName
+                        return prisma.user.update({ where: { id: user.id }, data })
+                    }
+                })
                 t.field('sendNotification', {
                     type: 'Boolean',
-                    async resolve(_root, args, { prisma }) {
+                    async resolve() {
                         try{
                             const msgId = await admin.messaging().send({
                                 data: {
@@ -37,7 +66,7 @@ const schema = makeSchema({
                                 android: {
                                     priority: 'high',
                                 },
-                                token: 'myToken'
+                                token: process.env.TEST_DEVICE_TOKEN!
                             })
                             console.log('Successfully sent message: ', msgId)
                         } catch (err) {
@@ -45,51 +74,48 @@ const schema = makeSchema({
                         }
                         return true;
                     }
+                }),
+                t.field('registerWithPassword', {
+                    type: 'String',
+                    args: { 
+                        email: GraphQLNonNull(GraphQLString),
+                        password: GraphQLNonNull(GraphQLString), 
+                        firstName: GraphQLString,
+                        lastName: GraphQLString 
+                    },
+                    async resolve(_root, args, { prisma, user }: IContext) {
+                        if(user) return user
+                        const { email, password, firstName, lastName } = args
+                        const hashedPassword = await bcrypt.hash(password, 10)
+                        console.log('hashedPassword', hashedPassword)
+                        const newUser = await prisma.user.create({ data: { email, firstName, lastName, password }})
+
+                        return jwt.sign(newUser.id.toString(), process.env.JWT_SECRET!)
+                    }
+                }),
+                t.field('loginWithPassword', {
+                    type: 'String',
+                    args: { 
+                        email: GraphQLNonNull(GraphQLString),
+                        password: GraphQLNonNull(GraphQLString),
+                    },
+                    async resolve(_root, args, { prisma, user }: IContext) {
+                        if(user) return user
+                        const { email, password } = args
+                        const hashedPassword = await bcrypt.hash(password, 10)
+                        console.log('hashedPassword', hashedPassword)
+                        const foundUser = await prisma.user.findFirst({ where: { email, password }})
+
+                        if (!foundUser) throw new AuthenticationError('Unable to login')
+                        return jwt.sign(foundUser.id.toString(), process.env.JWT_SECRET!)
+                    }
                 })
             }
         }),
-        objectType({
-            name: 'User',
-            definition(t) {
-                t.model.id()
-                t.model.email()
-                t.model.firstName()
-                t.model.lastName()
-                t.model.hubs()
-            }
-        }),
-        objectType({
-            name: 'Hub',
-            definition(t) {
-                t.model.id()
-                t.model.serial()
-                t.model.batteryLevel()
-                t.model.isCharging()
-                t.model.owner()
-            }
-        }),
-        objectType({
-            name: 'Sensor',
-            definition(t) {
-                t.model.id()
-                t.model.serial()
-                t.model.batteryLevel()
-                t.model.isOpen()
-                t.model.isConnected()
-                t.model.isArmed()
-                t.model.doorColumn()
-                t.model.doorRow()
-                t.model.events()
-            }
-        }),
-        objectType({
-            name: 'Event',
-            definition(t) {
-                t.model.id()
-                t.model.time()
-                t.model.sensor()
-            }
-        })
+        userGraphType,
+        hubGraphType,
+        sensorGraphType,
+        eventGraphType
     ],
     plugins: [nexusPrisma({shouldGenerateArtifacts: true, experimentalCRUD: true })],
     sourceTypes: {

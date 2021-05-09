@@ -53,9 +53,11 @@ input EventWhereUniqueInput {
 
 type Hub {
   batteryLevel: Int
+  createdAt: DateTime!
   id: Int!
   isCharging: Boolean
   owner: User!
+  sensors(after: SensorWhereUniqueInput, before: SensorWhereUniqueInput, first: Int, last: Int): [Sensor!]!
   serial: String!
 }
 
@@ -64,40 +66,27 @@ input HubCreateInput {
   createdAt: DateTime
   isCharging: Boolean
   owner: UserCreateNestedOneWithoutHubsInput!
+  sensors: SensorCreateNestedManyWithoutHubInput
   serial: String!
   updatedAt: DateTime
 }
 
-input HubCreateManyOwnerInput {
-  batteryLevel: Int
-  createdAt: DateTime
-  id: Int
-  isCharging: Boolean
-  serial: String!
-  updatedAt: DateTime
+input HubCreateNestedOneWithoutSensorsInput {
+  connect: HubWhereUniqueInput
+  connectOrCreate: HubCreateOrConnectWithoutSensorsInput
+  create: HubCreateWithoutSensorsInput
 }
 
-input HubCreateManyOwnerInputEnvelope {
-  data: [HubCreateManyOwnerInput!]
-  skipDuplicates: Boolean
-}
-
-input HubCreateNestedManyWithoutOwnerInput {
-  connect: [HubWhereUniqueInput!]
-  connectOrCreate: [HubCreateOrConnectWithoutOwnerInput!]
-  create: [HubCreateWithoutOwnerInput!]
-  createMany: HubCreateManyOwnerInputEnvelope
-}
-
-input HubCreateOrConnectWithoutOwnerInput {
-  create: HubCreateWithoutOwnerInput!
+input HubCreateOrConnectWithoutSensorsInput {
+  create: HubCreateWithoutSensorsInput!
   where: HubWhereUniqueInput!
 }
 
-input HubCreateWithoutOwnerInput {
+input HubCreateWithoutSensorsInput {
   batteryLevel: Int
   createdAt: DateTime
   isCharging: Boolean
+  owner: UserCreateNestedOneWithoutHubsInput!
   serial: String!
   updatedAt: DateTime
 }
@@ -111,12 +100,14 @@ type Mutation {
   createOneEvent(data: EventCreateInput!): Event!
   createOneHub(data: HubCreateInput!): Hub!
   createOneSensor(data: SensorCreateInput!): Sensor!
-  createOneUser(data: UserCreateInput!): User!
+  loginWithPassword(email: String!, password: String!): String
+  registerWithPassword(email: String!, firstName: String, lastName: String, password: String!): String
   sendNotification: Boolean
+  updateUser(firstName: String, lastName: String): User
 }
 
 type Query {
-  user(where: UserWhereUniqueInput!): User
+  viewer: Viewer!
 }
 
 type Sensor {
@@ -124,6 +115,7 @@ type Sensor {
   doorColumn: Int!
   doorRow: Int!
   events(after: EventWhereUniqueInput, before: EventWhereUniqueInput, first: Int, last: Int): [Event!]!
+  hub: Hub!
   id: Int!
   isArmed: Boolean!
   isConnected: Boolean!
@@ -137,11 +129,37 @@ input SensorCreateInput {
   doorColumn: Int!
   doorRow: Int!
   events: EventCreateNestedManyWithoutSensorInput
+  hub: HubCreateNestedOneWithoutSensorsInput!
   isArmed: Boolean!
   isConnected: Boolean!
   isOpen: Boolean!
   serial: String!
   updatedAt: DateTime
+}
+
+input SensorCreateManyHubInput {
+  batteryLevel: Int
+  createdAt: DateTime
+  doorColumn: Int!
+  doorRow: Int!
+  id: Int
+  isArmed: Boolean!
+  isConnected: Boolean!
+  isOpen: Boolean!
+  serial: String!
+  updatedAt: DateTime
+}
+
+input SensorCreateManyHubInputEnvelope {
+  data: [SensorCreateManyHubInput!]
+  skipDuplicates: Boolean
+}
+
+input SensorCreateNestedManyWithoutHubInput {
+  connect: [SensorWhereUniqueInput!]
+  connectOrCreate: [SensorCreateOrConnectWithoutHubInput!]
+  create: [SensorCreateWithoutHubInput!]
+  createMany: SensorCreateManyHubInputEnvelope
 }
 
 input SensorCreateNestedOneWithoutEventsInput {
@@ -155,11 +173,30 @@ input SensorCreateOrConnectWithoutEventsInput {
   where: SensorWhereUniqueInput!
 }
 
+input SensorCreateOrConnectWithoutHubInput {
+  create: SensorCreateWithoutHubInput!
+  where: SensorWhereUniqueInput!
+}
+
 input SensorCreateWithoutEventsInput {
   batteryLevel: Int
   createdAt: DateTime
   doorColumn: Int!
   doorRow: Int!
+  hub: HubCreateNestedOneWithoutSensorsInput!
+  isArmed: Boolean!
+  isConnected: Boolean!
+  isOpen: Boolean!
+  serial: String!
+  updatedAt: DateTime
+}
+
+input SensorCreateWithoutHubInput {
+  batteryLevel: Int
+  createdAt: DateTime
+  doorColumn: Int!
+  doorRow: Int!
+  events: EventCreateNestedManyWithoutSensorInput
   isArmed: Boolean!
   isConnected: Boolean!
   isOpen: Boolean!
@@ -173,20 +210,12 @@ input SensorWhereUniqueInput {
 }
 
 type User {
+  displayName: String!
   email: String!
-  firstName: String!
+  firstName: String
   hubs(after: HubWhereUniqueInput, before: HubWhereUniqueInput, first: Int, last: Int): [Hub!]!
   id: Int!
-  lastName: String!
-}
-
-input UserCreateInput {
-  createdAt: DateTime
-  email: String!
-  firstName: String!
-  hubs: HubCreateNestedManyWithoutOwnerInput
-  lastName: String!
-  updatedAt: DateTime
+  lastName: String
 }
 
 input UserCreateNestedOneWithoutHubsInput {
@@ -203,12 +232,18 @@ input UserCreateOrConnectWithoutHubsInput {
 input UserCreateWithoutHubsInput {
   createdAt: DateTime
   email: String!
-  firstName: String!
-  lastName: String!
+  firstName: String
+  lastName: String
+  password: String!
   updatedAt: DateTime
 }
 
 input UserWhereUniqueInput {
   email: String
   id: Int
+}
+
+type Viewer {
+  hubs: [Hub!]!
+  user: User!
 }

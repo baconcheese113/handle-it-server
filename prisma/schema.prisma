@@ -15,8 +15,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
   email     String   @unique
-  firstName String   @db.VarChar(255)
-  lastName  String   @db.VarChar(255)
+  password  String
+  firstName String?  @db.VarChar(255)
+  lastName  String?  @db.VarChar(255)
   hubs      Hub[]
 }
 
@@ -27,17 +28,9 @@ model Hub {
   serial       String   @unique
   batteryLevel Int?
   isCharging   Boolean?
-  owner        User     @relation(fields: [ownerId], references: [id])
   ownerId      Int
-}
-
-model Event {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  time      DateTime @default(now())
-  sensor    Sensor   @relation(fields: [sensorId], references: [id])
-  sensorId  Int
+  owner        User     @relation(fields: [ownerId], references: [id])
+  sensors      Sensor[]
 }
 
 model Sensor {
@@ -51,5 +44,16 @@ model Sensor {
   isArmed      Boolean
   doorColumn   Int
   doorRow      Int
+  hubId        Int
+  hub          Hub      @relation(fields: [hubId], references: [id])
   events       Event[]
+}
+
+model Event {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  time      DateTime @default(now())
+  sensorId  Int
+  sensor    Sensor   @relation(fields: [sensorId], references: [id])
 }

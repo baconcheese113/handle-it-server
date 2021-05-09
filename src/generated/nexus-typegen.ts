@@ -58,35 +58,24 @@ export interface NexusGenInputs {
     createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
     isCharging?: boolean | null; // Boolean
     owner: NexusGenInputs['UserCreateNestedOneWithoutHubsInput']; // UserCreateNestedOneWithoutHubsInput!
+    sensors?: NexusGenInputs['SensorCreateNestedManyWithoutHubInput'] | null; // SensorCreateNestedManyWithoutHubInput
     serial: string; // String!
     updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
   }
-  HubCreateManyOwnerInput: { // input type
-    batteryLevel?: number | null; // Int
-    createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
-    id?: number | null; // Int
-    isCharging?: boolean | null; // Boolean
-    serial: string; // String!
-    updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
+  HubCreateNestedOneWithoutSensorsInput: { // input type
+    connect?: NexusGenInputs['HubWhereUniqueInput'] | null; // HubWhereUniqueInput
+    connectOrCreate?: NexusGenInputs['HubCreateOrConnectWithoutSensorsInput'] | null; // HubCreateOrConnectWithoutSensorsInput
+    create?: NexusGenInputs['HubCreateWithoutSensorsInput'] | null; // HubCreateWithoutSensorsInput
   }
-  HubCreateManyOwnerInputEnvelope: { // input type
-    data?: NexusGenInputs['HubCreateManyOwnerInput'][] | null; // [HubCreateManyOwnerInput!]
-    skipDuplicates?: boolean | null; // Boolean
-  }
-  HubCreateNestedManyWithoutOwnerInput: { // input type
-    connect?: NexusGenInputs['HubWhereUniqueInput'][] | null; // [HubWhereUniqueInput!]
-    connectOrCreate?: NexusGenInputs['HubCreateOrConnectWithoutOwnerInput'][] | null; // [HubCreateOrConnectWithoutOwnerInput!]
-    create?: NexusGenInputs['HubCreateWithoutOwnerInput'][] | null; // [HubCreateWithoutOwnerInput!]
-    createMany?: NexusGenInputs['HubCreateManyOwnerInputEnvelope'] | null; // HubCreateManyOwnerInputEnvelope
-  }
-  HubCreateOrConnectWithoutOwnerInput: { // input type
-    create: NexusGenInputs['HubCreateWithoutOwnerInput']; // HubCreateWithoutOwnerInput!
+  HubCreateOrConnectWithoutSensorsInput: { // input type
+    create: NexusGenInputs['HubCreateWithoutSensorsInput']; // HubCreateWithoutSensorsInput!
     where: NexusGenInputs['HubWhereUniqueInput']; // HubWhereUniqueInput!
   }
-  HubCreateWithoutOwnerInput: { // input type
+  HubCreateWithoutSensorsInput: { // input type
     batteryLevel?: number | null; // Int
     createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
     isCharging?: boolean | null; // Boolean
+    owner: NexusGenInputs['UserCreateNestedOneWithoutHubsInput']; // UserCreateNestedOneWithoutHubsInput!
     serial: string; // String!
     updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
   }
@@ -100,11 +89,34 @@ export interface NexusGenInputs {
     doorColumn: number; // Int!
     doorRow: number; // Int!
     events?: NexusGenInputs['EventCreateNestedManyWithoutSensorInput'] | null; // EventCreateNestedManyWithoutSensorInput
+    hub: NexusGenInputs['HubCreateNestedOneWithoutSensorsInput']; // HubCreateNestedOneWithoutSensorsInput!
     isArmed: boolean; // Boolean!
     isConnected: boolean; // Boolean!
     isOpen: boolean; // Boolean!
     serial: string; // String!
     updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
+  }
+  SensorCreateManyHubInput: { // input type
+    batteryLevel?: number | null; // Int
+    createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
+    doorColumn: number; // Int!
+    doorRow: number; // Int!
+    id?: number | null; // Int
+    isArmed: boolean; // Boolean!
+    isConnected: boolean; // Boolean!
+    isOpen: boolean; // Boolean!
+    serial: string; // String!
+    updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
+  }
+  SensorCreateManyHubInputEnvelope: { // input type
+    data?: NexusGenInputs['SensorCreateManyHubInput'][] | null; // [SensorCreateManyHubInput!]
+    skipDuplicates?: boolean | null; // Boolean
+  }
+  SensorCreateNestedManyWithoutHubInput: { // input type
+    connect?: NexusGenInputs['SensorWhereUniqueInput'][] | null; // [SensorWhereUniqueInput!]
+    connectOrCreate?: NexusGenInputs['SensorCreateOrConnectWithoutHubInput'][] | null; // [SensorCreateOrConnectWithoutHubInput!]
+    create?: NexusGenInputs['SensorCreateWithoutHubInput'][] | null; // [SensorCreateWithoutHubInput!]
+    createMany?: NexusGenInputs['SensorCreateManyHubInputEnvelope'] | null; // SensorCreateManyHubInputEnvelope
   }
   SensorCreateNestedOneWithoutEventsInput: { // input type
     connect?: NexusGenInputs['SensorWhereUniqueInput'] | null; // SensorWhereUniqueInput
@@ -115,11 +127,28 @@ export interface NexusGenInputs {
     create: NexusGenInputs['SensorCreateWithoutEventsInput']; // SensorCreateWithoutEventsInput!
     where: NexusGenInputs['SensorWhereUniqueInput']; // SensorWhereUniqueInput!
   }
+  SensorCreateOrConnectWithoutHubInput: { // input type
+    create: NexusGenInputs['SensorCreateWithoutHubInput']; // SensorCreateWithoutHubInput!
+    where: NexusGenInputs['SensorWhereUniqueInput']; // SensorWhereUniqueInput!
+  }
   SensorCreateWithoutEventsInput: { // input type
     batteryLevel?: number | null; // Int
     createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
     doorColumn: number; // Int!
     doorRow: number; // Int!
+    hub: NexusGenInputs['HubCreateNestedOneWithoutSensorsInput']; // HubCreateNestedOneWithoutSensorsInput!
+    isArmed: boolean; // Boolean!
+    isConnected: boolean; // Boolean!
+    isOpen: boolean; // Boolean!
+    serial: string; // String!
+    updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
+  }
+  SensorCreateWithoutHubInput: { // input type
+    batteryLevel?: number | null; // Int
+    createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
+    doorColumn: number; // Int!
+    doorRow: number; // Int!
+    events?: NexusGenInputs['EventCreateNestedManyWithoutSensorInput'] | null; // EventCreateNestedManyWithoutSensorInput
     isArmed: boolean; // Boolean!
     isConnected: boolean; // Boolean!
     isOpen: boolean; // Boolean!
@@ -129,14 +158,6 @@ export interface NexusGenInputs {
   SensorWhereUniqueInput: { // input type
     id?: number | null; // Int
     serial?: string | null; // String
-  }
-  UserCreateInput: { // input type
-    createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
-    email: string; // String!
-    firstName: string; // String!
-    hubs?: NexusGenInputs['HubCreateNestedManyWithoutOwnerInput'] | null; // HubCreateNestedManyWithoutOwnerInput
-    lastName: string; // String!
-    updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
   }
   UserCreateNestedOneWithoutHubsInput: { // input type
     connect?: NexusGenInputs['UserWhereUniqueInput'] | null; // UserWhereUniqueInput
@@ -150,8 +171,9 @@ export interface NexusGenInputs {
   UserCreateWithoutHubsInput: { // input type
     createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
     email: string; // String!
-    firstName: string; // String!
-    lastName: string; // String!
+    firstName?: string | null; // String
+    lastName?: string | null; // String
+    password: string; // String!
     updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
   }
   UserWhereUniqueInput: { // input type
@@ -179,6 +201,7 @@ export interface NexusGenObjects {
   }
   Hub: { // root type
     batteryLevel?: number | null; // Int
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
     id: number; // Int!
     isCharging?: boolean | null; // Boolean
     serial: string; // String!
@@ -197,10 +220,11 @@ export interface NexusGenObjects {
   }
   User: { // root type
     email: string; // String!
-    firstName: string; // String!
+    firstName?: string | null; // String
     id: number; // Int!
-    lastName: string; // String!
+    lastName?: string | null; // String
   }
+  Viewer: {};
 }
 
 export interface NexusGenInterfaces {
@@ -221,26 +245,31 @@ export interface NexusGenFieldTypes {
   }
   Hub: { // field return type
     batteryLevel: number | null; // Int
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
     id: number; // Int!
     isCharging: boolean | null; // Boolean
     owner: NexusGenRootTypes['User']; // User!
+    sensors: NexusGenRootTypes['Sensor'][]; // [Sensor!]!
     serial: string; // String!
   }
   Mutation: { // field return type
     createOneEvent: NexusGenRootTypes['Event']; // Event!
     createOneHub: NexusGenRootTypes['Hub']; // Hub!
     createOneSensor: NexusGenRootTypes['Sensor']; // Sensor!
-    createOneUser: NexusGenRootTypes['User']; // User!
+    loginWithPassword: string | null; // String
+    registerWithPassword: string | null; // String
     sendNotification: boolean | null; // Boolean
+    updateUser: NexusGenRootTypes['User'] | null; // User
   }
   Query: { // field return type
-    user: NexusGenRootTypes['User'] | null; // User
+    viewer: NexusGenRootTypes['Viewer']; // Viewer!
   }
   Sensor: { // field return type
     batteryLevel: number | null; // Int
     doorColumn: number; // Int!
     doorRow: number; // Int!
     events: NexusGenRootTypes['Event'][]; // [Event!]!
+    hub: NexusGenRootTypes['Hub']; // Hub!
     id: number; // Int!
     isArmed: boolean; // Boolean!
     isConnected: boolean; // Boolean!
@@ -248,11 +277,16 @@ export interface NexusGenFieldTypes {
     serial: string; // String!
   }
   User: { // field return type
+    displayName: string; // String!
     email: string; // String!
-    firstName: string; // String!
+    firstName: string | null; // String
     hubs: NexusGenRootTypes['Hub'][]; // [Hub!]!
     id: number; // Int!
-    lastName: string; // String!
+    lastName: string | null; // String
+  }
+  Viewer: { // field return type
+    hubs: NexusGenRootTypes['Hub'][]; // [Hub!]!
+    user: NexusGenRootTypes['User']; // User!
   }
 }
 
@@ -264,26 +298,31 @@ export interface NexusGenFieldTypeNames {
   }
   Hub: { // field return type name
     batteryLevel: 'Int'
+    createdAt: 'DateTime'
     id: 'Int'
     isCharging: 'Boolean'
     owner: 'User'
+    sensors: 'Sensor'
     serial: 'String'
   }
   Mutation: { // field return type name
     createOneEvent: 'Event'
     createOneHub: 'Hub'
     createOneSensor: 'Sensor'
-    createOneUser: 'User'
+    loginWithPassword: 'String'
+    registerWithPassword: 'String'
     sendNotification: 'Boolean'
+    updateUser: 'User'
   }
   Query: { // field return type name
-    user: 'User'
+    viewer: 'Viewer'
   }
   Sensor: { // field return type name
     batteryLevel: 'Int'
     doorColumn: 'Int'
     doorRow: 'Int'
     events: 'Event'
+    hub: 'Hub'
     id: 'Int'
     isArmed: 'Boolean'
     isConnected: 'Boolean'
@@ -291,15 +330,28 @@ export interface NexusGenFieldTypeNames {
     serial: 'String'
   }
   User: { // field return type name
+    displayName: 'String'
     email: 'String'
     firstName: 'String'
     hubs: 'Hub'
     id: 'Int'
     lastName: 'String'
   }
+  Viewer: { // field return type name
+    hubs: 'Hub'
+    user: 'User'
+  }
 }
 
 export interface NexusGenArgTypes {
+  Hub: {
+    sensors: { // args
+      after?: NexusGenInputs['SensorWhereUniqueInput'] | null; // SensorWhereUniqueInput
+      before?: NexusGenInputs['SensorWhereUniqueInput'] | null; // SensorWhereUniqueInput
+      first?: number | null; // Int
+      last?: number | null; // Int
+    }
+  }
   Mutation: {
     createOneEvent: { // args
       data: NexusGenInputs['EventCreateInput']; // EventCreateInput!
@@ -310,13 +362,19 @@ export interface NexusGenArgTypes {
     createOneSensor: { // args
       data: NexusGenInputs['SensorCreateInput']; // SensorCreateInput!
     }
-    createOneUser: { // args
-      data: NexusGenInputs['UserCreateInput']; // UserCreateInput!
+    loginWithPassword: { // args
+      email: string; // String!
+      password: string; // String!
     }
-  }
-  Query: {
-    user: { // args
-      where: NexusGenInputs['UserWhereUniqueInput']; // UserWhereUniqueInput!
+    registerWithPassword: { // args
+      email: string; // String!
+      firstName?: string | null; // String
+      lastName?: string | null; // String
+      password: string; // String!
+    }
+    updateUser: { // args
+      firstName?: string | null; // String
+      lastName?: string | null; // String
     }
   }
   Sensor: {
