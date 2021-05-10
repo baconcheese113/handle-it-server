@@ -9,7 +9,8 @@
   "scripts": {
     "start": "node dist",
     "dev": "env-cmd ts-node-dev --transpile-only --no-notify index.ts",
-    "push-db-prod": "env-cmd -f ./.env.production prisma db push --preview-feature",
+    "push-db-prod": "env-cmd -f ./.env.production prisma db push",
+    "migrate-reset-prod": "env-cmd -f ./.env.production prisma migrate reset",
     "build": "npm -s run generate && tsc",
     "generate": "npm -s run generate:prisma && npm -s run generate:nexus",
     "generate:prisma": "npx prisma generate",
