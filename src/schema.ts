@@ -2,7 +2,6 @@ import { makeSchema, mutationType, queryType } from "nexus"
 import path from 'path'
 import { nexusPrisma } from "nexus-plugin-prisma"
 import * as admin from 'firebase-admin'
-import * as serviceAccount from '../serviceAccountKey.json'
 import { IContext } from "./context"
 import bcrypt from 'bcrypt'
 import { AuthenticationError } from "apollo-server-errors"
@@ -16,9 +15,9 @@ import eventGraphType from "./resolvers/query/eventGraphType"
 
 admin.initializeApp({
     credential: admin.credential.cert({
-        projectId: serviceAccount.project_id,
-        clientEmail: serviceAccount.client_email,
-        privateKey: serviceAccount.private_key    
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY,    
     })
 })
 const rootDir = __dirname || process.cwd()
@@ -79,16 +78,17 @@ const schema = makeSchema({
                     type: 'String',
                     args: { 
                         email: GraphQLNonNull(GraphQLString),
-                        password: GraphQLNonNull(GraphQLString), 
+                        password: GraphQLNonNull(GraphQLString),
+                        fcmToken: GraphQLNonNull(GraphQLString),
                         firstName: GraphQLString,
-                        lastName: GraphQLString 
+                        lastName: GraphQLString,
                     },
                     async resolve(_root, args, { prisma, user }: IContext) {
                         if(user) return jwt.sign(user.id.toString(), process.env.JWT_SECRET!);
-                        const { email, password, firstName, lastName } = args
+                        const { email, password, firstName, lastName, fcmToken } = args
                         const hashedPassword = await bcrypt.hash(password, 10)
                         console.log('hashedPassword', hashedPassword)
-                        const newUser = await prisma.user.create({ data: { email, firstName, lastName, password }})
+                        const newUser = await prisma.user.create({ data: { email, firstName, lastName, password: hashedPassword, fcmToken }})
 
                         return jwt.sign(newUser.id.toString(), process.env.JWT_SECRET!)
                     }
@@ -98,15 +98,17 @@ const schema = makeSchema({
                     args: { 
                         email: GraphQLNonNull(GraphQLString),
                         password: GraphQLNonNull(GraphQLString),
+                        fcmToken: GraphQLNonNull(GraphQLString),
                     },
                     async resolve(_root, args, { prisma, user }: IContext) {
                         if(user) return jwt.sign(user.id.toString(), process.env.JWT_SECRET!);
-                        const { email, password } = args
+                        const { email, password, fcmToken } = args
                         const hashedPassword = await bcrypt.hash(password, 10)
                         console.log('hashedPassword', hashedPassword)
-                        const foundUser = await prisma.user.findFirst({ where: { email, password }})
-
+                        const foundUser = await prisma.user.findFirst({ where: { AND: [ {email}, {password: hashedPassword} ]}})
                         if (!foundUser) throw new AuthenticationError('Unable to login')
+                        await prisma.user.update({ where: { email }, data: { fcmToken }})
+
                         return jwt.sign(foundUser.id.toString(), process.env.JWT_SECRET!)
                     }
                 })

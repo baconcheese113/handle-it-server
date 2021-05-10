@@ -171,6 +171,7 @@ export interface NexusGenInputs {
   UserCreateWithoutHubsInput: { // input type
     createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
     email: string; // String!
+    fcmToken: string; // String!
     firstName?: string | null; // String
     lastName?: string | null; // String
     password: string; // String!
@@ -364,10 +365,12 @@ export interface NexusGenArgTypes {
     }
     loginWithPassword: { // args
       email: string; // String!
+      fcmToken: string; // String!
       password: string; // String!
     }
     registerWithPassword: { // args
       email: string; // String!
+      fcmToken: string; // String!
       firstName?: string | null; // String
       lastName?: string | null; // String
       password: string; // String!

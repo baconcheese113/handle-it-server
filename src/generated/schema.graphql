@@ -100,8 +100,8 @@ type Mutation {
   createOneEvent(data: EventCreateInput!): Event!
   createOneHub(data: HubCreateInput!): Hub!
   createOneSensor(data: SensorCreateInput!): Sensor!
-  loginWithPassword(email: String!, password: String!): String
-  registerWithPassword(email: String!, firstName: String, lastName: String, password: String!): String
+  loginWithPassword(email: String!, fcmToken: String!, password: String!): String
+  registerWithPassword(email: String!, fcmToken: String!, firstName: String, lastName: String, password: String!): String
   sendNotification: Boolean
   updateUser(firstName: String, lastName: String): User
 }
@@ -232,6 +232,7 @@ input UserCreateOrConnectWithoutHubsInput {
 input UserCreateWithoutHubsInput {
   createdAt: DateTime
   email: String!
+  fcmToken: String!
   firstName: String
   lastName: String
   password: String!

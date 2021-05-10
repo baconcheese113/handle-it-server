@@ -16,6 +16,7 @@ model User {
   updatedAt DateTime @default(now())
   email     String   @unique
   password  String
+  fcmToken  String
   firstName String?  @db.VarChar(255)
   lastName  String?  @db.VarChar(255)
   hubs      Hub[]
