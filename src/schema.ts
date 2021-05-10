@@ -84,7 +84,7 @@ const schema = makeSchema({
                         lastName: GraphQLString 
                     },
                     async resolve(_root, args, { prisma, user }: IContext) {
-                        if(user) return user
+                        if(user) return jwt.sign(user.id.toString(), process.env.JWT_SECRET!);
                         const { email, password, firstName, lastName } = args
                         const hashedPassword = await bcrypt.hash(password, 10)
                         console.log('hashedPassword', hashedPassword)
@@ -100,7 +100,7 @@ const schema = makeSchema({
                         password: GraphQLNonNull(GraphQLString),
                     },
                     async resolve(_root, args, { prisma, user }: IContext) {
-                        if(user) return user
+                        if(user) return jwt.sign(user.id.toString(), process.env.JWT_SECRET!);
                         const { email, password } = args
                         const hashedPassword = await bcrypt.hash(password, 10)
                         console.log('hashedPassword', hashedPassword)
