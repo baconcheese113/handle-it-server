@@ -106,7 +106,7 @@ const schema = makeSchema({
                         const hashedPassword = await bcrypt.hash(password, 10)
                         console.log('hashedPassword', hashedPassword)
                         const foundUser = await prisma.user.findFirst({ where: { AND: [ {email}, {password: hashedPassword} ]}})
-                        if (!foundUser) throw new AuthenticationError('Unable to login')
+                        if (!foundUser) throw new AuthenticationError('User not found, unable to login')
                         await prisma.user.update({ where: { email }, data: { fcmToken }})
 
                         return jwt.sign(foundUser.id.toString(), process.env.JWT_SECRET!)
