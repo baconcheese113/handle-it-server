@@ -121,7 +121,7 @@ type Sensor {
   batteryLevel: Int
   doorColumn: Int!
   doorRow: Int!
-  events(after: EventWhereUniqueInput, before: EventWhereUniqueInput, first: Int, last: Int): [Event!]!
+  events(after: EventWhereUniqueInput, before: EventWhereUniqueInput, first: Int, last: Int, orderBy: [SensorEventsOrderByInput!]): [Event!]!
   hub: Hub!
   id: Int!
   isArmed: Boolean!
@@ -211,9 +211,18 @@ input SensorCreateWithoutHubInput {
   updatedAt: DateTime
 }
 
+input SensorEventsOrderByInput {
+  time: SortOrder
+}
+
 input SensorWhereUniqueInput {
   id: Int
   serial: String
+}
+
+enum SortOrder {
+  asc
+  desc
 }
 
 type User {

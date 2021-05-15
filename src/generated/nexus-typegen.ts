@@ -157,6 +157,9 @@ export interface NexusGenInputs {
     serial: string; // String!
     updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
   }
+  SensorEventsOrderByInput: { // input type
+    time?: NexusGenEnums['SortOrder'] | null; // SortOrder
+  }
   SensorWhereUniqueInput: { // input type
     id?: number | null; // Int
     serial?: string | null; // String
@@ -186,6 +189,7 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
+  SortOrder: "asc" | "desc"
 }
 
 export interface NexusGenScalars {
@@ -239,7 +243,7 @@ export interface NexusGenUnions {
 
 export type NexusGenRootTypes = NexusGenObjects
 
-export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
+export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars & NexusGenEnums
 
 export interface NexusGenFieldTypes {
   Event: { // field return type
@@ -397,6 +401,7 @@ export interface NexusGenArgTypes {
       before?: NexusGenInputs['EventWhereUniqueInput'] | null; // EventWhereUniqueInput
       first?: number | null; // Int
       last?: number | null; // Int
+      orderBy?: NexusGenInputs['SensorEventsOrderByInput'][] | null; // [SensorEventsOrderByInput!]
     }
   }
   User: {
@@ -419,7 +424,7 @@ export type NexusGenObjectNames = keyof NexusGenObjects;
 
 export type NexusGenInputNames = keyof NexusGenInputs;
 
-export type NexusGenEnumNames = never;
+export type NexusGenEnumNames = keyof NexusGenEnums;
 
 export type NexusGenInterfaceNames = never;
 
