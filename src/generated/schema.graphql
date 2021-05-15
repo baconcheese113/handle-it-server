@@ -56,6 +56,7 @@ type Hub {
   createdAt: DateTime!
   id: Int!
   isCharging: Boolean
+  name: String!
   owner: User!
   sensors(after: SensorWhereUniqueInput, before: SensorWhereUniqueInput, first: Int, last: Int): [Sensor!]!
   serial: String!
@@ -65,6 +66,7 @@ input HubCreateInput {
   batteryLevel: Int
   createdAt: DateTime
   isCharging: Boolean
+  name: String!
   owner: UserCreateNestedOneWithoutHubsInput!
   sensors: SensorCreateNestedManyWithoutHubInput
   serial: String!
@@ -86,6 +88,7 @@ input HubCreateWithoutSensorsInput {
   batteryLevel: Int
   createdAt: DateTime
   isCharging: Boolean
+  name: String!
   owner: UserCreateNestedOneWithoutHubsInput!
   serial: String!
   updatedAt: DateTime

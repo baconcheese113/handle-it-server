@@ -57,6 +57,7 @@ export interface NexusGenInputs {
     batteryLevel?: number | null; // Int
     createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
     isCharging?: boolean | null; // Boolean
+    name: string; // String!
     owner: NexusGenInputs['UserCreateNestedOneWithoutHubsInput']; // UserCreateNestedOneWithoutHubsInput!
     sensors?: NexusGenInputs['SensorCreateNestedManyWithoutHubInput'] | null; // SensorCreateNestedManyWithoutHubInput
     serial: string; // String!
@@ -75,6 +76,7 @@ export interface NexusGenInputs {
     batteryLevel?: number | null; // Int
     createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
     isCharging?: boolean | null; // Boolean
+    name: string; // String!
     owner: NexusGenInputs['UserCreateNestedOneWithoutHubsInput']; // UserCreateNestedOneWithoutHubsInput!
     serial: string; // String!
     updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
@@ -205,6 +207,7 @@ export interface NexusGenObjects {
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     id: number; // Int!
     isCharging?: boolean | null; // Boolean
+    name: string; // String!
     serial: string; // String!
   }
   Mutation: {};
@@ -249,6 +252,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     id: number; // Int!
     isCharging: boolean | null; // Boolean
+    name: string; // String!
     owner: NexusGenRootTypes['User']; // User!
     sensors: NexusGenRootTypes['Sensor'][]; // [Sensor!]!
     serial: string; // String!
@@ -302,6 +306,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: 'DateTime'
     id: 'Int'
     isCharging: 'Boolean'
+    name: 'String'
     owner: 'User'
     sensors: 'Sensor'
     serial: 'String'

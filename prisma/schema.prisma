@@ -26,6 +26,7 @@ model Hub {
   id           Int      @id @default(autoincrement())
   createdAt    DateTime @default(now())
   updatedAt    DateTime @default(now())
+  name         String
   serial       String   @unique
   batteryLevel Int?
   isCharging   Boolean?
