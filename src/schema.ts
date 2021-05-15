@@ -6,7 +6,8 @@ import { IContext } from "./context"
 import bcrypt from 'bcrypt'
 import { AuthenticationError } from "apollo-server-errors"
 import jwt from 'jsonwebtoken'
-import { GraphQLNonNull, GraphQLString } from "graphql"
+import { GraphQLID, GraphQLNonNull, GraphQLString } from "graphql"
+import { GraphQLDateTime } from 'graphql-iso-date'
 import viewerGraphField from "./resolvers/query/viewerGraphType"
 import hubGraphType from "./resolvers/query/hubGraphType"
 import userGraphType from "./resolvers/query/userGraphType"
@@ -112,6 +113,37 @@ const schema = makeSchema({
                         await prisma.user.update({ where: { email }, data: { fcmToken }})
 
                         return jwt.sign(foundUser.id.toString(), process.env.JWT_SECRET!)
+                    }
+                })
+                t.field('createEvent', {
+                    type: "Event",
+                    args: {
+                        time: GraphQLNonNull(GraphQLDateTime),
+                        sensorId: GraphQLNonNull(GraphQLID),
+                    },
+                    async resolve(_root, args, { prisma, user }: IContext) {
+                        if(!user) throw new AuthenticationError("User does not have access")
+                        const { time } = args
+                        const sensorId = Number.parseInt(args.sensorId)
+                        const sensor = await prisma.sensor.findFirst({ where: { id: sensorId }, include: { hub: true }})
+                        if(!sensor) throw new Error("Sensor not found")
+                        if(user.id !== sensor.hub.ownerId) throw new Error("User does not have access to sensor")
+
+                        try{
+                            const msgId = await admin.messaging().send({
+                                data: {
+                                    type: 'alert',
+                                },
+                                android: {
+                                    priority: 'high',
+                                },
+                                token: user.fcmToken
+                            })
+                            console.log('Successfully sent message: ', msgId)
+                        } catch (err) {
+                            console.log('Error sending message: ', err)
+                        }
+                        return await prisma.event.create({ data: { time, sensorId }})
                     }
                 })
             }

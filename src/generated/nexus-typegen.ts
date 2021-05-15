@@ -258,6 +258,7 @@ export interface NexusGenFieldTypes {
     serial: string; // String!
   }
   Mutation: { // field return type
+    createEvent: NexusGenRootTypes['Event'] | null; // Event
     createOneEvent: NexusGenRootTypes['Event']; // Event!
     createOneHub: NexusGenRootTypes['Hub']; // Hub!
     createOneSensor: NexusGenRootTypes['Sensor']; // Sensor!
@@ -312,6 +313,7 @@ export interface NexusGenFieldTypeNames {
     serial: 'String'
   }
   Mutation: { // field return type name
+    createEvent: 'Event'
     createOneEvent: 'Event'
     createOneHub: 'Hub'
     createOneSensor: 'Sensor'
@@ -359,6 +361,10 @@ export interface NexusGenArgTypes {
     }
   }
   Mutation: {
+    createEvent: { // args
+      sensorId: string; // ID!
+      time: NexusGenScalars['DateTime']; // DateTime!
+    }
     createOneEvent: { // args
       data: NexusGenInputs['EventCreateInput']; // EventCreateInput!
     }
