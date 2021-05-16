@@ -266,6 +266,7 @@ export interface NexusGenFieldTypes {
     createOneEvent: NexusGenRootTypes['Event']; // Event!
     createOneHub: NexusGenRootTypes['Hub']; // Hub!
     createOneSensor: NexusGenRootTypes['Sensor']; // Sensor!
+    deleteOneHub: NexusGenRootTypes['Hub'] | null; // Hub
     loginWithPassword: string | null; // String
     registerWithPassword: string | null; // String
     sendNotification: boolean | null; // Boolean
@@ -321,6 +322,7 @@ export interface NexusGenFieldTypeNames {
     createOneEvent: 'Event'
     createOneHub: 'Hub'
     createOneSensor: 'Sensor'
+    deleteOneHub: 'Hub'
     loginWithPassword: 'String'
     registerWithPassword: 'String'
     sendNotification: 'Boolean'
@@ -377,6 +379,9 @@ export interface NexusGenArgTypes {
     }
     createOneSensor: { // args
       data: NexusGenInputs['SensorCreateInput']; // SensorCreateInput!
+    }
+    deleteOneHub: { // args
+      where: NexusGenInputs['HubWhereUniqueInput']; // HubWhereUniqueInput!
     }
     loginWithPassword: { // args
       email: string; // String!

@@ -38,7 +38,9 @@ const schema = makeSchema({
         }),
         mutationType({
             definition(t) {
+                // TODO extend resolvers to check that user has permissions for crud event
                 t.crud.createOneHub()
+                t.crud.deleteOneHub()
                 t.crud.createOneSensor()
                 t.crud.createOneEvent()
                 t.field('updateUser', {

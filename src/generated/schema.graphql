@@ -107,6 +107,7 @@ type Mutation {
   createOneEvent(data: EventCreateInput!): Event!
   createOneHub(data: HubCreateInput!): Hub!
   createOneSensor(data: SensorCreateInput!): Sensor!
+  deleteOneHub(where: HubWhereUniqueInput!): Hub
   loginWithPassword(email: String!, fcmToken: String!, password: String!): String
   registerWithPassword(email: String!, fcmToken: String!, firstName: String, lastName: String, password: String!): String
   sendNotification: Boolean
