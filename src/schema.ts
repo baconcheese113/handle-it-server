@@ -87,13 +87,13 @@ const schema = makeSchema({
                         lastName: GraphQLString,
                     },
                     async resolve(_root, args, { prisma, user }: IContext) {
-                        if(user) return jwt.sign(user.id.toString(), process.env.JWT_SECRET!);
+                        if(user) return jwt.sign(`User:${user.id}`, process.env.JWT_SECRET!);
                         const { email, password, firstName, lastName, fcmToken } = args
                         const hashedPassword = await bcrypt.hash(password, 10)
                         console.log('hashedPassword', hashedPassword)
                         const newUser = await prisma.user.create({ data: { email, firstName, lastName, password: hashedPassword, fcmToken }})
 
-                        return jwt.sign(newUser.id.toString(), process.env.JWT_SECRET!)
+                        return jwt.sign(`User:${newUser.id}`, process.env.JWT_SECRET!)
                     }
                 }),
                 t.field('loginWithPassword', {
@@ -104,7 +104,7 @@ const schema = makeSchema({
                         fcmToken: GraphQLNonNull(GraphQLString),
                     },
                     async resolve(_root, args, { prisma, user }: IContext) {
-                        if(user) return jwt.sign(user.id.toString(), process.env.JWT_SECRET!);
+                        if(user) return jwt.sign(`User:${user.id}`, process.env.JWT_SECRET!);
                         const { email, password, fcmToken } = args
                         const hashedPassword = await bcrypt.hash(password, 10)
                         console.log('hashedPassword', hashedPassword)
@@ -114,7 +114,7 @@ const schema = makeSchema({
                         if (!isCorrectPwd) throw new AuthenticationError('Password incorrect, unable to login')
                         await prisma.user.update({ where: { email }, data: { fcmToken }})
 
-                        return jwt.sign(foundUser.id.toString(), process.env.JWT_SECRET!)
+                        return jwt.sign(`User:${foundUser.id}`, process.env.JWT_SECRET!)
                     }
                 })
                 t.field('createEvent', {
@@ -145,7 +145,24 @@ const schema = makeSchema({
                         } catch (err) {
                             console.log('Error sending message: ', err)
                         }
-                        return await prisma.event.create({ data: { time, sensorId }})
+                t.field('loginAsHub', {
+                    type: 'String',
+                    args: { 
+                        userId: GraphQLNonNull(GraphQLID),
+                        serial: GraphQLNonNull(GraphQLString),
+                    },
+                    async resolve(_root, args, { prisma, hub }: IContext) {
+                        if(hub) return jwt.sign(`Hub:${hub.id}`, process.env.JWT_SECRET!)
+                        const { serial } = args
+                        const userId = Number.parseInt(args.userId)
+                        if(!Number.isFinite(userId)) throw new Error("Invalid userId")
+                        const connectedUser = await prisma.user.findFirst({ where: { id: userId }})
+                        if(!connectedUser) throw new Error("User does not exist")
+                        const serialHub = await prisma.hub.findFirst({ where: { serial }})
+                        // if(serialHub) throw new Error("Hub already registered")
+                        // if(listOfValidSerials.contains(serial)) throw new Error("Invalid serial")
+                        const connectedHub = serialHub || await prisma.hub.create({ data: { name: "TempName", serial, ownerId: userId }})
+                        return jwt.sign(`Hub:${connectedHub.id}`, process.env.JWT_SECRET!)
                     }
                 })
             }
