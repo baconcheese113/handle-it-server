@@ -145,6 +145,9 @@ const schema = makeSchema({
                         } catch (err) {
                             console.log('Error sending message: ', err)
                         }
+                        return await prisma.event.create({ data: { sensorId }})
+                    }
+                })
                 t.field('loginAsHub', {
                     type: 'String',
                     args: { 
