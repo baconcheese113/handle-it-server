@@ -22,13 +22,11 @@ export interface NexusGenInputs {
   EventCreateInput: { // input type
     createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
     sensor: NexusGenInputs['SensorCreateNestedOneWithoutEventsInput']; // SensorCreateNestedOneWithoutEventsInput!
-    time?: NexusGenScalars['DateTime'] | null; // DateTime
     updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
   }
   EventCreateManySensorInput: { // input type
     createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
     id?: number | null; // Int
-    time?: NexusGenScalars['DateTime'] | null; // DateTime
     updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
   }
   EventCreateManySensorInputEnvelope: { // input type
@@ -47,7 +45,6 @@ export interface NexusGenInputs {
   }
   EventCreateWithoutSensorInput: { // input type
     createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
-    time?: NexusGenScalars['DateTime'] | null; // DateTime
     updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
   }
   EventWhereUniqueInput: { // input type
@@ -158,7 +155,7 @@ export interface NexusGenInputs {
     updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
   }
   SensorEventsOrderByInput: { // input type
-    time?: NexusGenEnums['SortOrder'] | null; // SortOrder
+    createdAt?: NexusGenEnums['SortOrder'] | null; // SortOrder
   }
   SensorWhereUniqueInput: { // input type
     id?: number | null; // Int
@@ -203,8 +200,8 @@ export interface NexusGenScalars {
 
 export interface NexusGenObjects {
   Event: { // root type
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
     id: number; // Int!
-    time: NexusGenScalars['DateTime']; // DateTime!
   }
   Hub: { // root type
     batteryLevel?: number | null; // Int
@@ -247,9 +244,9 @@ export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars & NexusGenEnu
 
 export interface NexusGenFieldTypes {
   Event: { // field return type
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
     id: number; // Int!
     sensor: NexusGenRootTypes['Sensor']; // Sensor!
-    time: NexusGenScalars['DateTime']; // DateTime!
   }
   Hub: { // field return type
     batteryLevel: number | null; // Int
@@ -304,9 +301,9 @@ export interface NexusGenFieldTypes {
 
 export interface NexusGenFieldTypeNames {
   Event: { // field return type name
+    createdAt: 'DateTime'
     id: 'Int'
     sensor: 'Sensor'
-    time: 'DateTime'
   }
   Hub: { // field return type name
     batteryLevel: 'Int'
@@ -371,7 +368,6 @@ export interface NexusGenArgTypes {
   Mutation: {
     createEvent: { // args
       sensorId: string; // ID!
-      time: NexusGenScalars['DateTime']; // DateTime!
     }
     createOneEvent: { // args
       data: NexusGenInputs['EventCreateInput']; // EventCreateInput!

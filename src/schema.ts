@@ -120,16 +120,17 @@ const schema = makeSchema({
                 t.field('createEvent', {
                     type: "Event",
                     args: {
-                        time: GraphQLNonNull(GraphQLDateTime),
                         sensorId: GraphQLNonNull(GraphQLID),
                     },
-                    async resolve(_root, args, { prisma, user }: IContext) {
-                        if(!user) throw new AuthenticationError("User does not have access")
-                        const { time } = args
+                    async resolve(_root, args, { prisma, hub }: IContext) {
+                        if(!hub) throw new AuthenticationError("Hub does not have access")
                         const sensorId = Number.parseInt(args.sensorId)
                         const sensor = await prisma.sensor.findFirst({ where: { id: sensorId }, include: { hub: true }})
                         if(!sensor) throw new Error("Sensor not found")
-                        if(user.id !== sensor.hub.ownerId) throw new Error("User does not have access to sensor")
+                        console.log(`hub.id ${hub.id} and sensor.hub.id ${sensor.hubId}`)
+                        if(hub.id !== sensor.hubId) throw new Error("Hub does not have access to sensor")
+                        const owner = await prisma.user.findFirst({ where: { id: sensor.hub.ownerId }})
+                        if(!owner) throw new Error("No owner found for hub")
 
                         try{
                             const msgId = await admin.messaging().send({
@@ -139,7 +140,7 @@ const schema = makeSchema({
                                 android: {
                                     priority: 'high',
                                 },
-                                token: user.fcmToken
+                                token: owner.fcmToken
                             })
                             console.log('Successfully sent message: ', msgId)
                         } catch (err) {

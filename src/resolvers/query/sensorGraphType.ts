@@ -12,6 +12,6 @@ export default objectType({
         t.model.doorColumn()
         t.model.doorRow()
         t.model.hub()
-        t.model.events({ordering: { time: true } })
+        t.model.events({ordering: { createdAt: true } })
     }
 })
