@@ -1,12 +1,12 @@
-import { makeSchema, mutationType, queryType } from "nexus"
-import path from 'path'
+import { makeSchema, mutationType, queryType, subscriptionType } from "nexus"
+import path, { resolve } from 'path'
 import { nexusPrisma } from "nexus-plugin-prisma"
 import * as admin from 'firebase-admin'
-import { IContext } from "./context"
+import { IAuthContext, IContext } from "./context"
 import bcrypt from 'bcrypt'
-import { AuthenticationError } from "apollo-server-errors"
+import { AuthenticationError, UserInputError } from "apollo-server-errors"
 import jwt from 'jsonwebtoken'
-import { GraphQLID, GraphQLNonNull, GraphQLString } from "graphql"
+import { GraphQLBoolean, GraphQLID, GraphQLInt, GraphQLNonNull, GraphQLString } from "graphql"
 import { GraphQLDateTime } from 'graphql-iso-date'
 import viewerGraphField from "./resolvers/query/viewerGraphType"
 import hubGraphType from "./resolvers/query/hubGraphType"
@@ -32,6 +32,13 @@ const schema = makeSchema({
                     resolve(_root, _args, { user }: IContext) {
                         if(!user) throw new AuthenticationError("User does not have permission")
                         return user
+                    }
+                })
+                t.nonNull.field('hubViewer', {
+                    type: hubGraphType,
+                    resolve(_root, _args, { hub }: IContext) {
+                        if (!hub) throw new AuthenticationError("Hub does not have permission")
+                        return hub
                     }
                 })
             }
@@ -167,6 +174,59 @@ const schema = makeSchema({
                         // if(listOfValidSerials.contains(serial)) throw new Error("Invalid serial")
                         const connectedHub = serialHub || await prisma.hub.create({ data: { name: "TempName", serial, ownerId: userId }})
                         return jwt.sign(`Hub:${connectedHub.id}`, process.env.JWT_SECRET!)
+                    }
+                })
+                t.field('updateHub', {
+                    type: "Hub",
+                    args: {
+                        id: GraphQLID,
+                        name: GraphQLString,
+                        batteryLevel: GraphQLInt,
+                        isCharging: GraphQLBoolean
+                    },
+                    async resolve(_root, args, { prisma, hub, user }: IContext) {
+                        if(!hub && !user) throw new AuthenticationError("No access")
+                        const { id, ...data } = args
+                        const hubId = Number.parseInt(args.id);
+                        const hubToUpdate = hub || await prisma.hub.findFirst({ where: { id: hubId, ownerId: user?.id }})
+                        if(!hubToUpdate) throw new UserInputError("Hub doesn't exist")
+                        return prisma.hub.update({ where: { id: hubToUpdate.id }, data })
+                    }
+                })
+                t.field('createSensor', {
+                    type: "Sensor",
+                    args: {
+                        doorColumn: GraphQLNonNull(GraphQLInt),
+                        doorRow: GraphQLNonNull(GraphQLInt),
+                        serial: GraphQLNonNull(GraphQLID),
+                        isArmed: GraphQLBoolean,
+                        isConnected: GraphQLBoolean,
+                        isOpen: GraphQLBoolean,
+                        batteryLevel: GraphQLInt,
+                    },
+                    async resolve(_root, args, { prisma, hub }: IContext) {
+                        if(!hub) throw new AuthenticationError("Hub does not have access")
+                        const { isArmed, isConnected, isOpen, ...otherArgs } = args
+                        const serialSensor = await prisma.sensor.findFirst({ where: { serial: args.serial }})
+                        // if(serialSensor) throw new UserInputError("Sensor already added")
+                        return prisma.sensor.upsert({ 
+                            create: { 
+                                hubId: hub.id,
+                                isArmed: !!isArmed, 
+                                isConnected: !!isConnected,
+                                isOpen: !!isOpen,
+                                ...otherArgs
+                            },
+                            update: {
+                                isArmed: !!isArmed, 
+                                isConnected: !!isConnected,
+                                isOpen: !!isOpen,
+                                ...otherArgs
+                            },
+                            where: {
+                                id: serialSensor?.id,
+                            }
+                        })
                     }
                 })
             }

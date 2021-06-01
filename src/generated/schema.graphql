@@ -101,15 +101,18 @@ type Mutation {
   createOneEvent(data: EventCreateInput!): Event!
   createOneHub(data: HubCreateInput!): Hub!
   createOneSensor(data: SensorCreateInput!): Sensor!
+  createSensor(batteryLevel: Int, doorColumn: Int!, doorRow: Int!, isArmed: Boolean, isConnected: Boolean, isOpen: Boolean, serial: ID!): Sensor
   deleteOneHub(where: HubWhereUniqueInput!): Hub
   loginAsHub(serial: String!, userId: ID!): String
   loginWithPassword(email: String!, fcmToken: String!, password: String!): String
   registerWithPassword(email: String!, fcmToken: String!, firstName: String, lastName: String, password: String!): String
   sendNotification: Boolean
+  updateHub(batteryLevel: Int, id: ID, isCharging: Boolean, name: String): Hub
   updateUser(firstName: String, lastName: String): User
 }
 
 type Query {
+  hubViewer: Hub!
   viewer: Viewer!
 }
 

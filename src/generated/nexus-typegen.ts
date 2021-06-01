@@ -263,14 +263,17 @@ export interface NexusGenFieldTypes {
     createOneEvent: NexusGenRootTypes['Event']; // Event!
     createOneHub: NexusGenRootTypes['Hub']; // Hub!
     createOneSensor: NexusGenRootTypes['Sensor']; // Sensor!
+    createSensor: NexusGenRootTypes['Sensor'] | null; // Sensor
     deleteOneHub: NexusGenRootTypes['Hub'] | null; // Hub
     loginAsHub: string | null; // String
     loginWithPassword: string | null; // String
     registerWithPassword: string | null; // String
     sendNotification: boolean | null; // Boolean
+    updateHub: NexusGenRootTypes['Hub'] | null; // Hub
     updateUser: NexusGenRootTypes['User'] | null; // User
   }
   Query: { // field return type
+    hubViewer: NexusGenRootTypes['Hub']; // Hub!
     viewer: NexusGenRootTypes['Viewer']; // Viewer!
   }
   Sensor: { // field return type
@@ -320,14 +323,17 @@ export interface NexusGenFieldTypeNames {
     createOneEvent: 'Event'
     createOneHub: 'Hub'
     createOneSensor: 'Sensor'
+    createSensor: 'Sensor'
     deleteOneHub: 'Hub'
     loginAsHub: 'String'
     loginWithPassword: 'String'
     registerWithPassword: 'String'
     sendNotification: 'Boolean'
+    updateHub: 'Hub'
     updateUser: 'User'
   }
   Query: { // field return type name
+    hubViewer: 'Hub'
     viewer: 'Viewer'
   }
   Sensor: { // field return type name
@@ -378,6 +384,15 @@ export interface NexusGenArgTypes {
     createOneSensor: { // args
       data: NexusGenInputs['SensorCreateInput']; // SensorCreateInput!
     }
+    createSensor: { // args
+      batteryLevel?: number | null; // Int
+      doorColumn: number; // Int!
+      doorRow: number; // Int!
+      isArmed?: boolean | null; // Boolean
+      isConnected?: boolean | null; // Boolean
+      isOpen?: boolean | null; // Boolean
+      serial: string; // ID!
+    }
     deleteOneHub: { // args
       where: NexusGenInputs['HubWhereUniqueInput']; // HubWhereUniqueInput!
     }
@@ -396,6 +411,12 @@ export interface NexusGenArgTypes {
       firstName?: string | null; // String
       lastName?: string | null; // String
       password: string; // String!
+    }
+    updateHub: { // args
+      batteryLevel?: number | null; // Int
+      id?: string | null; // ID
+      isCharging?: boolean | null; // Boolean
+      name?: string | null; // String
     }
     updateUser: { // args
       firstName?: string | null; // String
