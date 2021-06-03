@@ -207,7 +207,7 @@ const schema = makeSchema({
                     async resolve(_root, args, { prisma, hub }: IContext) {
                         if(!hub) throw new AuthenticationError("Hub does not have access")
                         const { isArmed, isConnected, isOpen, ...otherArgs } = args
-                        const serialSensor = await prisma.sensor.findFirst({ where: { serial: args.serial }})
+                        // const serialSensor = await prisma.sensor.findFirst({ where: { serial: args.serial }})
                         // if(serialSensor) throw new UserInputError("Sensor already added")
                         return prisma.sensor.upsert({ 
                             create: { 
@@ -224,7 +224,7 @@ const schema = makeSchema({
                                 ...otherArgs
                             },
                             where: {
-                                id: serialSensor?.id,
+                                serial: args.serial,
                             }
                         })
                     }
