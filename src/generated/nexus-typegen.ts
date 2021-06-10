@@ -264,7 +264,7 @@ export interface NexusGenFieldTypes {
     createOneHub: NexusGenRootTypes['Hub']; // Hub!
     createOneSensor: NexusGenRootTypes['Sensor']; // Sensor!
     createSensor: NexusGenRootTypes['Sensor'] | null; // Sensor
-    deleteOneHub: NexusGenRootTypes['Hub'] | null; // Hub
+    deleteHub: NexusGenRootTypes['Hub'] | null; // Hub
     loginAsHub: string | null; // String
     loginWithPassword: string | null; // String
     registerWithPassword: string | null; // String
@@ -324,7 +324,7 @@ export interface NexusGenFieldTypeNames {
     createOneHub: 'Hub'
     createOneSensor: 'Sensor'
     createSensor: 'Sensor'
-    deleteOneHub: 'Hub'
+    deleteHub: 'Hub'
     loginAsHub: 'String'
     loginWithPassword: 'String'
     registerWithPassword: 'String'
@@ -393,8 +393,8 @@ export interface NexusGenArgTypes {
       isOpen?: boolean | null; // Boolean
       serial: string; // ID!
     }
-    deleteOneHub: { // args
-      where: NexusGenInputs['HubWhereUniqueInput']; // HubWhereUniqueInput!
+    deleteHub: { // args
+      id: string; // ID!
     }
     loginAsHub: { // args
       serial: string; // String!

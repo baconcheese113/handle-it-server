@@ -1,13 +1,12 @@
 import { makeSchema, mutationType, queryType, subscriptionType } from "nexus"
-import path, { resolve } from 'path'
+import path from 'path'
 import { nexusPrisma } from "nexus-plugin-prisma"
 import * as admin from 'firebase-admin'
-import { IAuthContext, IContext } from "./context"
+import { IContext } from "./context"
 import bcrypt from 'bcrypt'
-import { AuthenticationError, UserInputError } from "apollo-server-errors"
+import { AuthenticationError, ForbiddenError, UserInputError } from "apollo-server-errors"
 import jwt from 'jsonwebtoken'
 import { GraphQLBoolean, GraphQLID, GraphQLInt, GraphQLNonNull, GraphQLString } from "graphql"
-import { GraphQLDateTime } from 'graphql-iso-date'
 import viewerGraphField from "./resolvers/query/viewerGraphType"
 import hubGraphType from "./resolvers/query/hubGraphType"
 import userGraphType from "./resolvers/query/userGraphType"
@@ -47,7 +46,6 @@ const schema = makeSchema({
             definition(t) {
                 // TODO extend resolvers to check that user has permissions for crud event
                 t.crud.createOneHub()
-                t.crud.deleteOneHub()
                 t.crud.createOneSensor()
                 t.crud.createOneEvent()
                 t.field('updateUser', {
@@ -191,6 +189,27 @@ const schema = makeSchema({
                         const hubToUpdate = hub || await prisma.hub.findFirst({ where: { id: hubId, ownerId: user?.id }})
                         if(!hubToUpdate) throw new UserInputError("Hub doesn't exist")
                         return prisma.hub.update({ where: { id: hubToUpdate.id }, data })
+                    }
+                })
+                t.field('deleteHub', {
+                    type: "Hub",
+                    args: {
+                        id: GraphQLNonNull(GraphQLID)
+                    },
+                    async resolve(_root, args, { prisma, user }: IContext) {
+                        if(!user) throw new AuthenticationError("User does not have access")
+                        const id = Number.parseInt(args.id);
+                        const hubToDelete = await prisma.hub.findFirst({ where: { id }, include: { sensors: true }})
+                        if(!hubToDelete) throw new UserInputError("Hub doesn't exist")
+                        if(hubToDelete.ownerId !== user.id) throw new ForbiddenError("User does not have access")
+                        // Because Cascade delete doesn't appear to work correctly
+                        const sensorDels = hubToDelete.sensors.map(s => prisma.event.deleteMany({ where: { sensorId: s.id }}))
+                        const transactionRet = await prisma.$transaction([
+                            ...sensorDels,
+                            prisma.sensor.deleteMany({ where: { hubId: id }}),
+                            prisma.hub.delete({ where: { id }}),
+                        ])
+                        return transactionRet[transactionRet.length - 1]
                     }
                 })
                 t.field('createSensor', {
