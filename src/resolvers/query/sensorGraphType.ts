@@ -8,7 +8,6 @@ export default objectType({
         t.model.batteryLevel()
         t.model.isOpen()
         t.model.isConnected()
-        t.model.isArmed()
         t.model.doorColumn()
         t.model.doorRow()
         t.model.hub()

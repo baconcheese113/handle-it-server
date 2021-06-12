@@ -53,6 +53,7 @@ export interface NexusGenInputs {
   HubCreateInput: { // input type
     batteryLevel?: number | null; // Int
     createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
+    isArmed?: boolean | null; // Boolean
     isCharging?: boolean | null; // Boolean
     name: string; // String!
     owner: NexusGenInputs['UserCreateNestedOneWithoutHubsInput']; // UserCreateNestedOneWithoutHubsInput!
@@ -72,6 +73,7 @@ export interface NexusGenInputs {
   HubCreateWithoutSensorsInput: { // input type
     batteryLevel?: number | null; // Int
     createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
+    isArmed?: boolean | null; // Boolean
     isCharging?: boolean | null; // Boolean
     name: string; // String!
     owner: NexusGenInputs['UserCreateNestedOneWithoutHubsInput']; // UserCreateNestedOneWithoutHubsInput!
@@ -89,7 +91,6 @@ export interface NexusGenInputs {
     doorRow: number; // Int!
     events?: NexusGenInputs['EventCreateNestedManyWithoutSensorInput'] | null; // EventCreateNestedManyWithoutSensorInput
     hub: NexusGenInputs['HubCreateNestedOneWithoutSensorsInput']; // HubCreateNestedOneWithoutSensorsInput!
-    isArmed: boolean; // Boolean!
     isConnected: boolean; // Boolean!
     isOpen: boolean; // Boolean!
     serial: string; // String!
@@ -101,7 +102,6 @@ export interface NexusGenInputs {
     doorColumn: number; // Int!
     doorRow: number; // Int!
     id?: number | null; // Int
-    isArmed: boolean; // Boolean!
     isConnected: boolean; // Boolean!
     isOpen: boolean; // Boolean!
     serial: string; // String!
@@ -136,7 +136,6 @@ export interface NexusGenInputs {
     doorColumn: number; // Int!
     doorRow: number; // Int!
     hub: NexusGenInputs['HubCreateNestedOneWithoutSensorsInput']; // HubCreateNestedOneWithoutSensorsInput!
-    isArmed: boolean; // Boolean!
     isConnected: boolean; // Boolean!
     isOpen: boolean; // Boolean!
     serial: string; // String!
@@ -148,7 +147,6 @@ export interface NexusGenInputs {
     doorColumn: number; // Int!
     doorRow: number; // Int!
     events?: NexusGenInputs['EventCreateNestedManyWithoutSensorInput'] | null; // EventCreateNestedManyWithoutSensorInput
-    isArmed: boolean; // Boolean!
     isConnected: boolean; // Boolean!
     isOpen: boolean; // Boolean!
     serial: string; // String!
@@ -207,6 +205,7 @@ export interface NexusGenObjects {
     batteryLevel?: number | null; // Int
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     id: number; // Int!
+    isArmed: boolean; // Boolean!
     isCharging?: boolean | null; // Boolean
     name: string; // String!
     serial: string; // String!
@@ -218,7 +217,6 @@ export interface NexusGenObjects {
     doorColumn: number; // Int!
     doorRow: number; // Int!
     id: number; // Int!
-    isArmed: boolean; // Boolean!
     isConnected: boolean; // Boolean!
     isOpen: boolean; // Boolean!
     serial: string; // String!
@@ -252,6 +250,7 @@ export interface NexusGenFieldTypes {
     batteryLevel: number | null; // Int
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     id: number; // Int!
+    isArmed: boolean; // Boolean!
     isCharging: boolean | null; // Boolean
     name: string; // String!
     owner: NexusGenRootTypes['User']; // User!
@@ -270,6 +269,7 @@ export interface NexusGenFieldTypes {
     registerWithPassword: string | null; // String
     sendNotification: boolean | null; // Boolean
     updateHub: NexusGenRootTypes['Hub'] | null; // Hub
+    updateSensor: NexusGenRootTypes['Sensor'] | null; // Sensor
     updateUser: NexusGenRootTypes['User'] | null; // User
   }
   Query: { // field return type
@@ -283,7 +283,6 @@ export interface NexusGenFieldTypes {
     events: NexusGenRootTypes['Event'][]; // [Event!]!
     hub: NexusGenRootTypes['Hub']; // Hub!
     id: number; // Int!
-    isArmed: boolean; // Boolean!
     isConnected: boolean; // Boolean!
     isOpen: boolean; // Boolean!
     serial: string; // String!
@@ -312,6 +311,7 @@ export interface NexusGenFieldTypeNames {
     batteryLevel: 'Int'
     createdAt: 'DateTime'
     id: 'Int'
+    isArmed: 'Boolean'
     isCharging: 'Boolean'
     name: 'String'
     owner: 'User'
@@ -330,6 +330,7 @@ export interface NexusGenFieldTypeNames {
     registerWithPassword: 'String'
     sendNotification: 'Boolean'
     updateHub: 'Hub'
+    updateSensor: 'Sensor'
     updateUser: 'User'
   }
   Query: { // field return type name
@@ -343,7 +344,6 @@ export interface NexusGenFieldTypeNames {
     events: 'Event'
     hub: 'Hub'
     id: 'Int'
-    isArmed: 'Boolean'
     isConnected: 'Boolean'
     isOpen: 'Boolean'
     serial: 'String'
@@ -388,7 +388,6 @@ export interface NexusGenArgTypes {
       batteryLevel?: number | null; // Int
       doorColumn: number; // Int!
       doorRow: number; // Int!
-      isArmed?: boolean | null; // Boolean
       isConnected?: boolean | null; // Boolean
       isOpen?: boolean | null; // Boolean
       serial: string; // ID!
@@ -415,8 +414,13 @@ export interface NexusGenArgTypes {
     updateHub: { // args
       batteryLevel?: number | null; // Int
       id?: string | null; // ID
+      isArmed?: boolean | null; // Boolean
       isCharging?: boolean | null; // Boolean
       name?: string | null; // String
+    }
+    updateSensor: { // args
+      id: string; // ID!
+      isOpen?: boolean | null; // Boolean
     }
     updateUser: { // args
       firstName?: string | null; // String

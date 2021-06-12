@@ -180,12 +180,13 @@ const schema = makeSchema({
                         id: GraphQLID,
                         name: GraphQLString,
                         batteryLevel: GraphQLInt,
-                        isCharging: GraphQLBoolean
+                        isCharging: GraphQLBoolean,
+                        isArmed: GraphQLBoolean,
                     },
                     async resolve(_root, args, { prisma, hub, user }: IContext) {
                         if(!hub && !user) throw new AuthenticationError("No access")
                         const { id, ...data } = args
-                        const hubId = Number.parseInt(args.id);
+                        const hubId = Number.parseInt(id);
                         const hubToUpdate = hub || await prisma.hub.findFirst({ where: { id: hubId, ownerId: user?.id }})
                         if(!hubToUpdate) throw new UserInputError("Hub doesn't exist")
                         return prisma.hub.update({ where: { id: hubToUpdate.id }, data })
@@ -204,10 +205,11 @@ const schema = makeSchema({
                         if(hubToDelete.ownerId !== user.id) throw new ForbiddenError("User does not have access")
                         // Because Cascade delete doesn't appear to work correctly
                         const sensorDels = hubToDelete.sensors.map(s => prisma.event.deleteMany({ where: { sensorId: s.id }}))
+
                         const transactionRet = await prisma.$transaction([
                             ...sensorDels,
                             prisma.sensor.deleteMany({ where: { hubId: id }}),
-                            prisma.hub.delete({ where: { id }}),
+                            prisma.hub.delete({ where: { id }, include: { sensors: true }}),
                         ])
                         return transactionRet[transactionRet.length - 1]
                     }
@@ -218,26 +220,23 @@ const schema = makeSchema({
                         doorColumn: GraphQLNonNull(GraphQLInt),
                         doorRow: GraphQLNonNull(GraphQLInt),
                         serial: GraphQLNonNull(GraphQLID),
-                        isArmed: GraphQLBoolean,
                         isConnected: GraphQLBoolean,
                         isOpen: GraphQLBoolean,
                         batteryLevel: GraphQLInt,
                     },
                     async resolve(_root, args, { prisma, hub }: IContext) {
                         if(!hub) throw new AuthenticationError("Hub does not have access")
-                        const { isArmed, isConnected, isOpen, ...otherArgs } = args
+                        const { isConnected, isOpen, ...otherArgs } = args
                         // const serialSensor = await prisma.sensor.findFirst({ where: { serial: args.serial }})
                         // if(serialSensor) throw new UserInputError("Sensor already added")
                         return prisma.sensor.upsert({ 
                             create: { 
                                 hubId: hub.id,
-                                isArmed: !!isArmed, 
                                 isConnected: !!isConnected,
                                 isOpen: !!isOpen,
                                 ...otherArgs
                             },
                             update: {
-                                isArmed: !!isArmed, 
                                 isConnected: !!isConnected,
                                 isOpen: !!isOpen,
                                 ...otherArgs
@@ -246,6 +245,40 @@ const schema = makeSchema({
                                 serial: args.serial,
                             }
                         })
+                    }
+                })
+                t.field('updateSensor', {
+                    type: "Sensor",
+                    args: {
+                        id: GraphQLNonNull(GraphQLID),
+                        isOpen: GraphQLBoolean,
+                    },
+                    async resolve(_root, args, { prisma, hub }: IContext) {
+                        if(!hub) throw new AuthenticationError("Hub does not have access")
+                        const id = Number.parseInt(args.id)
+                        const { isOpen } = args
+                        const sensorToUpdate = await prisma.sensor.findFirst({ where: { id, hubId: hub.id }})
+                        if(!sensorToUpdate) throw new UserInputError("Sensor doesn't exist")
+                        if(!sensorToUpdate.isOpen && hub.isArmed && isOpen) {
+                            const owner = await prisma.user.findFirst({ where: { id: hub.ownerId }})
+                            if(!owner) throw new Error("Hub doesn't have an owner")
+                            await prisma.event.create({ data: { sensorId: id }})
+                            try{
+                                const msgId = await admin.messaging().send({
+                                    data: {
+                                        type: 'alert',
+                                    },
+                                    android: {
+                                        priority: 'high',
+                                    },
+                                    token: owner.fcmToken
+                                })
+                                console.log('Successfully sent message: ', msgId)
+                            } catch (err) {
+                                console.log('Error sending message: ', err)
+                            }
+                        }
+                        return prisma.sensor.update({ where: { id }, data: { ...sensorToUpdate, isOpen } })
                     }
                 })
             }

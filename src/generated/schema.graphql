@@ -52,6 +52,7 @@ type Hub {
   batteryLevel: Int
   createdAt: DateTime!
   id: Int!
+  isArmed: Boolean!
   isCharging: Boolean
   name: String!
   owner: User!
@@ -62,6 +63,7 @@ type Hub {
 input HubCreateInput {
   batteryLevel: Int
   createdAt: DateTime
+  isArmed: Boolean
   isCharging: Boolean
   name: String!
   owner: UserCreateNestedOneWithoutHubsInput!
@@ -84,6 +86,7 @@ input HubCreateOrConnectWithoutSensorsInput {
 input HubCreateWithoutSensorsInput {
   batteryLevel: Int
   createdAt: DateTime
+  isArmed: Boolean
   isCharging: Boolean
   name: String!
   owner: UserCreateNestedOneWithoutHubsInput!
@@ -101,13 +104,14 @@ type Mutation {
   createOneEvent(data: EventCreateInput!): Event!
   createOneHub(data: HubCreateInput!): Hub!
   createOneSensor(data: SensorCreateInput!): Sensor!
-  createSensor(batteryLevel: Int, doorColumn: Int!, doorRow: Int!, isArmed: Boolean, isConnected: Boolean, isOpen: Boolean, serial: ID!): Sensor
+  createSensor(batteryLevel: Int, doorColumn: Int!, doorRow: Int!, isConnected: Boolean, isOpen: Boolean, serial: ID!): Sensor
   deleteHub(id: ID!): Hub
   loginAsHub(serial: String!, userId: ID!): String
   loginWithPassword(email: String!, fcmToken: String!, password: String!): String
   registerWithPassword(email: String!, fcmToken: String!, firstName: String, lastName: String, password: String!): String
   sendNotification: Boolean
-  updateHub(batteryLevel: Int, id: ID, isCharging: Boolean, name: String): Hub
+  updateHub(batteryLevel: Int, id: ID, isArmed: Boolean, isCharging: Boolean, name: String): Hub
+  updateSensor(id: ID!, isOpen: Boolean): Sensor
   updateUser(firstName: String, lastName: String): User
 }
 
@@ -123,7 +127,6 @@ type Sensor {
   events(after: EventWhereUniqueInput, before: EventWhereUniqueInput, first: Int, last: Int, orderBy: [SensorEventsOrderByInput!]): [Event!]!
   hub: Hub!
   id: Int!
-  isArmed: Boolean!
   isConnected: Boolean!
   isOpen: Boolean!
   serial: String!
@@ -136,7 +139,6 @@ input SensorCreateInput {
   doorRow: Int!
   events: EventCreateNestedManyWithoutSensorInput
   hub: HubCreateNestedOneWithoutSensorsInput!
-  isArmed: Boolean!
   isConnected: Boolean!
   isOpen: Boolean!
   serial: String!
@@ -149,7 +151,6 @@ input SensorCreateManyHubInput {
   doorColumn: Int!
   doorRow: Int!
   id: Int
-  isArmed: Boolean!
   isConnected: Boolean!
   isOpen: Boolean!
   serial: String!
@@ -190,7 +191,6 @@ input SensorCreateWithoutEventsInput {
   doorColumn: Int!
   doorRow: Int!
   hub: HubCreateNestedOneWithoutSensorsInput!
-  isArmed: Boolean!
   isConnected: Boolean!
   isOpen: Boolean!
   serial: String!
@@ -203,7 +203,6 @@ input SensorCreateWithoutHubInput {
   doorColumn: Int!
   doorRow: Int!
   events: EventCreateNestedManyWithoutSensorInput
-  isArmed: Boolean!
   isConnected: Boolean!
   isOpen: Boolean!
   serial: String!

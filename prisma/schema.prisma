@@ -30,6 +30,7 @@ model Hub {
   serial       String   @unique
   batteryLevel Int?
   isCharging   Boolean?
+  isArmed      Boolean  @default(false)
   ownerId      Int
   owner        User     @relation(fields: [ownerId], references: [id])
   sensors      Sensor[]
@@ -43,7 +44,6 @@ model Sensor {
   batteryLevel Int?
   isOpen       Boolean
   isConnected  Boolean
-  isArmed      Boolean
   doorColumn   Int
   doorRow      Int
   hubId        Int

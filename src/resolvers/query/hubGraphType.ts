@@ -7,6 +7,7 @@ export default objectType({
         t.model.name()
         t.model.isCharging()
         t.model.batteryLevel()
+        t.model.isArmed()
         t.model.owner()
         t.model.serial()
         t.model.createdAt()
