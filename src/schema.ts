@@ -46,20 +46,17 @@ const schema = makeSchema({
             definition(t) {
                 // TODO extend resolvers to check that user has permissions for crud event
                 t.crud.createOneHub()
-                t.crud.createOneSensor()
-                t.crud.createOneEvent()
+
                 t.field('updateUser', {
                     type: 'User',
                     args: {
                         firstName: GraphQLString,
-                        lastName: GraphQLString
+                        lastName: GraphQLString,
+                        defaultFullNotification: GraphQLBoolean,
                     },
-                    async resolve(_root, { firstName, lastName }, { prisma, user }:IContext) {
+                    async resolve(_root, args, { prisma, user }:IContext) {
                         if(!user) throw new AuthenticationError("User does not have access")
-                        const data: { firstName?: string, lastName?: string } = {}
-                        if(firstName) data.firstName = firstName
-                        if(lastName) data.lastName = lastName
-                        return prisma.user.update({ where: { id: user.id }, data })
+                        return prisma.user.update({ where: { id: user.id }, data: args })
                     }
                 })
                 t.field('sendNotification', {
@@ -259,23 +256,28 @@ const schema = makeSchema({
                         const { isOpen } = args
                         const sensorToUpdate = await prisma.sensor.findFirst({ where: { id, hubId: hub.id }})
                         if(!sensorToUpdate) throw new UserInputError("Sensor doesn't exist")
-                        if(!sensorToUpdate.isOpen && hub.isArmed && isOpen) {
+                        if(sensorToUpdate.isOpen == isOpen) return sensorToUpdate
+                        if(isOpen) {
                             const owner = await prisma.user.findFirst({ where: { id: hub.ownerId }})
                             if(!owner) throw new Error("Hub doesn't have an owner")
                             await prisma.event.create({ data: { sensorId: id }})
-                            try{
-                                const msgId = await admin.messaging().send({
-                                    data: {
-                                        type: 'alert',
-                                    },
-                                    android: {
-                                        priority: 'high',
-                                    },
-                                    token: owner.fcmToken
-                                })
-                                console.log('Successfully sent message: ', msgId)
-                            } catch (err) {
-                                console.log('Error sending message: ', err)
+                            if(owner.defaultFullNotification && hub.isArmed) {
+                                try{
+                                    const msgId = await admin.messaging().send({
+                                        data: {
+                                            type: 'alert',
+                                            title: `${hub.name} detected that a handle was pulled`,
+                                            body: "Your phone wasn't detected nearby"
+                                        },
+                                        android: {
+                                            priority: 'high',
+                                        },
+                                        token: owner.fcmToken,
+                                    })
+                                    console.log('Successfully sent message: ', msgId)
+                                } catch (err) {
+                                    console.log('Error sending message: ', err)
+                                }
                             }
                         }
                         return prisma.sensor.update({ where: { id }, data: { ...sensorToUpdate, isOpen } })

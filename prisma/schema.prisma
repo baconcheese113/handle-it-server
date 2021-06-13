@@ -11,15 +11,16 @@ generator client {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  email     String   @unique
-  password  String
-  fcmToken  String
-  firstName String?  @db.VarChar(255)
-  lastName  String?  @db.VarChar(255)
-  hubs      Hub[]
+  id                      Int      @id @default(autoincrement())
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @default(now())
+  email                   String   @unique
+  password                String
+  fcmToken                String
+  firstName               String?  @db.VarChar(255)
+  lastName                String?  @db.VarChar(255)
+  defaultFullNotification Boolean  @default(true)
+  hubs                    Hub[]
 }
 
 model Hub {

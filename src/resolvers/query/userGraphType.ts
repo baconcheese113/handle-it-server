@@ -8,6 +8,7 @@ export default objectType({
         t.model.email()
         t.model.firstName()
         t.model.lastName()
+        t.model.defaultFullNotification()
         t.nonNull.field('displayName', {
             type: "String",
             resolve: (user) => {

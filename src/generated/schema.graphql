@@ -10,12 +10,6 @@ type Event {
   sensor: Sensor!
 }
 
-input EventCreateInput {
-  createdAt: DateTime
-  sensor: SensorCreateNestedOneWithoutEventsInput!
-  updatedAt: DateTime
-}
-
 input EventCreateManySensorInput {
   createdAt: DateTime
   id: Int
@@ -72,28 +66,6 @@ input HubCreateInput {
   updatedAt: DateTime
 }
 
-input HubCreateNestedOneWithoutSensorsInput {
-  connect: HubWhereUniqueInput
-  connectOrCreate: HubCreateOrConnectWithoutSensorsInput
-  create: HubCreateWithoutSensorsInput
-}
-
-input HubCreateOrConnectWithoutSensorsInput {
-  create: HubCreateWithoutSensorsInput!
-  where: HubWhereUniqueInput!
-}
-
-input HubCreateWithoutSensorsInput {
-  batteryLevel: Int
-  createdAt: DateTime
-  isArmed: Boolean
-  isCharging: Boolean
-  name: String!
-  owner: UserCreateNestedOneWithoutHubsInput!
-  serial: String!
-  updatedAt: DateTime
-}
-
 input HubWhereUniqueInput {
   id: Int
   serial: String
@@ -101,9 +73,7 @@ input HubWhereUniqueInput {
 
 type Mutation {
   createEvent(sensorId: ID!): Event
-  createOneEvent(data: EventCreateInput!): Event!
   createOneHub(data: HubCreateInput!): Hub!
-  createOneSensor(data: SensorCreateInput!): Sensor!
   createSensor(batteryLevel: Int, doorColumn: Int!, doorRow: Int!, isConnected: Boolean, isOpen: Boolean, serial: ID!): Sensor
   deleteHub(id: ID!): Hub
   loginAsHub(serial: String!, userId: ID!): String
@@ -112,7 +82,7 @@ type Mutation {
   sendNotification: Boolean
   updateHub(batteryLevel: Int, id: ID, isArmed: Boolean, isCharging: Boolean, name: String): Hub
   updateSensor(id: ID!, isOpen: Boolean): Sensor
-  updateUser(firstName: String, lastName: String): User
+  updateUser(defaultFullNotification: Boolean, firstName: String, lastName: String): User
 }
 
 type Query {
@@ -130,19 +100,6 @@ type Sensor {
   isConnected: Boolean!
   isOpen: Boolean!
   serial: String!
-}
-
-input SensorCreateInput {
-  batteryLevel: Int
-  createdAt: DateTime
-  doorColumn: Int!
-  doorRow: Int!
-  events: EventCreateNestedManyWithoutSensorInput
-  hub: HubCreateNestedOneWithoutSensorsInput!
-  isConnected: Boolean!
-  isOpen: Boolean!
-  serial: String!
-  updatedAt: DateTime
 }
 
 input SensorCreateManyHubInput {
@@ -169,32 +126,9 @@ input SensorCreateNestedManyWithoutHubInput {
   createMany: SensorCreateManyHubInputEnvelope
 }
 
-input SensorCreateNestedOneWithoutEventsInput {
-  connect: SensorWhereUniqueInput
-  connectOrCreate: SensorCreateOrConnectWithoutEventsInput
-  create: SensorCreateWithoutEventsInput
-}
-
-input SensorCreateOrConnectWithoutEventsInput {
-  create: SensorCreateWithoutEventsInput!
-  where: SensorWhereUniqueInput!
-}
-
 input SensorCreateOrConnectWithoutHubInput {
   create: SensorCreateWithoutHubInput!
   where: SensorWhereUniqueInput!
-}
-
-input SensorCreateWithoutEventsInput {
-  batteryLevel: Int
-  createdAt: DateTime
-  doorColumn: Int!
-  doorRow: Int!
-  hub: HubCreateNestedOneWithoutSensorsInput!
-  isConnected: Boolean!
-  isOpen: Boolean!
-  serial: String!
-  updatedAt: DateTime
 }
 
 input SensorCreateWithoutHubInput {
@@ -224,6 +158,7 @@ enum SortOrder {
 }
 
 type User {
+  defaultFullNotification: Boolean!
   displayName: String!
   email: String!
   firstName: String
@@ -245,6 +180,7 @@ input UserCreateOrConnectWithoutHubsInput {
 
 input UserCreateWithoutHubsInput {
   createdAt: DateTime
+  defaultFullNotification: Boolean
   email: String!
   fcmToken: String!
   firstName: String
