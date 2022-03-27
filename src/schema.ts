@@ -82,9 +82,9 @@ const schema = makeSchema({
                 t.field('registerWithPassword', {
                     type: 'String',
                     args: { 
-                        email: GraphQLNonNull(GraphQLString),
-                        password: GraphQLNonNull(GraphQLString),
-                        fcmToken: GraphQLNonNull(GraphQLString),
+                        email: new GraphQLNonNull(GraphQLString),
+                        password: new GraphQLNonNull(GraphQLString),
+                        fcmToken: new GraphQLNonNull(GraphQLString),
                         firstName: GraphQLString,
                         lastName: GraphQLString,
                     },
@@ -101,9 +101,9 @@ const schema = makeSchema({
                 t.field('loginWithPassword', {
                     type: 'String',
                     args: { 
-                        email: GraphQLNonNull(GraphQLString),
-                        password: GraphQLNonNull(GraphQLString),
-                        fcmToken: GraphQLNonNull(GraphQLString),
+                        email: new GraphQLNonNull(GraphQLString),
+                        password: new GraphQLNonNull(GraphQLString),
+                        fcmToken: new GraphQLNonNull(GraphQLString),
                     },
                     async resolve(_root, args, { prisma, user }: IContext) {
                         if(user) return jwt.sign(`User:${user.id}`, process.env.JWT_SECRET!);
@@ -122,7 +122,7 @@ const schema = makeSchema({
                 t.field('createEvent', {
                     type: "Event",
                     args: {
-                        sensorId: GraphQLNonNull(GraphQLID),
+                        sensorId: new GraphQLNonNull(GraphQLID),
                     },
                     async resolve(_root, args, { prisma, hub }: IContext) {
                         if(!hub) throw new AuthenticationError("Hub does not have access")
@@ -154,8 +154,8 @@ const schema = makeSchema({
                 t.field('loginAsHub', {
                     type: 'String',
                     args: { 
-                        userId: GraphQLNonNull(GraphQLID),
-                        serial: GraphQLNonNull(GraphQLString),
+                        userId: new GraphQLNonNull(GraphQLID),
+                        serial: new GraphQLNonNull(GraphQLString),
                     },
                     async resolve(_root, args, { prisma, hub }: IContext) {
                         if(hub) return jwt.sign(`Hub:${hub.id}`, process.env.JWT_SECRET!)
@@ -192,7 +192,7 @@ const schema = makeSchema({
                 t.field('deleteHub', {
                     type: "Hub",
                     args: {
-                        id: GraphQLNonNull(GraphQLID)
+                        id: new GraphQLNonNull(GraphQLID)
                     },
                     async resolve(_root, args, { prisma, user }: IContext) {
                         if(!user) throw new AuthenticationError("User does not have access")
@@ -214,9 +214,9 @@ const schema = makeSchema({
                 t.field('createSensor', {
                     type: "Sensor",
                     args: {
-                        doorColumn: GraphQLNonNull(GraphQLInt),
-                        doorRow: GraphQLNonNull(GraphQLInt),
-                        serial: GraphQLNonNull(GraphQLID),
+                        doorColumn: new GraphQLNonNull(GraphQLInt),
+                        doorRow: new GraphQLNonNull(GraphQLInt),
+                        serial: new GraphQLNonNull(GraphQLID),
                         isConnected: GraphQLBoolean,
                         isOpen: GraphQLBoolean,
                         batteryLevel: GraphQLInt,
@@ -247,7 +247,7 @@ const schema = makeSchema({
                 t.field('updateSensor', {
                     type: "Sensor",
                     args: {
-                        id: GraphQLNonNull(GraphQLID),
+                        id: new GraphQLNonNull(GraphQLID),
                         isOpen: GraphQLBoolean,
                     },
                     async resolve(_root, args, { prisma, hub }: IContext) {
