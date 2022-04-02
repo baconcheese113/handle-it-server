@@ -317,7 +317,7 @@ export interface NexusGenArgTypes {
   }
   Mutation: {
     createEvent: { // args
-      sensorId: string; // ID!
+      serial: string; // String!
     }
     createOneHub: { // args
       data: NexusGenInputs['HubCreateInput']; // HubCreateInput!

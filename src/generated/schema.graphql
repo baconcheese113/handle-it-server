@@ -72,7 +72,7 @@ input HubWhereUniqueInput {
 }
 
 type Mutation {
-  createEvent(sensorId: ID!): Event
+  createEvent(serial: String!): Event
   createOneHub(data: HubCreateInput!): Hub!
   createSensor(batteryLevel: Int, doorColumn: Int!, doorRow: Int!, isConnected: Boolean, isOpen: Boolean, serial: ID!): Sensor
   deleteHub(id: ID!): Hub

@@ -122,33 +122,35 @@ const schema = makeSchema({
                 t.field('createEvent', {
                     type: "Event",
                     args: {
-                        sensorId: new GraphQLNonNull(GraphQLID),
+                        serial: new GraphQLNonNull(GraphQLString),
                     },
-                    async resolve(_root, args, { prisma, hub }: IContext) {
+                    async resolve(_root, args: { serial: string }, { prisma, hub }: IContext) {
                         if(!hub) throw new AuthenticationError("Hub does not have access")
-                        const sensorId = Number.parseInt(args.sensorId)
-                        const sensor = await prisma.sensor.findFirst({ where: { id: sensorId }, include: { hub: true }})
-                        if(!sensor) throw new Error("Sensor not found")
-                        console.log(`hub.id ${hub.id} and sensor.hub.id ${sensor.hubId}`)
-                        if(hub.id !== sensor.hubId) throw new Error("Hub does not have access to sensor")
-                        const owner = await prisma.user.findFirst({ where: { id: sensor.hub.ownerId }})
-                        if(!owner) throw new Error("No owner found for hub")
-
-                        try{
-                            const msgId = await admin.messaging().send({
-                                data: {
-                                    type: 'alert',
-                                },
-                                android: {
-                                    priority: 'high',
-                                },
-                                token: owner.fcmToken
-                            })
-                            console.log('Successfully sent message: ', msgId)
-                        } catch (err) {
-                            console.log('Error sending message: ', err)
+                        const { serial } = args
+                        const sensor = await prisma.sensor.findFirst({ where: { serial, hubId: hub.id }});
+                        if(!sensor) throw new UserInputError("Sensor doesn't exist")
+                        const owner = await prisma.user.findFirst({ where: { id: hub.ownerId }})
+                        if(!owner) throw new Error("Hub doesn't have an owner")
+                        const createdEvent = await prisma.event.create({ data: { sensorId: sensor.id }})
+                        if(owner.defaultFullNotification && hub.isArmed) {
+                            try{
+                                const msgId = await admin.messaging().send({
+                                    data: {
+                                        type: 'alert',
+                                        title: `${hub.name} detected that a handle was pulled`,
+                                        body: "Your phone wasn't detected nearby"
+                                    },
+                                    android: {
+                                        priority: 'high',
+                                    },
+                                    token: owner.fcmToken,
+                                })
+                                console.log('Successfully sent message: ', msgId)
+                            } catch (err) {
+                                console.log('Error sending message: ', err)
+                            }
                         }
-                        return await prisma.event.create({ data: { sensorId }})
+                        return createdEvent
                     }
                 })
                 t.field('loginAsHub', {
