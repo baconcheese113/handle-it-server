@@ -10,6 +10,10 @@ export default objectType({
         t.model.isArmed()
         t.model.owner()
         t.model.serial()
+        t.nonNull.field('latestVersion', {
+            type: 'Int',
+            resolve: () => Number.parseInt(process.env.HUB_CURRENT_FIRMWARE_VERSION ?? "1")
+        })
         t.model.createdAt()
         t.model.sensors()
     }

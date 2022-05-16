@@ -48,6 +48,7 @@ type Hub {
   id: Int!
   isArmed: Boolean!
   isCharging: Boolean
+  latestVersion: Int!
   name: String!
   owner: User!
   sensors(after: SensorWhereUniqueInput, before: SensorWhereUniqueInput, first: Int, last: Int): [Sensor!]!

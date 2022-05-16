@@ -198,6 +198,7 @@ export interface NexusGenFieldTypes {
     id: number; // Int!
     isArmed: boolean; // Boolean!
     isCharging: boolean | null; // Boolean
+    latestVersion: number; // Int!
     name: string; // String!
     owner: NexusGenRootTypes['User']; // User!
     sensors: NexusGenRootTypes['Sensor'][]; // [Sensor!]!
@@ -258,6 +259,7 @@ export interface NexusGenFieldTypeNames {
     id: 'Int'
     isArmed: 'Boolean'
     isCharging: 'Boolean'
+    latestVersion: 'Int'
     name: 'String'
     owner: 'User'
     sensors: 'Sensor'
