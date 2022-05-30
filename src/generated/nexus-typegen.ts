@@ -243,6 +243,7 @@ export interface NexusGenFieldTypes {
   }
   Viewer: { // field return type
     hubs: NexusGenRootTypes['Hub'][]; // [Hub!]!
+    latestSensorVersion: string; // String!
     user: NexusGenRootTypes['User']; // User!
   }
 }
@@ -304,6 +305,7 @@ export interface NexusGenFieldTypeNames {
   }
   Viewer: { // field return type name
     hubs: 'Hub'
+    latestSensorVersion: 'String'
     user: 'User'
   }
 }

@@ -197,5 +197,6 @@ input UserWhereUniqueInput {
 
 type Viewer {
   hubs: [Hub!]!
+  latestSensorVersion: String!
   user: User!
 }

@@ -16,6 +16,10 @@ export default objectType({
                 return prisma.hub.findMany({ where: { ownerId: user.id }})
             }
         })
+        t.nonNull.field('latestSensorVersion', {
+            type: 'String',
+            resolve: () => process.env.SENSOR_CURRENT_FIRMWARE_VERSION ?? "0.0.0"
+        })
 
     }
 })
