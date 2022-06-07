@@ -24,17 +24,18 @@ model User {
 }
 
 model Hub {
-  id           Int      @id @default(autoincrement())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @default(now())
+  id           Int        @id @default(autoincrement())
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @default(now())
   name         String
-  serial       String   @unique
+  serial       String     @unique
   batteryLevel Int?
   isCharging   Boolean?
-  isArmed      Boolean  @default(false)
+  isArmed      Boolean    @default(false)
   ownerId      Int
-  owner        User     @relation(fields: [ownerId], references: [id])
+  owner        User       @relation(fields: [ownerId], references: [id])
   sensors      Sensor[]
+  locations    Location[]
 }
 
 model Sensor {
@@ -58,4 +59,18 @@ model Event {
   updatedAt DateTime @default(now())
   sensorId  Int
   sensor    Sensor   @relation(fields: [sensorId], references: [id])
+}
+
+model Location {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  lat       Float
+  lng       Float
+  hdop      Float
+  speed     Float
+  course    Float
+  age       Int
+  hubId     Int
+  hub       Hub      @relation(fields: [hubId], references: [id])
 }

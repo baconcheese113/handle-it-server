@@ -50,6 +50,7 @@ export interface NexusGenInputs {
     createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
     isArmed?: boolean | null; // Boolean
     isCharging?: boolean | null; // Boolean
+    locations?: NexusGenInputs['LocationCreateNestedManyWithoutHubInput'] | null; // LocationCreateNestedManyWithoutHubInput
     name: string; // String!
     owner: NexusGenInputs['UserCreateNestedOneWithoutHubsInput']; // UserCreateNestedOneWithoutHubsInput!
     sensors?: NexusGenInputs['SensorCreateNestedManyWithoutHubInput'] | null; // SensorCreateNestedManyWithoutHubInput
@@ -59,6 +60,44 @@ export interface NexusGenInputs {
   HubWhereUniqueInput: { // input type
     id?: number | null; // Int
     serial?: string | null; // String
+  }
+  LocationCreateManyHubInput: { // input type
+    age: number; // Int!
+    course: number; // Float!
+    createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
+    hdop: number; // Float!
+    id?: number | null; // Int
+    lat: number; // Float!
+    lng: number; // Float!
+    speed: number; // Float!
+    updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
+  }
+  LocationCreateManyHubInputEnvelope: { // input type
+    data?: NexusGenInputs['LocationCreateManyHubInput'][] | null; // [LocationCreateManyHubInput!]
+    skipDuplicates?: boolean | null; // Boolean
+  }
+  LocationCreateNestedManyWithoutHubInput: { // input type
+    connect?: NexusGenInputs['LocationWhereUniqueInput'][] | null; // [LocationWhereUniqueInput!]
+    connectOrCreate?: NexusGenInputs['LocationCreateOrConnectWithoutHubInput'][] | null; // [LocationCreateOrConnectWithoutHubInput!]
+    create?: NexusGenInputs['LocationCreateWithoutHubInput'][] | null; // [LocationCreateWithoutHubInput!]
+    createMany?: NexusGenInputs['LocationCreateManyHubInputEnvelope'] | null; // LocationCreateManyHubInputEnvelope
+  }
+  LocationCreateOrConnectWithoutHubInput: { // input type
+    create: NexusGenInputs['LocationCreateWithoutHubInput']; // LocationCreateWithoutHubInput!
+    where: NexusGenInputs['LocationWhereUniqueInput']; // LocationWhereUniqueInput!
+  }
+  LocationCreateWithoutHubInput: { // input type
+    age: number; // Int!
+    course: number; // Float!
+    createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
+    hdop: number; // Float!
+    lat: number; // Float!
+    lng: number; // Float!
+    speed: number; // Float!
+    updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
+  }
+  LocationWhereUniqueInput: { // input type
+    id?: number | null; // Int
   }
   SensorCreateManyHubInput: { // input type
     batteryLevel?: number | null; // Int
@@ -155,6 +194,16 @@ export interface NexusGenObjects {
     name: string; // String!
     serial: string; // String!
   }
+  Location: { // root type
+    age: number; // Int!
+    course: number; // Float!
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
+    hdop: number; // Float!
+    id: number; // Int!
+    lat: number; // Float!
+    lng: number; // Float!
+    speed: number; // Float!
+  }
   Mutation: {};
   Query: {};
   Sensor: { // root type
@@ -199,13 +248,26 @@ export interface NexusGenFieldTypes {
     isArmed: boolean; // Boolean!
     isCharging: boolean | null; // Boolean
     latestVersion: number; // Int!
+    locations: NexusGenRootTypes['Location'][]; // [Location!]!
     name: string; // String!
     owner: NexusGenRootTypes['User']; // User!
     sensors: NexusGenRootTypes['Sensor'][]; // [Sensor!]!
     serial: string; // String!
   }
+  Location: { // field return type
+    age: number; // Int!
+    course: number; // Float!
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
+    hdop: number; // Float!
+    hub: NexusGenRootTypes['Hub']; // Hub!
+    id: number; // Int!
+    lat: number; // Float!
+    lng: number; // Float!
+    speed: number; // Float!
+  }
   Mutation: { // field return type
     createEvent: NexusGenRootTypes['Event'] | null; // Event
+    createLocation: NexusGenRootTypes['Location'] | null; // Location
     createOneHub: NexusGenRootTypes['Hub']; // Hub!
     createSensor: NexusGenRootTypes['Sensor'] | null; // Sensor
     deleteHub: NexusGenRootTypes['Hub'] | null; // Hub
@@ -261,13 +323,26 @@ export interface NexusGenFieldTypeNames {
     isArmed: 'Boolean'
     isCharging: 'Boolean'
     latestVersion: 'Int'
+    locations: 'Location'
     name: 'String'
     owner: 'User'
     sensors: 'Sensor'
     serial: 'String'
   }
+  Location: { // field return type name
+    age: 'Int'
+    course: 'Float'
+    createdAt: 'DateTime'
+    hdop: 'Float'
+    hub: 'Hub'
+    id: 'Int'
+    lat: 'Float'
+    lng: 'Float'
+    speed: 'Float'
+  }
   Mutation: { // field return type name
     createEvent: 'Event'
+    createLocation: 'Location'
     createOneHub: 'Hub'
     createSensor: 'Sensor'
     deleteHub: 'Hub'
@@ -312,6 +387,12 @@ export interface NexusGenFieldTypeNames {
 
 export interface NexusGenArgTypes {
   Hub: {
+    locations: { // args
+      after?: NexusGenInputs['LocationWhereUniqueInput'] | null; // LocationWhereUniqueInput
+      before?: NexusGenInputs['LocationWhereUniqueInput'] | null; // LocationWhereUniqueInput
+      first?: number | null; // Int
+      last?: number | null; // Int
+    }
     sensors: { // args
       after?: NexusGenInputs['SensorWhereUniqueInput'] | null; // SensorWhereUniqueInput
       before?: NexusGenInputs['SensorWhereUniqueInput'] | null; // SensorWhereUniqueInput
@@ -322,6 +403,14 @@ export interface NexusGenArgTypes {
   Mutation: {
     createEvent: { // args
       serial: string; // String!
+    }
+    createLocation: { // args
+      age: number; // Int!
+      course: number; // Float!
+      hdop: number; // Float!
+      lat: number; // Float!
+      lng: number; // Float!
+      speed: number; // Float!
     }
     createOneHub: { // args
       data: NexusGenInputs['HubCreateInput']; // HubCreateInput!
@@ -355,7 +444,7 @@ export interface NexusGenArgTypes {
     }
     updateHub: { // args
       batteryLevel?: number | null; // Int
-      id?: string | null; // ID
+      id: string; // ID!
       isArmed?: boolean | null; // Boolean
       isCharging?: boolean | null; // Boolean
       name?: string | null; // String

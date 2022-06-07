@@ -16,5 +16,6 @@ export default objectType({
         })
         t.model.createdAt()
         t.model.sensors()
+        t.model.locations()
     }
 })

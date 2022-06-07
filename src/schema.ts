@@ -1,4 +1,4 @@
-import { makeSchema, mutationType, queryType, subscriptionType } from "nexus"
+import { makeSchema, mutationType, queryType } from "nexus"
 import path from 'path'
 import { nexusPrisma } from "nexus-plugin-prisma"
 import * as admin from 'firebase-admin'
@@ -6,12 +6,14 @@ import { IContext } from "./context"
 import bcrypt from 'bcrypt'
 import { AuthenticationError, ForbiddenError, UserInputError } from "apollo-server-errors"
 import jwt from 'jsonwebtoken'
-import { GraphQLBoolean, GraphQLID, GraphQLInt, GraphQLNonNull, GraphQLString } from "graphql"
+import { GraphQLBoolean, GraphQLFloat, GraphQLID, GraphQLInt, GraphQLNonNull, GraphQLString } from "graphql"
 import viewerGraphField from "./resolvers/query/viewerGraphType"
 import hubGraphType from "./resolvers/query/hubGraphType"
 import userGraphType from "./resolvers/query/userGraphType"
 import sensorGraphType from "./resolvers/query/sensorGraphType"
 import eventGraphType from "./resolvers/query/eventGraphType"
+import locationGraphType from "./resolvers/query/locationGraphType"
+import { Hub } from "@prisma/client"
 
 admin.initializeApp({
     credential: admin.credential.cert({
@@ -56,7 +58,8 @@ const schema = makeSchema({
                     },
                     async resolve(_root, args, { prisma, user }:IContext) {
                         if(!user) throw new AuthenticationError("User does not have access")
-                        return prisma.user.update({ where: { id: user.id }, data: args })
+                        const data: any = args
+                        return prisma.user.update({ where: { id: user.id }, data })
                     }
                 })
                 t.field('sendNotification', {
@@ -176,7 +179,7 @@ const schema = makeSchema({
                 t.field('updateHub', {
                     type: "Hub",
                     args: {
-                        id: GraphQLID,
+                        id: new GraphQLNonNull(GraphQLID),
                         name: GraphQLString,
                         batteryLevel: GraphQLInt,
                         isCharging: GraphQLBoolean,
@@ -188,8 +191,24 @@ const schema = makeSchema({
                         const hubId = Number.parseInt(id);
                         const hubToUpdate = hub || await prisma.hub.findFirst({ where: { id: hubId, ownerId: user?.id }})
                         if(!hubToUpdate) throw new UserInputError("Hub doesn't exist")
-                        return prisma.hub.update({ where: { id: hubToUpdate.id }, data })
+                        return prisma.hub.update({ where: { id: hubToUpdate.id }, data: data as any })
                     }
+                })
+                t.field('createLocation', {
+                    type: "Location",
+                    args: {
+                        lat: new GraphQLNonNull(GraphQLFloat),
+                        lng: new GraphQLNonNull(GraphQLFloat),
+                        hdop: new GraphQLNonNull(GraphQLFloat),
+                        speed: new GraphQLNonNull(GraphQLFloat),
+                        age: new GraphQLNonNull(GraphQLInt),
+                        course: new GraphQLNonNull(GraphQLFloat),
+                    },
+                    resolve(_root, args, { prisma, hub }: IContext) {
+                        if(!hub) throw new AuthenticationError("Hub does not have access")
+                        const data = {...args, hubId: hub.id }
+                        return prisma.location.create({ data })
+                    } 
                 })
                 t.field('deleteHub', {
                     type: "Hub",
@@ -208,9 +227,11 @@ const schema = makeSchema({
                         const transactionRet = await prisma.$transaction([
                             ...sensorDels,
                             prisma.sensor.deleteMany({ where: { hubId: id }}),
+                            prisma.location.deleteMany({ where: { hubId: id }}),
                             prisma.hub.delete({ where: { id }, include: { sensors: true }}),
                         ])
-                        return transactionRet[transactionRet.length - 1]
+                        const deletedHub = transactionRet[transactionRet.length - 1] as Hub
+                        return deletedHub
                     }
                 })
                 t.field('createSensor', {
@@ -226,6 +247,7 @@ const schema = makeSchema({
                     async resolve(_root, args, { prisma, hub }: IContext) {
                         if(!hub) throw new AuthenticationError("Hub does not have access")
                         const { isConnected, isOpen, ...otherArgs } = args
+                        // TODO ensure sensors only linked to a single hub
                         // const serialSensor = await prisma.sensor.findFirst({ where: { serial: args.serial }})
                         // if(serialSensor) throw new UserInputError("Sensor already added")
                         return prisma.sensor.upsert({ 
@@ -255,7 +277,7 @@ const schema = makeSchema({
                     async resolve(_root, args, { prisma, hub }: IContext) {
                         if(!hub) throw new AuthenticationError("Hub does not have access")
                         const id = Number.parseInt(args.id)
-                        const { isOpen } = args
+                        const isOpen = args.isOpen ?? undefined;
                         const sensorToUpdate = await prisma.sensor.findFirst({ where: { id, hubId: hub.id }})
                         if(!sensorToUpdate) throw new UserInputError("Sensor doesn't exist")
                         if(sensorToUpdate.isOpen == isOpen) return sensorToUpdate
@@ -290,7 +312,8 @@ const schema = makeSchema({
         userGraphType,
         hubGraphType,
         sensorGraphType,
-        eventGraphType
+        eventGraphType,
+        locationGraphType,
     ],
     plugins: [nexusPrisma({shouldGenerateArtifacts: true, experimentalCRUD: true })],
     sourceTypes: {

@@ -49,6 +49,7 @@ type Hub {
   isArmed: Boolean!
   isCharging: Boolean
   latestVersion: Int!
+  locations(after: LocationWhereUniqueInput, before: LocationWhereUniqueInput, first: Int, last: Int): [Location!]!
   name: String!
   owner: User!
   sensors(after: SensorWhereUniqueInput, before: SensorWhereUniqueInput, first: Int, last: Int): [Sensor!]!
@@ -60,6 +61,7 @@ input HubCreateInput {
   createdAt: DateTime
   isArmed: Boolean
   isCharging: Boolean
+  locations: LocationCreateNestedManyWithoutHubInput
   name: String!
   owner: UserCreateNestedOneWithoutHubsInput!
   sensors: SensorCreateNestedManyWithoutHubInput
@@ -72,8 +74,76 @@ input HubWhereUniqueInput {
   serial: String
 }
 
+type Location {
+  """Age of this location (in ms)"""
+  age: Int!
+
+  """Ground course (in degrees)"""
+  course: Float!
+  createdAt: DateTime!
+
+  """Horizontal diminution of precision (in meters)"""
+  hdop: Float!
+  hub: Hub!
+  id: Int!
+
+  """Latitude (in degrees)"""
+  lat: Float!
+
+  """Longitude (in degrees)"""
+  lng: Float!
+
+  """Speed in KMPH (always slight movement)"""
+  speed: Float!
+}
+
+input LocationCreateManyHubInput {
+  age: Int!
+  course: Float!
+  createdAt: DateTime
+  hdop: Float!
+  id: Int
+  lat: Float!
+  lng: Float!
+  speed: Float!
+  updatedAt: DateTime
+}
+
+input LocationCreateManyHubInputEnvelope {
+  data: [LocationCreateManyHubInput!]
+  skipDuplicates: Boolean
+}
+
+input LocationCreateNestedManyWithoutHubInput {
+  connect: [LocationWhereUniqueInput!]
+  connectOrCreate: [LocationCreateOrConnectWithoutHubInput!]
+  create: [LocationCreateWithoutHubInput!]
+  createMany: LocationCreateManyHubInputEnvelope
+}
+
+input LocationCreateOrConnectWithoutHubInput {
+  create: LocationCreateWithoutHubInput!
+  where: LocationWhereUniqueInput!
+}
+
+input LocationCreateWithoutHubInput {
+  age: Int!
+  course: Float!
+  createdAt: DateTime
+  hdop: Float!
+  lat: Float!
+  lng: Float!
+  speed: Float!
+  updatedAt: DateTime
+}
+
+input LocationWhereUniqueInput {
+  id: Int
+}
+
 type Mutation {
   createEvent(serial: String!): Event
+  createLocation(age: Int!, course: Float!, hdop: Float!, lat: Float!, lng: Float!, speed: Float!): Location
   createOneHub(data: HubCreateInput!): Hub!
   createSensor(batteryLevel: Int, doorColumn: Int!, doorRow: Int!, isConnected: Boolean, isOpen: Boolean, serial: ID!): Sensor
   deleteHub(id: ID!): Hub
@@ -81,7 +151,7 @@ type Mutation {
   loginWithPassword(email: String!, fcmToken: String!, password: String!): String
   registerWithPassword(email: String!, fcmToken: String!, firstName: String, lastName: String, password: String!): String
   sendNotification: Boolean
-  updateHub(batteryLevel: Int, id: ID, isArmed: Boolean, isCharging: Boolean, name: String): Hub
+  updateHub(batteryLevel: Int, id: ID!, isArmed: Boolean, isCharging: Boolean, name: String): Hub
   updateSensor(id: ID!, isOpen: Boolean): Sensor
   updateUser(defaultFullNotification: Boolean, firstName: String, lastName: String): User
 }
