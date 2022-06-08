@@ -13,7 +13,7 @@ generator client {
 model User {
   id                      Int      @id @default(autoincrement())
   createdAt               DateTime @default(now())
-  updatedAt               DateTime @default(now())
+  updatedAt               DateTime @default(now()) @updatedAt
   email                   String   @unique
   password                String
   fcmToken                String
@@ -26,7 +26,7 @@ model User {
 model Hub {
   id           Int        @id @default(autoincrement())
   createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @default(now())
+  updatedAt    DateTime   @default(now()) @updatedAt
   name         String
   serial       String     @unique
   batteryLevel Int?
@@ -41,7 +41,7 @@ model Hub {
 model Sensor {
   id           Int      @id @default(autoincrement())
   createdAt    DateTime @default(now())
-  updatedAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
   serial       String   @unique
   batteryLevel Int?
   isOpen       Boolean
@@ -56,7 +56,7 @@ model Sensor {
 model Event {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
   sensorId  Int
   sensor    Sensor   @relation(fields: [sensorId], references: [id])
 }
@@ -64,7 +64,7 @@ model Event {
 model Location {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
   lat       Float
   lng       Float
   hdop      Float

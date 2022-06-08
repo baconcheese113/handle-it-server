@@ -19,121 +19,15 @@ declare global {
 }
 
 export interface NexusGenInputs {
-  EventCreateManySensorInput: { // input type
-    createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
-    id?: number | null; // Int
-    updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
-  }
-  EventCreateManySensorInputEnvelope: { // input type
-    data?: NexusGenInputs['EventCreateManySensorInput'][] | null; // [EventCreateManySensorInput!]
-    skipDuplicates?: boolean | null; // Boolean
-  }
-  EventCreateNestedManyWithoutSensorInput: { // input type
-    connect?: NexusGenInputs['EventWhereUniqueInput'][] | null; // [EventWhereUniqueInput!]
-    connectOrCreate?: NexusGenInputs['EventCreateOrConnectWithoutSensorInput'][] | null; // [EventCreateOrConnectWithoutSensorInput!]
-    create?: NexusGenInputs['EventCreateWithoutSensorInput'][] | null; // [EventCreateWithoutSensorInput!]
-    createMany?: NexusGenInputs['EventCreateManySensorInputEnvelope'] | null; // EventCreateManySensorInputEnvelope
-  }
-  EventCreateOrConnectWithoutSensorInput: { // input type
-    create: NexusGenInputs['EventCreateWithoutSensorInput']; // EventCreateWithoutSensorInput!
-    where: NexusGenInputs['EventWhereUniqueInput']; // EventWhereUniqueInput!
-  }
-  EventCreateWithoutSensorInput: { // input type
-    createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
-    updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
-  }
   EventWhereUniqueInput: { // input type
     id?: number | null; // Int
-  }
-  HubCreateInput: { // input type
-    batteryLevel?: number | null; // Int
-    createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
-    isArmed?: boolean | null; // Boolean
-    isCharging?: boolean | null; // Boolean
-    locations?: NexusGenInputs['LocationCreateNestedManyWithoutHubInput'] | null; // LocationCreateNestedManyWithoutHubInput
-    name: string; // String!
-    owner: NexusGenInputs['UserCreateNestedOneWithoutHubsInput']; // UserCreateNestedOneWithoutHubsInput!
-    sensors?: NexusGenInputs['SensorCreateNestedManyWithoutHubInput'] | null; // SensorCreateNestedManyWithoutHubInput
-    serial: string; // String!
-    updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
   }
   HubWhereUniqueInput: { // input type
     id?: number | null; // Int
     serial?: string | null; // String
   }
-  LocationCreateManyHubInput: { // input type
-    age: number; // Int!
-    course: number; // Float!
-    createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
-    hdop: number; // Float!
-    id?: number | null; // Int
-    lat: number; // Float!
-    lng: number; // Float!
-    speed: number; // Float!
-    updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
-  }
-  LocationCreateManyHubInputEnvelope: { // input type
-    data?: NexusGenInputs['LocationCreateManyHubInput'][] | null; // [LocationCreateManyHubInput!]
-    skipDuplicates?: boolean | null; // Boolean
-  }
-  LocationCreateNestedManyWithoutHubInput: { // input type
-    connect?: NexusGenInputs['LocationWhereUniqueInput'][] | null; // [LocationWhereUniqueInput!]
-    connectOrCreate?: NexusGenInputs['LocationCreateOrConnectWithoutHubInput'][] | null; // [LocationCreateOrConnectWithoutHubInput!]
-    create?: NexusGenInputs['LocationCreateWithoutHubInput'][] | null; // [LocationCreateWithoutHubInput!]
-    createMany?: NexusGenInputs['LocationCreateManyHubInputEnvelope'] | null; // LocationCreateManyHubInputEnvelope
-  }
-  LocationCreateOrConnectWithoutHubInput: { // input type
-    create: NexusGenInputs['LocationCreateWithoutHubInput']; // LocationCreateWithoutHubInput!
-    where: NexusGenInputs['LocationWhereUniqueInput']; // LocationWhereUniqueInput!
-  }
-  LocationCreateWithoutHubInput: { // input type
-    age: number; // Int!
-    course: number; // Float!
-    createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
-    hdop: number; // Float!
-    lat: number; // Float!
-    lng: number; // Float!
-    speed: number; // Float!
-    updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
-  }
   LocationWhereUniqueInput: { // input type
     id?: number | null; // Int
-  }
-  SensorCreateManyHubInput: { // input type
-    batteryLevel?: number | null; // Int
-    createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
-    doorColumn: number; // Int!
-    doorRow: number; // Int!
-    id?: number | null; // Int
-    isConnected: boolean; // Boolean!
-    isOpen: boolean; // Boolean!
-    serial: string; // String!
-    updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
-  }
-  SensorCreateManyHubInputEnvelope: { // input type
-    data?: NexusGenInputs['SensorCreateManyHubInput'][] | null; // [SensorCreateManyHubInput!]
-    skipDuplicates?: boolean | null; // Boolean
-  }
-  SensorCreateNestedManyWithoutHubInput: { // input type
-    connect?: NexusGenInputs['SensorWhereUniqueInput'][] | null; // [SensorWhereUniqueInput!]
-    connectOrCreate?: NexusGenInputs['SensorCreateOrConnectWithoutHubInput'][] | null; // [SensorCreateOrConnectWithoutHubInput!]
-    create?: NexusGenInputs['SensorCreateWithoutHubInput'][] | null; // [SensorCreateWithoutHubInput!]
-    createMany?: NexusGenInputs['SensorCreateManyHubInputEnvelope'] | null; // SensorCreateManyHubInputEnvelope
-  }
-  SensorCreateOrConnectWithoutHubInput: { // input type
-    create: NexusGenInputs['SensorCreateWithoutHubInput']; // SensorCreateWithoutHubInput!
-    where: NexusGenInputs['SensorWhereUniqueInput']; // SensorWhereUniqueInput!
-  }
-  SensorCreateWithoutHubInput: { // input type
-    batteryLevel?: number | null; // Int
-    createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
-    doorColumn: number; // Int!
-    doorRow: number; // Int!
-    events?: NexusGenInputs['EventCreateNestedManyWithoutSensorInput'] | null; // EventCreateNestedManyWithoutSensorInput
-    isConnected: boolean; // Boolean!
-    isOpen: boolean; // Boolean!
-    serial: string; // String!
-    updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
   }
   SensorEventsOrderByInput: { // input type
     createdAt?: NexusGenEnums['SortOrder'] | null; // SortOrder
@@ -141,29 +35,6 @@ export interface NexusGenInputs {
   SensorWhereUniqueInput: { // input type
     id?: number | null; // Int
     serial?: string | null; // String
-  }
-  UserCreateNestedOneWithoutHubsInput: { // input type
-    connect?: NexusGenInputs['UserWhereUniqueInput'] | null; // UserWhereUniqueInput
-    connectOrCreate?: NexusGenInputs['UserCreateOrConnectWithoutHubsInput'] | null; // UserCreateOrConnectWithoutHubsInput
-    create?: NexusGenInputs['UserCreateWithoutHubsInput'] | null; // UserCreateWithoutHubsInput
-  }
-  UserCreateOrConnectWithoutHubsInput: { // input type
-    create: NexusGenInputs['UserCreateWithoutHubsInput']; // UserCreateWithoutHubsInput!
-    where: NexusGenInputs['UserWhereUniqueInput']; // UserWhereUniqueInput!
-  }
-  UserCreateWithoutHubsInput: { // input type
-    createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
-    defaultFullNotification?: boolean | null; // Boolean
-    email: string; // String!
-    fcmToken: string; // String!
-    firstName?: string | null; // String
-    lastName?: string | null; // String
-    password: string; // String!
-    updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
-  }
-  UserWhereUniqueInput: { // input type
-    email?: string | null; // String
-    id?: number | null; // Int
   }
 }
 
@@ -267,14 +138,13 @@ export interface NexusGenFieldTypes {
   }
   Mutation: { // field return type
     createEvent: NexusGenRootTypes['Event'] | null; // Event
+    createHub: NexusGenRootTypes['Hub'] | null; // Hub
     createLocation: NexusGenRootTypes['Location'] | null; // Location
-    createOneHub: NexusGenRootTypes['Hub']; // Hub!
     createSensor: NexusGenRootTypes['Sensor'] | null; // Sensor
     deleteHub: NexusGenRootTypes['Hub'] | null; // Hub
     loginAsHub: string | null; // String
     loginWithPassword: string | null; // String
     registerWithPassword: string | null; // String
-    sendNotification: boolean | null; // Boolean
     updateHub: NexusGenRootTypes['Hub'] | null; // Hub
     updateSensor: NexusGenRootTypes['Sensor'] | null; // Sensor
     updateUser: NexusGenRootTypes['User'] | null; // User
@@ -342,14 +212,13 @@ export interface NexusGenFieldTypeNames {
   }
   Mutation: { // field return type name
     createEvent: 'Event'
+    createHub: 'Hub'
     createLocation: 'Location'
-    createOneHub: 'Hub'
     createSensor: 'Sensor'
     deleteHub: 'Hub'
     loginAsHub: 'String'
     loginWithPassword: 'String'
     registerWithPassword: 'String'
-    sendNotification: 'Boolean'
     updateHub: 'Hub'
     updateSensor: 'Sensor'
     updateUser: 'User'
@@ -404,6 +273,10 @@ export interface NexusGenArgTypes {
     createEvent: { // args
       serial: string; // String!
     }
+    createHub: { // args
+      name: string; // String!
+      serial: string; // String!
+    }
     createLocation: { // args
       age: number; // Int!
       course: number; // Float!
@@ -411,9 +284,6 @@ export interface NexusGenArgTypes {
       lat: number; // Float!
       lng: number; // Float!
       speed: number; // Float!
-    }
-    createOneHub: { // args
-      data: NexusGenInputs['HubCreateInput']; // HubCreateInput!
     }
     createSensor: { // args
       batteryLevel?: number | null; // Int

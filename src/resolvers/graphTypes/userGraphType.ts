@@ -1,5 +1,4 @@
 import { objectType } from "nexus";
-import { IAuthContext } from "../../context";
 
 export default objectType({
     name: "User",
