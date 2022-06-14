@@ -11,15 +11,15 @@ export default mutationField((t) => {
             serial: new GraphQLNonNull(GraphQLString),
         },
         async resolve(_root, args: { serial: string }, { prisma, hub }: IContext) {
-            if(!hub) throw new AuthenticationError("Hub does not have access")
+            if (!hub) throw new AuthenticationError("Hub does not have access")
             const { serial } = args
-            const sensor = await prisma.sensor.findFirst({ where: { serial, hubId: hub.id }});
-            if(!sensor) throw new UserInputError("Sensor doesn't exist")
-            const owner = await prisma.user.findFirst({ where: { id: hub.ownerId }})
-            if(!owner) throw new Error("Hub doesn't have an owner")
-            const createdEvent = await prisma.event.create({ data: { sensorId: sensor.id }})
-            if(owner.defaultFullNotification && hub.isArmed) {
-                try{
+            const sensor = await prisma.sensor.findFirst({ where: { serial, hubId: hub.id } });
+            if (!sensor) throw new UserInputError("Sensor doesn't exist")
+            const owner = await prisma.user.findFirst({ where: { id: hub.ownerId } })
+            if (!owner) throw new Error("Hub doesn't have an owner")
+            const createdEvent = await prisma.event.create({ data: { sensorId: sensor.id } })
+            if (owner.defaultFullNotification && hub.isArmed) {
+                try {
                     const msgId = await admin.messaging().send({
                         data: {
                             type: 'alert',
@@ -29,7 +29,7 @@ export default mutationField((t) => {
                         android: {
                             priority: 'high',
                         },
-                        token: owner.fcmToken,
+                        token: owner.fcmToken!,
                     })
                     console.log('Successfully sent message: ', msgId)
                 } catch (err) {

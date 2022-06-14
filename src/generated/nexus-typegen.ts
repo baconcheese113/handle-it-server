@@ -29,6 +29,9 @@ export interface NexusGenInputs {
   LocationWhereUniqueInput: { // input type
     id?: number | null; // Int
   }
+  NetworkMemberWhereUniqueInput: { // input type
+    id?: number | null; // Int
+  }
   SensorEventsOrderByInput: { // input type
     createdAt?: NexusGenEnums['SortOrder'] | null; // SortOrder
   }
@@ -39,6 +42,8 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
+  NetworkMemberStatus: "active" | "invited" | "requested"
+  RoleType: "member" | "owner"
   SortOrder: "asc" | "desc"
 }
 
@@ -76,6 +81,20 @@ export interface NexusGenObjects {
     speed: number; // Float!
   }
   Mutation: {};
+  Network: { // root type
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
+    createdById: number; // Int!
+    id: number; // Int!
+    name: string; // String!
+  }
+  NetworkMember: { // root type
+    id: number; // Int!
+    inviteeAcceptedAt?: NexusGenScalars['DateTime'] | null; // DateTime
+    inviterAcceptedAt?: NexusGenScalars['DateTime'] | null; // DateTime
+    networkId: number; // Int!
+    role: NexusGenEnums['RoleType']; // RoleType!
+    userId: number; // Int!
+  }
   Query: {};
   Sensor: { // root type
     batteryLevel?: number | null; // Int
@@ -87,6 +106,7 @@ export interface NexusGenObjects {
     serial: string; // String!
   }
   User: { // root type
+    activatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
     defaultFullNotification: boolean; // Boolean!
     email: string; // String!
     firstName?: string | null; // String
@@ -129,6 +149,7 @@ export interface NexusGenFieldTypes {
     age: number; // Int!
     course: number; // Float!
     createdAt: NexusGenScalars['DateTime']; // DateTime!
+    fixedAt: NexusGenScalars['DateTime'] | null; // DateTime
     hdop: number; // Float!
     hub: NexusGenRootTypes['Hub']; // Hub!
     id: number; // Int!
@@ -140,14 +161,35 @@ export interface NexusGenFieldTypes {
     createEvent: NexusGenRootTypes['Event'] | null; // Event
     createHub: NexusGenRootTypes['Hub'] | null; // Hub
     createLocation: NexusGenRootTypes['Location'] | null; // Location
+    createNetwork: NexusGenRootTypes['Network'] | null; // Network
+    createNetworkMember: NexusGenRootTypes['NetworkMember'] | null; // NetworkMember
     createSensor: NexusGenRootTypes['Sensor'] | null; // Sensor
     deleteHub: NexusGenRootTypes['Hub'] | null; // Hub
     loginAsHub: string | null; // String
     loginWithPassword: string | null; // String
     registerWithPassword: string | null; // String
+    seedUser: NexusGenRootTypes['User'] | null; // User
     updateHub: NexusGenRootTypes['Hub'] | null; // Hub
     updateSensor: NexusGenRootTypes['Sensor'] | null; // Sensor
     updateUser: NexusGenRootTypes['User'] | null; // User
+  }
+  Network: { // field return type
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
+    createdById: number; // Int!
+    id: number; // Int!
+    members: NexusGenRootTypes['NetworkMember'][]; // [NetworkMember!]!
+    name: string; // String!
+  }
+  NetworkMember: { // field return type
+    id: number; // Int!
+    inviteeAcceptedAt: NexusGenScalars['DateTime'] | null; // DateTime
+    inviterAcceptedAt: NexusGenScalars['DateTime'] | null; // DateTime
+    network: NexusGenRootTypes['Network']; // Network!
+    networkId: number; // Int!
+    role: NexusGenEnums['RoleType']; // RoleType!
+    status: NexusGenEnums['NetworkMemberStatus'] | null; // NetworkMemberStatus
+    user: NexusGenRootTypes['User']; // User!
+    userId: number; // Int!
   }
   Query: { // field return type
     hubViewer: NexusGenRootTypes['Hub']; // Hub!
@@ -165,6 +207,7 @@ export interface NexusGenFieldTypes {
     serial: string; // String!
   }
   User: { // field return type
+    activatedAt: NexusGenScalars['DateTime'] | null; // DateTime
     defaultFullNotification: boolean; // Boolean!
     displayName: string; // String!
     email: string; // String!
@@ -172,10 +215,12 @@ export interface NexusGenFieldTypes {
     hubs: NexusGenRootTypes['Hub'][]; // [Hub!]!
     id: number; // Int!
     lastName: string | null; // String
+    networkMemberships: NexusGenRootTypes['NetworkMember'][]; // [NetworkMember!]!
   }
   Viewer: { // field return type
     hubs: NexusGenRootTypes['Hub'][]; // [Hub!]!
     latestSensorVersion: string; // String!
+    networks: NexusGenRootTypes['Network'][]; // [Network!]!
     user: NexusGenRootTypes['User']; // User!
   }
 }
@@ -203,6 +248,7 @@ export interface NexusGenFieldTypeNames {
     age: 'Int'
     course: 'Float'
     createdAt: 'DateTime'
+    fixedAt: 'DateTime'
     hdop: 'Float'
     hub: 'Hub'
     id: 'Int'
@@ -214,14 +260,35 @@ export interface NexusGenFieldTypeNames {
     createEvent: 'Event'
     createHub: 'Hub'
     createLocation: 'Location'
+    createNetwork: 'Network'
+    createNetworkMember: 'NetworkMember'
     createSensor: 'Sensor'
     deleteHub: 'Hub'
     loginAsHub: 'String'
     loginWithPassword: 'String'
     registerWithPassword: 'String'
+    seedUser: 'User'
     updateHub: 'Hub'
     updateSensor: 'Sensor'
     updateUser: 'User'
+  }
+  Network: { // field return type name
+    createdAt: 'DateTime'
+    createdById: 'Int'
+    id: 'Int'
+    members: 'NetworkMember'
+    name: 'String'
+  }
+  NetworkMember: { // field return type name
+    id: 'Int'
+    inviteeAcceptedAt: 'DateTime'
+    inviterAcceptedAt: 'DateTime'
+    network: 'Network'
+    networkId: 'Int'
+    role: 'RoleType'
+    status: 'NetworkMemberStatus'
+    user: 'User'
+    userId: 'Int'
   }
   Query: { // field return type name
     hubViewer: 'Hub'
@@ -239,6 +306,7 @@ export interface NexusGenFieldTypeNames {
     serial: 'String'
   }
   User: { // field return type name
+    activatedAt: 'DateTime'
     defaultFullNotification: 'Boolean'
     displayName: 'String'
     email: 'String'
@@ -246,10 +314,12 @@ export interface NexusGenFieldTypeNames {
     hubs: 'Hub'
     id: 'Int'
     lastName: 'String'
+    networkMemberships: 'NetworkMember'
   }
   Viewer: { // field return type name
     hubs: 'Hub'
     latestSensorVersion: 'String'
+    networks: 'Network'
     user: 'User'
   }
 }
@@ -285,6 +355,14 @@ export interface NexusGenArgTypes {
       lng: number; // Float!
       speed: number; // Float!
     }
+    createNetwork: { // args
+      name: string; // String!
+    }
+    createNetworkMember: { // args
+      email: string; // String!
+      networkId: number; // Int!
+      role: NexusGenEnums['RoleType']; // RoleType!
+    }
     createSensor: { // args
       batteryLevel?: number | null; // Int
       doorColumn: number; // Int!
@@ -312,6 +390,12 @@ export interface NexusGenArgTypes {
       lastName?: string | null; // String
       password: string; // String!
     }
+    seedUser: { // args
+      email: string; // String!
+      firstName?: string | null; // String
+      lat: number; // Float!
+      lng: number; // Float!
+    }
     updateHub: { // args
       batteryLevel?: number | null; // Int
       id: string; // ID!
@@ -329,6 +413,14 @@ export interface NexusGenArgTypes {
       lastName?: string | null; // String
     }
   }
+  Network: {
+    members: { // args
+      after?: NexusGenInputs['NetworkMemberWhereUniqueInput'] | null; // NetworkMemberWhereUniqueInput
+      before?: NexusGenInputs['NetworkMemberWhereUniqueInput'] | null; // NetworkMemberWhereUniqueInput
+      first?: number | null; // Int
+      last?: number | null; // Int
+    }
+  }
   Sensor: {
     events: { // args
       after?: NexusGenInputs['EventWhereUniqueInput'] | null; // EventWhereUniqueInput
@@ -342,6 +434,12 @@ export interface NexusGenArgTypes {
     hubs: { // args
       after?: NexusGenInputs['HubWhereUniqueInput'] | null; // HubWhereUniqueInput
       before?: NexusGenInputs['HubWhereUniqueInput'] | null; // HubWhereUniqueInput
+      first?: number | null; // Int
+      last?: number | null; // Int
+    }
+    networkMemberships: { // args
+      after?: NexusGenInputs['NetworkMemberWhereUniqueInput'] | null; // NetworkMemberWhereUniqueInput
+      before?: NexusGenInputs['NetworkMemberWhereUniqueInput'] | null; // NetworkMemberWhereUniqueInput
       first?: number | null; // Int
       last?: number | null; // Int
     }

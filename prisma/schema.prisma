@@ -11,16 +11,19 @@ generator client {
 }
 
 model User {
-  id                      Int      @id @default(autoincrement())
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @default(now()) @updatedAt
-  email                   String   @unique
-  password                String
-  fcmToken                String
-  firstName               String?  @db.VarChar(255)
-  lastName                String?  @db.VarChar(255)
-  defaultFullNotification Boolean  @default(true)
+  id                      Int             @id @default(autoincrement())
+  createdAt               DateTime        @default(now())
+  updatedAt               DateTime        @default(now()) @updatedAt
+  email                   String          @unique
+  password                String?
+  fcmToken                String?
+  firstName               String?         @db.VarChar(255)
+  lastName                String?         @db.VarChar(255)
+  activatedAt             DateTime?
+  isAdmin                 Boolean         @default(false)
+  defaultFullNotification Boolean         @default(true)
   hubs                    Hub[]
+  networkMemberships      NetworkMember[]
 }
 
 model Hub {
@@ -73,4 +76,29 @@ model Location {
   age       Int
   hubId     Int
   hub       Hub      @relation(fields: [hubId], references: [id])
+}
+
+enum RoleType {
+  member
+  owner
+}
+
+model NetworkMember {
+  id                Int       @id @default(autoincrement())
+  role              RoleType  @default(member)
+  userId            Int
+  user              User      @relation(fields: [userId], references: [id])
+  networkId         Int
+  network           Network   @relation(fields: [networkId], references: [id])
+  inviteeAcceptedAt DateTime?
+  inviterAcceptedAt DateTime?
+}
+
+model Network {
+  id          Int             @id @default(autoincrement())
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @default(now()) @updatedAt
+  name        String
+  createdById Int
+  members     NetworkMember[]
 }

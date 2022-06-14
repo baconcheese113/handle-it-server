@@ -8,10 +8,12 @@ export default objectType({
         t.model.firstName()
         t.model.lastName()
         t.model.defaultFullNotification()
+        t.model.activatedAt()
+        t.model.networkMemberships()
         t.nonNull.field('displayName', {
             type: "String",
             resolve: (user) => {
-                if(user.firstName || user.lastName) {
+                if (user.firstName || user.lastName) {
                     return [user.firstName, user.lastName].join(' ')
                 }
                 return user.email

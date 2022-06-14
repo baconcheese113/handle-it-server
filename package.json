@@ -13,6 +13,7 @@
     "push-db": "npm run push-db:dev && npm run push-db:prod",
     "push-db:prod": "env-cmd -f ./.env.production prisma db push",
     "push-db:dev": "env-cmd -f ./.env prisma db push",
+    "seed": "ts-node prisma/seed.ts", 
     "migrate-reset-prod": "env-cmd -f ./.env.production prisma migrate reset",
     "build": "npm -s run generate && tsc",
     "generate": "npm -s run generate:prisma && npm -s run generate:nexus",

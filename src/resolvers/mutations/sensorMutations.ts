@@ -16,13 +16,13 @@ export default mutationField((t) => {
             batteryLevel: GraphQLInt,
         },
         async resolve(_root, args, { prisma, hub }: IContext) {
-            if(!hub) throw new AuthenticationError("Hub does not have access")
+            if (!hub) throw new AuthenticationError("Hub does not have access")
             const { isConnected, isOpen, ...otherArgs } = args
             // TODO ensure sensors only linked to a single hub
             // const serialSensor = await prisma.sensor.findFirst({ where: { serial: args.serial }})
             // if(serialSensor) throw new UserInputError("Sensor already added")
-            return prisma.sensor.upsert({ 
-                create: { 
+            return prisma.sensor.upsert({
+                create: {
                     hubId: hub.id,
                     isConnected: !!isConnected,
                     isOpen: !!isOpen,
@@ -46,18 +46,18 @@ export default mutationField((t) => {
             isOpen: GraphQLBoolean,
         },
         async resolve(_root, args, { prisma, hub }: IContext) {
-            if(!hub) throw new AuthenticationError("Hub does not have access")
+            if (!hub) throw new AuthenticationError("Hub does not have access")
             const id = Number.parseInt(args.id)
             const isOpen = args.isOpen ?? undefined;
-            const sensorToUpdate = await prisma.sensor.findFirst({ where: { id, hubId: hub.id }})
-            if(!sensorToUpdate) throw new UserInputError("Sensor doesn't exist")
-            if(sensorToUpdate.isOpen == isOpen) return sensorToUpdate
-            if(isOpen) {
-                const owner = await prisma.user.findFirst({ where: { id: hub.ownerId }})
-                if(!owner) throw new Error("Hub doesn't have an owner")
-                await prisma.event.create({ data: { sensorId: id }})
-                if(owner.defaultFullNotification && hub.isArmed) {
-                    try{
+            const sensorToUpdate = await prisma.sensor.findFirst({ where: { id, hubId: hub.id } })
+            if (!sensorToUpdate) throw new UserInputError("Sensor doesn't exist")
+            if (sensorToUpdate.isOpen === isOpen) return sensorToUpdate
+            if (isOpen) {
+                const owner = await prisma.user.findFirst({ where: { id: hub.ownerId } })
+                if (!owner) throw new Error("Hub doesn't have an owner")
+                await prisma.event.create({ data: { sensorId: id } })
+                if (owner.defaultFullNotification && hub.isArmed) {
+                    try {
                         const msgId = await admin.messaging().send({
                             data: {
                                 type: 'alert',
@@ -67,7 +67,7 @@ export default mutationField((t) => {
                             android: {
                                 priority: 'high',
                             },
-                            token: owner.fcmToken,
+                            token: owner.fcmToken!,
                         })
                         console.log('Successfully sent message: ', msgId)
                     } catch (err) {

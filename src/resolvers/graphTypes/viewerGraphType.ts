@@ -13,7 +13,13 @@ export default objectType({
         t.nonNull.list.nonNull.field('hubs', {
             type: "Hub",
             resolve: (_root, _args, { prisma, user }: IAuthContext) => {
-                return prisma.hub.findMany({ where: { ownerId: user.id }})
+                return prisma.hub.findMany({ where: { ownerId: user.id } })
+            }
+        })
+        t.nonNull.list.nonNull.field('networks', {
+            type: "Network",
+            resolve: async (_root, _args, { prisma, user }: IAuthContext) => {
+                return prisma.network.findMany({ where: { members: { some: { userId: user.id } } } })
             }
         })
         t.nonNull.field('latestSensorVersion', {
