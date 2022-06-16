@@ -6,6 +6,7 @@ import networkMemberGraphType from "./networkMemberGraphType";
 import sensorGraphType from "./sensorGraphType";
 import userGraphType from "./userGraphType";
 import viewerGraphType from "./viewerGraphType";
+import notificationOverrideGraphType from "./notificationOverrideGraphType";
 
 export {
     eventGraphType,
@@ -15,5 +16,6 @@ export {
     networkMemberGraphType,
     sensorGraphType,
     userGraphType,
-    viewerGraphType
+    viewerGraphType,
+    notificationOverrideGraphType,
 }

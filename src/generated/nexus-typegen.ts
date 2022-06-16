@@ -32,6 +32,9 @@ export interface NexusGenInputs {
   NetworkMemberWhereUniqueInput: { // input type
     id?: number | null; // Int
   }
+  NotificationOverrideWhereUniqueInput: { // input type
+    id?: number | null; // Int
+  }
   SensorEventsOrderByInput: { // input type
     createdAt?: NexusGenEnums['SortOrder'] | null; // SortOrder
   }
@@ -68,6 +71,7 @@ export interface NexusGenObjects {
     isArmed: boolean; // Boolean!
     isCharging?: boolean | null; // Boolean
     name: string; // String!
+    ownerId: number; // Int!
     serial: string; // String!
   }
   Location: { // root type
@@ -93,6 +97,13 @@ export interface NexusGenObjects {
     inviterAcceptedAt?: NexusGenScalars['DateTime'] | null; // DateTime
     networkId: number; // Int!
     role: NexusGenEnums['RoleType']; // RoleType!
+    userId: number; // Int!
+  }
+  NotificationOverride: { // root type
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
+    hubId: number; // Int!
+    id: number; // Int!
+    isMuted: boolean; // Boolean!
     userId: number; // Int!
   }
   Query: {};
@@ -141,7 +152,10 @@ export interface NexusGenFieldTypes {
     latestVersion: number; // Int!
     locations: NexusGenRootTypes['Location'][]; // [Location!]!
     name: string; // String!
+    networks: NexusGenRootTypes['Network'][]; // [Network!]!
+    notificationOverride: NexusGenRootTypes['NotificationOverride'] | null; // NotificationOverride
     owner: NexusGenRootTypes['User']; // User!
+    ownerId: number; // Int!
     sensors: NexusGenRootTypes['Sensor'][]; // [Sensor!]!
     serial: string; // String!
   }
@@ -170,12 +184,14 @@ export interface NexusGenFieldTypes {
     registerWithPassword: string | null; // String
     seedUser: NexusGenRootTypes['User'] | null; // User
     updateHub: NexusGenRootTypes['Hub'] | null; // Hub
+    updateNotificationOverride: NexusGenRootTypes['NotificationOverride'] | null; // NotificationOverride
     updateSensor: NexusGenRootTypes['Sensor'] | null; // Sensor
     updateUser: NexusGenRootTypes['User'] | null; // User
   }
   Network: { // field return type
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     createdById: number; // Int!
+    hubs: NexusGenRootTypes['Hub'][]; // [Hub!]!
     id: number; // Int!
     members: NexusGenRootTypes['NetworkMember'][]; // [NetworkMember!]!
     name: string; // String!
@@ -191,7 +207,17 @@ export interface NexusGenFieldTypes {
     user: NexusGenRootTypes['User']; // User!
     userId: number; // Int!
   }
+  NotificationOverride: { // field return type
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
+    hub: NexusGenRootTypes['Hub']; // Hub!
+    hubId: number; // Int!
+    id: number; // Int!
+    isMuted: boolean; // Boolean!
+    user: NexusGenRootTypes['User']; // User!
+    userId: number; // Int!
+  }
   Query: { // field return type
+    hub: NexusGenRootTypes['Hub'] | null; // Hub
     hubViewer: NexusGenRootTypes['Hub']; // Hub!
     viewer: NexusGenRootTypes['Viewer']; // Viewer!
   }
@@ -214,8 +240,10 @@ export interface NexusGenFieldTypes {
     firstName: string | null; // String
     hubs: NexusGenRootTypes['Hub'][]; // [Hub!]!
     id: number; // Int!
+    isMe: boolean; // Boolean!
     lastName: string | null; // String
     networkMemberships: NexusGenRootTypes['NetworkMember'][]; // [NetworkMember!]!
+    notificationOverrides: NexusGenRootTypes['NotificationOverride'][]; // [NotificationOverride!]!
   }
   Viewer: { // field return type
     hubs: NexusGenRootTypes['Hub'][]; // [Hub!]!
@@ -240,7 +268,10 @@ export interface NexusGenFieldTypeNames {
     latestVersion: 'Int'
     locations: 'Location'
     name: 'String'
+    networks: 'Network'
+    notificationOverride: 'NotificationOverride'
     owner: 'User'
+    ownerId: 'Int'
     sensors: 'Sensor'
     serial: 'String'
   }
@@ -269,12 +300,14 @@ export interface NexusGenFieldTypeNames {
     registerWithPassword: 'String'
     seedUser: 'User'
     updateHub: 'Hub'
+    updateNotificationOverride: 'NotificationOverride'
     updateSensor: 'Sensor'
     updateUser: 'User'
   }
   Network: { // field return type name
     createdAt: 'DateTime'
     createdById: 'Int'
+    hubs: 'Hub'
     id: 'Int'
     members: 'NetworkMember'
     name: 'String'
@@ -290,7 +323,17 @@ export interface NexusGenFieldTypeNames {
     user: 'User'
     userId: 'Int'
   }
+  NotificationOverride: { // field return type name
+    createdAt: 'DateTime'
+    hub: 'Hub'
+    hubId: 'Int'
+    id: 'Int'
+    isMuted: 'Boolean'
+    user: 'User'
+    userId: 'Int'
+  }
   Query: { // field return type name
+    hub: 'Hub'
     hubViewer: 'Hub'
     viewer: 'Viewer'
   }
@@ -313,8 +356,10 @@ export interface NexusGenFieldTypeNames {
     firstName: 'String'
     hubs: 'Hub'
     id: 'Int'
+    isMe: 'Boolean'
     lastName: 'String'
     networkMemberships: 'NetworkMember'
+    notificationOverrides: 'NotificationOverride'
   }
   Viewer: { // field return type name
     hubs: 'Hub'
@@ -403,6 +448,10 @@ export interface NexusGenArgTypes {
       isCharging?: boolean | null; // Boolean
       name?: string | null; // String
     }
+    updateNotificationOverride: { // args
+      hubId: number; // Int!
+      shouldMute: boolean; // Boolean!
+    }
     updateSensor: { // args
       id: string; // ID!
       isOpen?: boolean | null; // Boolean
@@ -419,6 +468,11 @@ export interface NexusGenArgTypes {
       before?: NexusGenInputs['NetworkMemberWhereUniqueInput'] | null; // NetworkMemberWhereUniqueInput
       first?: number | null; // Int
       last?: number | null; // Int
+    }
+  }
+  Query: {
+    hub: { // args
+      id: number; // Int!
     }
   }
   Sensor: {
@@ -440,6 +494,12 @@ export interface NexusGenArgTypes {
     networkMemberships: { // args
       after?: NexusGenInputs['NetworkMemberWhereUniqueInput'] | null; // NetworkMemberWhereUniqueInput
       before?: NexusGenInputs['NetworkMemberWhereUniqueInput'] | null; // NetworkMemberWhereUniqueInput
+      first?: number | null; // Int
+      last?: number | null; // Int
+    }
+    notificationOverrides: { // args
+      after?: NexusGenInputs['NotificationOverrideWhereUniqueInput'] | null; // NotificationOverrideWhereUniqueInput
+      before?: NexusGenInputs['NotificationOverrideWhereUniqueInput'] | null; // NotificationOverrideWhereUniqueInput
       first?: number | null; // Int
       last?: number | null; // Int
     }

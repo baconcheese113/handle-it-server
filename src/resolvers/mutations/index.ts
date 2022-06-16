@@ -5,7 +5,7 @@ import sensorMutations from "./sensorMutations";
 import eventMutations from "./eventMutations";
 import userMutations from "./userMutations";
 import networkMutations from "./networkMutations";
-
+import notificationOverrideMutations from "./notificationOverrideMutations";
 export {
     authMutations,
     hubMutations,
@@ -14,4 +14,5 @@ export {
     eventMutations,
     userMutations,
     networkMutations,
+    notificationOverrideMutations,
 }

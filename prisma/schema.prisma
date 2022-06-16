@@ -11,34 +11,36 @@ generator client {
 }
 
 model User {
-  id                      Int             @id @default(autoincrement())
-  createdAt               DateTime        @default(now())
-  updatedAt               DateTime        @default(now()) @updatedAt
-  email                   String          @unique
+  id                      Int                    @id @default(autoincrement())
+  createdAt               DateTime               @default(now())
+  updatedAt               DateTime               @default(now()) @updatedAt
+  email                   String                 @unique
   password                String?
   fcmToken                String?
-  firstName               String?         @db.VarChar(255)
-  lastName                String?         @db.VarChar(255)
+  firstName               String?                @db.VarChar(255)
+  lastName                String?                @db.VarChar(255)
   activatedAt             DateTime?
-  isAdmin                 Boolean         @default(false)
-  defaultFullNotification Boolean         @default(true)
+  isAdmin                 Boolean                @default(false)
+  defaultFullNotification Boolean                @default(true)
   hubs                    Hub[]
   networkMemberships      NetworkMember[]
+  notificationOverrides   NotificationOverride[]
 }
 
 model Hub {
-  id           Int        @id @default(autoincrement())
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @default(now()) @updatedAt
-  name         String
-  serial       String     @unique
-  batteryLevel Int?
-  isCharging   Boolean?
-  isArmed      Boolean    @default(false)
-  ownerId      Int
-  owner        User       @relation(fields: [ownerId], references: [id])
-  sensors      Sensor[]
-  locations    Location[]
+  id                    Int                    @id @default(autoincrement())
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @default(now()) @updatedAt
+  name                  String
+  serial                String                 @unique
+  batteryLevel          Int?
+  isCharging            Boolean?
+  isArmed               Boolean                @default(false)
+  ownerId               Int
+  owner                 User                   @relation(fields: [ownerId], references: [id])
+  sensors               Sensor[]
+  locations             Location[]
+  notificationOverrides NotificationOverride[]
 }
 
 model Sensor {
@@ -101,4 +103,14 @@ model Network {
   name        String
   createdById Int
   members     NetworkMember[]
+}
+
+model NotificationOverride {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  hubId     Int
+  hub       Hub      @relation(fields: [hubId], references: [id])
+  isMuted   Boolean  @default(true)
+  createdAt DateTime @default(now())
 }

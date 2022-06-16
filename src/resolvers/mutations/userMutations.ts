@@ -51,8 +51,8 @@ export default mutationField((t) => {
                                             age: Math.round(Math.random() * 10),
                                             course: Math.random() * 360,
                                             hdop: Math.random() * 100,
-                                            lat: (Math.random() - .5) + lat,
-                                            lng: (Math.random() - .5) + lng,
+                                            lat: ((Math.random() - .5) / 10) + lat,
+                                            lng: ((Math.random() - .5) / 10) + lng,
                                             speed: Math.random(),
                                             createdAt: new Date(new Date().getTime() - (Math.random() * 10000000))
                                         },
@@ -60,8 +60,8 @@ export default mutationField((t) => {
                                             age: Math.round(Math.random() * 10),
                                             course: Math.random() * 360,
                                             hdop: Math.random() * 100,
-                                            lat: (Math.random() - .5) + lat,
-                                            lng: (Math.random() - .5) + lng,
+                                            lat: ((Math.random() - .5) / 10) + lat,
+                                            lng: ((Math.random() - .5) / 10) + lng,
                                             speed: Math.random(),
                                             createdAt: new Date(new Date().getTime() - (Math.random() * 10000000))
                                         },
@@ -125,8 +125,8 @@ export default mutationField((t) => {
                                     age: Math.round(Math.random() * 10),
                                     course: Math.random() * 360,
                                     hdop: Math.random() * 100,
-                                    lat: (Math.random() - .5) + lat,
-                                    lng: (Math.random() - .5) + lng,
+                                    lat: ((Math.random() - .5) / 10) + lat,
+                                    lng: ((Math.random() - .5) / 10) + lng,
                                     speed: Math.random(),
                                     createdAt: new Date(new Date().getTime() - (Math.random() * 10000000))
                                 }
@@ -161,8 +161,8 @@ export default mutationField((t) => {
                                     age: Math.round(Math.random() * 10),
                                     course: Math.random() * 360,
                                     hdop: Math.random() * 100,
-                                    lat: (Math.random() - .5) + lat,
-                                    lng: (Math.random() - .5) + lng,
+                                    lat: ((Math.random() - .5) / 10) + lat,
+                                    lng: ((Math.random() - .5) / 10) + lng,
                                     speed: Math.random(),
                                     createdAt: new Date(new Date().getTime() - (Math.random() * 10000000))
                                 }

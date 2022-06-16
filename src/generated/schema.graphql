@@ -23,7 +23,10 @@ type Hub {
   latestVersion: Int!
   locations(after: LocationWhereUniqueInput, before: LocationWhereUniqueInput, first: Int, last: Int): [Location!]!
   name: String!
+  networks: [Network!]!
+  notificationOverride: NotificationOverride
   owner: User!
+  ownerId: Int!
   sensors(after: SensorWhereUniqueInput, before: SensorWhereUniqueInput, first: Int, last: Int): [Sensor!]!
   serial: String!
 }
@@ -74,6 +77,7 @@ type Mutation {
   registerWithPassword(email: String!, fcmToken: String!, firstName: String, lastName: String, password: String!): String
   seedUser(email: String!, firstName: String, lat: Float!, lng: Float!): User
   updateHub(batteryLevel: Int, id: ID!, isArmed: Boolean, isCharging: Boolean, name: String): Hub
+  updateNotificationOverride(hubId: Int!, shouldMute: Boolean!): NotificationOverride
   updateSensor(id: ID!, isOpen: Boolean): Sensor
   updateUser(defaultFullNotification: Boolean, firstName: String, lastName: String): User
 }
@@ -81,6 +85,7 @@ type Mutation {
 type Network {
   createdAt: DateTime!
   createdById: Int!
+  hubs: [Hub!]!
   id: Int!
   members(after: NetworkMemberWhereUniqueInput, before: NetworkMemberWhereUniqueInput, first: Int, last: Int): [NetworkMember!]!
   name: String!
@@ -108,7 +113,22 @@ input NetworkMemberWhereUniqueInput {
   id: Int
 }
 
+type NotificationOverride {
+  createdAt: DateTime!
+  hub: Hub!
+  hubId: Int!
+  id: Int!
+  isMuted: Boolean!
+  user: User!
+  userId: Int!
+}
+
+input NotificationOverrideWhereUniqueInput {
+  id: Int
+}
+
 type Query {
+  hub(id: Int!): Hub
   hubViewer: Hub!
   viewer: Viewer!
 }
@@ -152,8 +172,10 @@ type User {
   firstName: String
   hubs(after: HubWhereUniqueInput, before: HubWhereUniqueInput, first: Int, last: Int): [Hub!]!
   id: Int!
+  isMe: Boolean!
   lastName: String
   networkMemberships(after: NetworkMemberWhereUniqueInput, before: NetworkMemberWhereUniqueInput, first: Int, last: Int): [NetworkMember!]!
+  notificationOverrides(after: NotificationOverrideWhereUniqueInput, before: NotificationOverrideWhereUniqueInput, first: Int, last: Int): [NotificationOverride!]!
 }
 
 type Viewer {
