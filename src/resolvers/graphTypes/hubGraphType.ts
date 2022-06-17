@@ -19,6 +19,12 @@ export default objectType({
         t.model.createdAt()
         t.model.sensors()
         t.model.locations()
+        t.nonNull.list.nonNull.field('events', {
+            type: "Event",
+            resolve: (hub, _args, { prisma }: IAuthContext) => {
+                return prisma.event.findMany({ where: { sensor: { hubId: hub.id } } })
+            }
+        })
         t.nonNull.list.nonNull.field('networks', {
             type: "Network",
             resolve: async (hub, _args, { prisma, user }: IAuthContext) => {

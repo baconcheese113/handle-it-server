@@ -17,6 +17,7 @@ input EventWhereUniqueInput {
 type Hub {
   batteryLevel: Int
   createdAt: DateTime!
+  events: [Event!]!
   id: Int!
   isArmed: Boolean!
   isCharging: Boolean

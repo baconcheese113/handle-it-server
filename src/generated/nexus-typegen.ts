@@ -146,6 +146,7 @@ export interface NexusGenFieldTypes {
   Hub: { // field return type
     batteryLevel: number | null; // Int
     createdAt: NexusGenScalars['DateTime']; // DateTime!
+    events: NexusGenRootTypes['Event'][]; // [Event!]!
     id: number; // Int!
     isArmed: boolean; // Boolean!
     isCharging: boolean | null; // Boolean
@@ -267,6 +268,7 @@ export interface NexusGenFieldTypeNames {
   Hub: { // field return type name
     batteryLevel: 'Int'
     createdAt: 'DateTime'
+    events: 'Event'
     id: 'Int'
     isArmed: 'Boolean'
     isCharging: 'Boolean'
