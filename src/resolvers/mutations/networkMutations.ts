@@ -31,6 +31,20 @@ export default mutationField((t) => {
         }
     })
 
+    t.field('deleteNetwork', {
+        type: "Network",
+        args: {
+            networkId: new GraphQLNonNull(GraphQLInt),
+        },
+        async resolve(_root, args, { prisma, user }: IContext) {
+            if (!user) throw new AuthenticationError("User does not have access")
+            const { networkId } = args
+            const networkToDelete = await prisma.network.findFirst({ where: { id: networkId, members: { some: { userId: user.id, role: "owner" } } } })
+            if (!networkToDelete) throw new UserInputError("User is not an owner of a network with specified networkId")
+            return prisma.network.delete({ where: { id: networkId } })
+        }
+    })
+
     t.field('createNetworkMember', {
         type: "NetworkMember",
         args: {
