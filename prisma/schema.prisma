@@ -37,7 +37,7 @@ model Hub {
   isCharging            Boolean?
   isArmed               Boolean                @default(false)
   ownerId               Int
-  owner                 User                   @relation(fields: [ownerId], references: [id])
+  owner                 User                   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   sensors               Sensor[]
   locations             Location[]
   notificationOverrides NotificationOverride[]
@@ -54,7 +54,7 @@ model Sensor {
   doorColumn   Int
   doorRow      Int
   hubId        Int
-  hub          Hub      @relation(fields: [hubId], references: [id])
+  hub          Hub      @relation(fields: [hubId], references: [id], onDelete: Cascade)
   events       Event[]
 }
 
@@ -63,7 +63,7 @@ model Event {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
   sensorId  Int
-  sensor    Sensor   @relation(fields: [sensorId], references: [id])
+  sensor    Sensor   @relation(fields: [sensorId], references: [id], onDelete: Cascade)
 }
 
 model Location {
@@ -77,7 +77,7 @@ model Location {
   course    Float
   age       Int
   hubId     Int
-  hub       Hub      @relation(fields: [hubId], references: [id])
+  hub       Hub      @relation(fields: [hubId], references: [id], onDelete: Cascade)
 }
 
 enum RoleType {
@@ -89,9 +89,9 @@ model NetworkMember {
   id                Int       @id @default(autoincrement())
   role              RoleType  @default(member)
   userId            Int
-  user              User      @relation(fields: [userId], references: [id])
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   networkId         Int
-  network           Network   @relation(fields: [networkId], references: [id])
+  network           Network   @relation(fields: [networkId], references: [id], onDelete: Cascade)
   inviteeAcceptedAt DateTime?
   inviterAcceptedAt DateTime?
 }
@@ -108,9 +108,9 @@ model Network {
 model NotificationOverride {
   id        Int      @id @default(autoincrement())
   userId    Int
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   hubId     Int
-  hub       Hub      @relation(fields: [hubId], references: [id])
+  hub       Hub      @relation(fields: [hubId], references: [id], onDelete: Cascade)
   isMuted   Boolean  @default(true)
   createdAt DateTime @default(now())
 }
