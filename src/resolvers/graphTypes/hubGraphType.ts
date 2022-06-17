@@ -25,7 +25,7 @@ export default objectType({
                 const networkMemberships = await prisma.networkMember.findMany({
                     where: {
                         userId: hub.ownerId,
-                        NOT: { OR: { inviteeAcceptedAt: null, inviterAcceptedAt: null } },
+                        NOT: [{ inviteeAcceptedAt: null }, { inviterAcceptedAt: null }],
                     },
                     include: { network: true }
                 })
@@ -33,7 +33,7 @@ export default objectType({
                 const userNetworkMemberships = await prisma.networkMember.findMany({
                     where: {
                         userId: user.id,
-                        NOT: { OR: { inviteeAcceptedAt: null, inviterAcceptedAt: null } },
+                        NOT: [{ inviteeAcceptedAt: null }, { inviterAcceptedAt: null }],
                     },
                     include: { network: true }
                 })

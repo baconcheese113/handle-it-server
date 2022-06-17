@@ -172,12 +172,14 @@ export interface NexusGenFieldTypes {
     speed: number; // Float!
   }
   Mutation: { // field return type
+    acceptNetworkMembership: NexusGenRootTypes['NetworkMember'] | null; // NetworkMember
     createEvent: NexusGenRootTypes['Event'] | null; // Event
     createHub: NexusGenRootTypes['Hub'] | null; // Hub
     createLocation: NexusGenRootTypes['Location'] | null; // Location
     createNetwork: NexusGenRootTypes['Network'] | null; // Network
     createNetworkMember: NexusGenRootTypes['NetworkMember'] | null; // NetworkMember
     createSensor: NexusGenRootTypes['Sensor'] | null; // Sensor
+    declineNetworkMembership: NexusGenRootTypes['User'] | null; // User
     deleteHub: NexusGenRootTypes['Hub'] | null; // Hub
     loginAsHub: string | null; // String
     loginWithPassword: string | null; // String
@@ -288,12 +290,14 @@ export interface NexusGenFieldTypeNames {
     speed: 'Float'
   }
   Mutation: { // field return type name
+    acceptNetworkMembership: 'NetworkMember'
     createEvent: 'Event'
     createHub: 'Hub'
     createLocation: 'Location'
     createNetwork: 'Network'
     createNetworkMember: 'NetworkMember'
     createSensor: 'Sensor'
+    declineNetworkMembership: 'User'
     deleteHub: 'Hub'
     loginAsHub: 'String'
     loginWithPassword: 'String'
@@ -385,6 +389,9 @@ export interface NexusGenArgTypes {
     }
   }
   Mutation: {
+    acceptNetworkMembership: { // args
+      networkMemberId: number; // Int!
+    }
     createEvent: { // args
       serial: string; // String!
     }
@@ -415,6 +422,9 @@ export interface NexusGenArgTypes {
       isConnected?: boolean | null; // Boolean
       isOpen?: boolean | null; // Boolean
       serial: string; // ID!
+    }
+    declineNetworkMembership: { // args
+      networkMemberId: number; // Int!
     }
     deleteHub: { // args
       id: string; // ID!
@@ -502,6 +512,11 @@ export interface NexusGenArgTypes {
       before?: NexusGenInputs['NotificationOverrideWhereUniqueInput'] | null; // NotificationOverrideWhereUniqueInput
       first?: number | null; // Int
       last?: number | null; // Int
+    }
+  }
+  Viewer: {
+    networks: { // args
+      status?: NexusGenEnums['NetworkMemberStatus'] | null; // NetworkMemberStatus
     }
   }
 }

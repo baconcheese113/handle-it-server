@@ -16,7 +16,7 @@ export default objectType({
                 const members = await prisma.networkMember.findMany({
                     where: {
                         networkId: network.id,
-                        NOT: { OR: { inviteeAcceptedAt: null, inviterAcceptedAt: null } },
+                        NOT: [{ inviteeAcceptedAt: null }, { inviterAcceptedAt: null }],
                     },
                     include: { user: { include: { hubs: true }}}
                 })

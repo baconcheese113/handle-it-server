@@ -10,6 +10,7 @@ export default objectType({
         t.model.lastName()
         t.model.defaultFullNotification()
         t.model.activatedAt()
+        // TODO filter this down to only relationships this member can view
         t.model.networkMemberships()
         t.nonNull.field('isMe', {
             type: "Boolean",
