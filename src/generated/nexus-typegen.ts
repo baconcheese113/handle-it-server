@@ -182,6 +182,7 @@ export interface NexusGenFieldTypes {
     declineNetworkMembership: NexusGenRootTypes['User'] | null; // User
     deleteHub: NexusGenRootTypes['Hub'] | null; // Hub
     deleteNetwork: NexusGenRootTypes['Network'] | null; // Network
+    deleteNetworkMember: NexusGenRootTypes['Network'] | null; // Network
     loginAsHub: string | null; // String
     loginWithPassword: string | null; // String
     registerWithPassword: string | null; // String
@@ -200,6 +201,7 @@ export interface NexusGenFieldTypes {
     name: string; // String!
   }
   NetworkMember: { // field return type
+    canDelete: boolean; // Boolean!
     id: number; // Int!
     inviteeAcceptedAt: NexusGenScalars['DateTime'] | null; // DateTime
     inviterAcceptedAt: NexusGenScalars['DateTime'] | null; // DateTime
@@ -301,6 +303,7 @@ export interface NexusGenFieldTypeNames {
     declineNetworkMembership: 'User'
     deleteHub: 'Hub'
     deleteNetwork: 'Network'
+    deleteNetworkMember: 'Network'
     loginAsHub: 'String'
     loginWithPassword: 'String'
     registerWithPassword: 'String'
@@ -319,6 +322,7 @@ export interface NexusGenFieldTypeNames {
     name: 'String'
   }
   NetworkMember: { // field return type name
+    canDelete: 'Boolean'
     id: 'Int'
     inviteeAcceptedAt: 'DateTime'
     inviterAcceptedAt: 'DateTime'
@@ -433,6 +437,9 @@ export interface NexusGenArgTypes {
     }
     deleteNetwork: { // args
       networkId: number; // Int!
+    }
+    deleteNetworkMember: { // args
+      networkMemberId: number; // Int!
     }
     loginAsHub: { // args
       serial: string; // String!

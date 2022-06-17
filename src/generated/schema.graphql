@@ -75,6 +75,7 @@ type Mutation {
   declineNetworkMembership(networkMemberId: Int!): User
   deleteHub(id: ID!): Hub
   deleteNetwork(networkId: Int!): Network
+  deleteNetworkMember(networkMemberId: Int!): Network
   loginAsHub(serial: String!, userId: ID!): String
   loginWithPassword(email: String!, fcmToken: String!, password: String!): String
   registerWithPassword(email: String!, fcmToken: String!, firstName: String, lastName: String, password: String!): String
@@ -95,12 +96,15 @@ type Network {
 }
 
 type NetworkMember {
+  canDelete: Boolean!
   id: Int!
   inviteeAcceptedAt: DateTime
   inviterAcceptedAt: DateTime
   network: Network!
   networkId: Int!
   role: RoleType!
+
+  "Invited: network invited them.\n\rRequested: they requested to join network.\n\rActive: accepted on both sides into network"
   status: NetworkMemberStatus
   user: User!
   userId: Int!

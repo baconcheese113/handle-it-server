@@ -66,6 +66,47 @@ export default mutationField((t) => {
         }
     })
 
+    t.field('deleteNetworkMember', {
+        type: "Network",
+        args: {
+            networkMemberId: new GraphQLNonNull(GraphQLInt),
+        },
+        async resolve(_root, args, { prisma, user }: IContext) {
+            if (!user) throw new AuthenticationError("User does not have access")
+            const { networkMemberId } = args
+            const member = await prisma.networkMember.findFirst({
+                where: {
+                    id: networkMemberId,
+                    OR: [
+                        { userId: user.id },
+                        {
+                            network: {
+                                members: {
+                                    some: {
+                                        userId: user.id,
+                                        role: "owner",
+                                        NOT: [{ inviteeAcceptedAt: null }, { inviterAcceptedAt: null }],
+                                    }
+                                }
+                            }
+                        },
+                    ]
+                },
+            })
+            if (!member) throw new UserInputError("No active member at specified id in a network where requestor has Owner role")
+            const numOtherOwners = await prisma.networkMember.count({
+                where: {
+                    networkId: member.networkId,
+                    role: "owner",
+                    NOT: { id: networkMemberId },
+                },
+            })
+            if (numOtherOwners === 0) throw new UserInputError("Unable to delete membership if only Owner")
+            await prisma.networkMember.delete({ where: { id: networkMemberId } })
+            return prisma.network.findFirst({ where: { id: member.networkId } })
+        }
+    })
+
     t.field('declineNetworkMembership', {
         type: "User",
         args: {
