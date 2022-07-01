@@ -187,8 +187,10 @@ export interface NexusGenFieldTypes {
     loginAsHub: string | null; // String
     loginWithPassword: string | null; // String
     registerWithPassword: string | null; // String
+    requestNetworkMembership: NexusGenRootTypes['NetworkMember'] | null; // NetworkMember
     seedUser: NexusGenRootTypes['User'] | null; // User
     updateHub: NexusGenRootTypes['Hub'] | null; // Hub
+    updateNetworkMember: NexusGenRootTypes['NetworkMember'] | null; // NetworkMember
     updateNotificationOverride: NexusGenRootTypes['NotificationOverride'] | null; // NotificationOverride
     updateSensor: NexusGenRootTypes['Sensor'] | null; // Sensor
     updateUser: NexusGenRootTypes['User'] | null; // User
@@ -309,8 +311,10 @@ export interface NexusGenFieldTypeNames {
     loginAsHub: 'String'
     loginWithPassword: 'String'
     registerWithPassword: 'String'
+    requestNetworkMembership: 'NetworkMember'
     seedUser: 'User'
     updateHub: 'Hub'
+    updateNetworkMember: 'NetworkMember'
     updateNotificationOverride: 'NotificationOverride'
     updateSensor: 'Sensor'
     updateUser: 'User'
@@ -459,6 +463,9 @@ export interface NexusGenArgTypes {
       lastName?: string | null; // String
       password: string; // String!
     }
+    requestNetworkMembership: { // args
+      networkName: string; // String!
+    }
     seedUser: { // args
       email: string; // String!
       firstName?: string | null; // String
@@ -471,6 +478,10 @@ export interface NexusGenArgTypes {
       isArmed?: boolean | null; // Boolean
       isCharging?: boolean | null; // Boolean
       name?: string | null; // String
+    }
+    updateNetworkMember: { // args
+      networkMemberId: number; // Int!
+      role?: NexusGenEnums['RoleType'] | null; // RoleType
     }
     updateNotificationOverride: { // args
       hubId: number; // Int!

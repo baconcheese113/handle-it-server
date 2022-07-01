@@ -39,7 +39,12 @@ export default mutationField((t) => {
         async resolve(_root, args, { prisma, user }: IContext) {
             if (!user) throw new AuthenticationError("User does not have access")
             const { networkId } = args
-            const networkToDelete = await prisma.network.findFirst({ where: { id: networkId, members: { some: { userId: user.id, role: "owner" } } } })
+            const networkToDelete = await prisma.network.findFirst({
+                where: {
+                    id: networkId,
+                    members: { some: { userId: user.id, role: "owner" } }
+                }
+            })
             if (!networkToDelete) throw new UserInputError("User is not an owner of a network with specified networkId")
             return prisma.network.delete({ where: { id: networkId } })
         }
@@ -115,7 +120,13 @@ export default mutationField((t) => {
         async resolve(_root, args, { prisma, user }: IContext) {
             if (!user) throw new AuthenticationError("User does not have access")
             const { networkMemberId } = args
-            const member = await prisma.networkMember.findFirst({ where: { id: networkMemberId, userId: user.id, inviteeAcceptedAt: null } })
+            const member = await prisma.networkMember.findFirst({
+                where: {
+                    id: networkMemberId,
+                    userId: user.id,
+                    OR: [{ inviteeAcceptedAt: null }, { inviterAcceptedAt: null }]
+                }
+            })
             if (!member) throw new UserInputError("No network membership for this id is pending for this user")
             await prisma.networkMember.delete({ where: { id: member.id } })
             return prisma.user.findFirst({ where: { id: user.id } })
@@ -130,9 +141,55 @@ export default mutationField((t) => {
         async resolve(_root, args, { prisma, user }: IContext) {
             if (!user) throw new AuthenticationError("User does not have access")
             const { networkMemberId } = args
-            const member = await prisma.networkMember.findFirst({ where: { id: networkMemberId, userId: user.id, inviteeAcceptedAt: null } })
+            const member = await prisma.networkMember.findFirst({
+                where: {
+                    id: networkMemberId,
+                    userId: user.id,
+                    inviteeAcceptedAt: null
+                }
+            })
             if (!member) throw new UserInputError("No network membership for this id is pending for this user")
             return prisma.networkMember.update({ where: { id: member.id }, data: { inviteeAcceptedAt: new Date() } })
+        }
+    })
+
+    t.field('requestNetworkMembership', {
+        type: "NetworkMember",
+        args: {
+            networkName: new GraphQLNonNull(GraphQLString),
+        },
+        async resolve(_root, args, { prisma, user }: IContext) {
+            if (!user) throw new AuthenticationError("User does not have access")
+            const { networkName } = args
+            const network = await prisma.network.findFirst({ where: { name: networkName } })
+            if (!network) throw new UserInputError("Network doesn't exist")
+            const existingMember = await prisma.networkMember.findFirst({ where: { network: { id: network.id }, userId: user.id } })
+            if (existingMember) throw new UserInputError("Membership already pending or active in this network")
+
+            return prisma.networkMember.create({ data: { inviteeAcceptedAt: new Date(), userId: user.id, networkId: network.id } })
+        }
+    })
+
+    t.field('updateNetworkMember', {
+        type: "NetworkMember",
+        args: {
+            networkMemberId: new GraphQLNonNull(GraphQLInt),
+            role: "RoleType",
+        },
+        async resolve(_root, args, { prisma, user }: IContext) {
+            if (!user) throw new AuthenticationError("User does not have access")
+            const { networkMemberId, role } = args
+            const member = await prisma.networkMember.findFirst({
+                where: {
+                    id: networkMemberId,
+                    network: { members: { some: { userId: user.id, role: "owner" } } }
+                }
+            })
+            if(!member) throw new UserInputError("No member with this ID in a network where user is owner")
+            const data = {
+                role: role ?? undefined
+            }
+            return prisma.networkMember.update({where: {id: networkMemberId}, data })
         }
     })
 })
