@@ -173,14 +173,14 @@ export interface NexusGenFieldTypes {
     speed: number; // Float!
   }
   Mutation: { // field return type
-    acceptNetworkMembership: NexusGenRootTypes['NetworkMember'] | null; // NetworkMember
+    acceptNetworkMembership: NexusGenRootTypes['Network'] | null; // Network
     createEvent: NexusGenRootTypes['Event'] | null; // Event
     createHub: NexusGenRootTypes['Hub'] | null; // Hub
     createLocation: NexusGenRootTypes['Location'] | null; // Location
     createNetwork: NexusGenRootTypes['Network'] | null; // Network
     createNetworkMember: NexusGenRootTypes['NetworkMember'] | null; // NetworkMember
     createSensor: NexusGenRootTypes['Sensor'] | null; // Sensor
-    declineNetworkMembership: NexusGenRootTypes['User'] | null; // User
+    declineNetworkMembership: NexusGenRootTypes['Network'] | null; // Network
     deleteHub: NexusGenRootTypes['Hub'] | null; // Hub
     deleteNetwork: NexusGenRootTypes['Network'] | null; // Network
     deleteNetworkMember: NexusGenRootTypes['Network'] | null; // Network
@@ -297,14 +297,14 @@ export interface NexusGenFieldTypeNames {
     speed: 'Float'
   }
   Mutation: { // field return type name
-    acceptNetworkMembership: 'NetworkMember'
+    acceptNetworkMembership: 'Network'
     createEvent: 'Event'
     createHub: 'Hub'
     createLocation: 'Location'
     createNetwork: 'Network'
     createNetworkMember: 'NetworkMember'
     createSensor: 'Sensor'
-    declineNetworkMembership: 'User'
+    declineNetworkMembership: 'Network'
     deleteHub: 'Hub'
     deleteNetwork: 'Network'
     deleteNetworkMember: 'Network'
