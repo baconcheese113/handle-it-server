@@ -11,7 +11,7 @@
     "start": "node dist",
     "dev": "env-cmd ts-node-dev --transpile-only --no-notify index.ts",
     "test": "env-cmd -f ./.env.testing ts-node-dev --transpile-only --no-notify index.ts",
-    "push-db": "npm run push-db:dev && npm run push-db:prod",
+    "push-db": "npm run push-db:test && npm run push-db:dev && npm run push-db:prod",
     "push-db:prod": "env-cmd -f ./.env.production prisma db push",
     "push-db:test": "env-cmd -f ./.env.testing prisma db push",
     "push-db:dev": "env-cmd -f ./.env prisma db push",

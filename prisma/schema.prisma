@@ -59,11 +59,12 @@ model Sensor {
 }
 
 model Event {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-  sensorId  Int
-  sensor    Sensor   @relation(fields: [sensorId], references: [id], onDelete: Cascade)
+  id           Int       @id @default(autoincrement())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @default(now()) @updatedAt
+  sensorId     Int
+  sensor       Sensor    @relation(fields: [sensorId], references: [id], onDelete: Cascade)
+  propagatedAt DateTime?
 }
 
 model Location {

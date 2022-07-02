@@ -63,6 +63,7 @@ export interface NexusGenObjects {
   Event: { // root type
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     id: number; // Int!
+    propagatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
   }
   Hub: { // root type
     batteryLevel?: number | null; // Int
@@ -141,6 +142,7 @@ export interface NexusGenFieldTypes {
   Event: { // field return type
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     id: number; // Int!
+    propagatedAt: NexusGenScalars['DateTime'] | null; // DateTime
     sensor: NexusGenRootTypes['Sensor']; // Sensor!
   }
   Hub: { // field return type
@@ -186,6 +188,7 @@ export interface NexusGenFieldTypes {
     deleteNetworkMember: NexusGenRootTypes['Network'] | null; // Network
     loginAsHub: string | null; // String
     loginWithPassword: string | null; // String
+    propagateEventToNetworks: NexusGenRootTypes['Event'] | null; // Event
     registerWithPassword: string | null; // String
     requestNetworkMembership: NexusGenRootTypes['NetworkMember'] | null; // NetworkMember
     seedUser: NexusGenRootTypes['User'] | null; // User
@@ -265,6 +268,7 @@ export interface NexusGenFieldTypeNames {
   Event: { // field return type name
     createdAt: 'DateTime'
     id: 'Int'
+    propagatedAt: 'DateTime'
     sensor: 'Sensor'
   }
   Hub: { // field return type name
@@ -310,6 +314,7 @@ export interface NexusGenFieldTypeNames {
     deleteNetworkMember: 'Network'
     loginAsHub: 'String'
     loginWithPassword: 'String'
+    propagateEventToNetworks: 'Event'
     registerWithPassword: 'String'
     requestNetworkMembership: 'NetworkMember'
     seedUser: 'User'
@@ -455,6 +460,9 @@ export interface NexusGenArgTypes {
       email: string; // String!
       fcmToken: string; // String!
       password: string; // String!
+    }
+    propagateEventToNetworks: { // args
+      eventId: number; // Int!
     }
     registerWithPassword: { // args
       email: string; // String!

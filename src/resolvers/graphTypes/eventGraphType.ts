@@ -5,6 +5,7 @@ export default objectType({
     definition(t) {
         t.model.id()
         t.model.sensor()
+        t.model.propagatedAt()
         t.model.createdAt()
     }
 })

@@ -7,6 +7,7 @@ scalar DateTime
 type Event {
   createdAt: DateTime!
   id: Int!
+  propagatedAt: DateTime
   sensor: Sensor!
 }
 
@@ -79,6 +80,7 @@ type Mutation {
   deleteNetworkMember(networkMemberId: Int!): Network
   loginAsHub(serial: String!, userId: ID!): String
   loginWithPassword(email: String!, fcmToken: String!, password: String!): String
+  propagateEventToNetworks(eventId: Int!): Event
   registerWithPassword(email: String!, fcmToken: String!, firstName: String, lastName: String, password: String!): String
   requestNetworkMembership(networkName: String!): NetworkMember
   seedUser(email: String!, firstName: String, lat: Float!, lng: Float!): User
