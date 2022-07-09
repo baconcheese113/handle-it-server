@@ -33,6 +33,7 @@ model Hub {
   updatedAt             DateTime               @default(now()) @updatedAt
   name                  String
   serial                String                 @unique
+  imei                  String                 @unique
   batteryLevel          Int?
   isCharging            Boolean?
   isArmed               Boolean                @default(false)

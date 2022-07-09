@@ -44,6 +44,7 @@ export default mutationField((t) => {
                         create: {
                             name: `${firstName}Hub1`,
                             serial: `${firstName}Hub1Serial`,
+                            imei: `${firstName}Hub1Imei`,
                             locations: {
                                 createMany: {
                                     data: [
@@ -120,6 +121,7 @@ export default mutationField((t) => {
                         create: {
                             name: `not${firstName}1Hub1`,
                             serial: `not${firstName}1Hub1Serial`,
+                            imei: `not${firstName}1Hub1Imei`,
                             locations: {
                                 create: {
                                     age: Math.round(Math.random() * 10),
@@ -156,6 +158,7 @@ export default mutationField((t) => {
                         create: {
                             name: `not${firstName}2Hub1`,
                             serial: `not${firstName}2Hub1Serial`,
+                            imei: `not${firstName}2Hub1Imei`,
                             locations: {
                                 create: {
                                     age: Math.round(Math.random() * 10),

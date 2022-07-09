@@ -35,6 +35,7 @@ type Hub {
 
 input HubWhereUniqueInput {
   id: Int
+  imei: String
   serial: String
 }
 
@@ -69,7 +70,7 @@ input LocationWhereUniqueInput {
 type Mutation {
   acceptNetworkMembership(networkMemberId: Int!): Network
   createEvent(serial: String!): Event
-  createHub(name: String!, serial: String!): Hub
+  createHub(imei: String!, name: String!, serial: String!): Hub
   createLocation(age: Int!, course: Float!, hdop: Float!, lat: Float!, lng: Float!, speed: Float!): Location
   createNetwork(name: String!): Network
   createNetworkMember(email: String!, networkId: Int!, role: RoleType!): NetworkMember

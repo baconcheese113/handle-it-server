@@ -25,7 +25,8 @@ export default mutationField((t) => {
                             type: 'alert',
                             title: `${hub.name} detected that a handle was pulled`,
                             body: "Your phone wasn't detected nearby",
-                            eventId: `${createdEvent.id}`
+                            eventId: `${createdEvent.id}`,
+                            hubSerial: hub.serial,
                         },
                         android: {
                             priority: 'high',

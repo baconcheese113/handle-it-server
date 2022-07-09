@@ -24,6 +24,7 @@ export interface NexusGenInputs {
   }
   HubWhereUniqueInput: { // input type
     id?: number | null; // Int
+    imei?: string | null; // String
     serial?: string | null; // String
   }
   LocationWhereUniqueInput: { // input type
@@ -413,6 +414,7 @@ export interface NexusGenArgTypes {
       serial: string; // String!
     }
     createHub: { // args
+      imei: string; // String!
       name: string; // String!
       serial: string; // String!
     }

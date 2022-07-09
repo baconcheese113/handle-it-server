@@ -10,6 +10,7 @@ export default mutationField((t) => {
         args: {
             name: new GraphQLNonNull(GraphQLString),
             serial: new GraphQLNonNull(GraphQLString),
+            imei: new GraphQLNonNull(GraphQLString),
         },
         resolve(_root, args, { prisma, user }: IContext) {
             if (!user) throw new AuthenticationError("User does not have access")
