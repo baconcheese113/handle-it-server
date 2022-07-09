@@ -19,6 +19,7 @@ async function main() {
                 create: {
                     name: "TestHub1",
                     serial: "TestHub1Serial",
+                    imei: "TestHub1Imei",
                     locations: {
                         createMany: {
                             data: [
@@ -88,6 +89,7 @@ async function main() {
                 create: {
                     name: "SteveHub1",
                     serial: "SteveHub1Serial",
+                    imei: "SteveHub1Imei",
                     locations: {
                         createMany: {
                             data: [
@@ -124,6 +126,7 @@ async function main() {
         data: {
             name: "SteveHub2",
             serial: "SteveHub2Serial",
+            imei: "SteveHub2Imei",
             ownerId: steve.id,
             locations: {
                 createMany: {

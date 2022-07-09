@@ -455,6 +455,7 @@ export interface NexusGenArgTypes {
       networkMemberId: number; // Int!
     }
     loginAsHub: { // args
+      imei: string; // String!
       serial: string; // String!
       userId: string; // ID!
     }

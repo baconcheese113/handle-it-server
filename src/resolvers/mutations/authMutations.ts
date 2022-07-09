@@ -51,10 +51,11 @@ export default mutationField((t) => {
         args: {
             userId: new GraphQLNonNull(GraphQLID),
             serial: new GraphQLNonNull(GraphQLString),
+            imei: new GraphQLNonNull(GraphQLString),
         },
         async resolve(_root, args, { prisma, hub }: IContext) {
             if (hub) return jwt.sign(`Hub:${hub.id}`, process.env.JWT_SECRET!)
-            const { serial } = args
+            const { serial, imei } = args
             const userId = Number.parseInt(args.userId)
             if (!Number.isFinite(userId)) throw new Error("Invalid userId")
             const connectedUser = await prisma.user.findFirst({ where: { id: userId } })
@@ -62,7 +63,7 @@ export default mutationField((t) => {
             const serialHub = await prisma.hub.findFirst({ where: { serial } })
             // if(serialHub) throw new Error("Hub already registered")
             // if(listOfValidSerials.contains(serial)) throw new Error("Invalid serial")
-            const connectedHub = serialHub || await prisma.hub.create({ data: { name: "TempName", serial, ownerId: userId } })
+            const connectedHub = serialHub || await prisma.hub.create({ data: { name: "TempName", serial, imei, ownerId: userId } })
             return jwt.sign(`Hub:${connectedHub.id}`, process.env.JWT_SECRET!)
         }
     })
