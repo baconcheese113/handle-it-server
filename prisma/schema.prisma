@@ -42,6 +42,7 @@ model Hub {
   sensors               Sensor[]
   locations             Location[]
   notificationOverrides NotificationOverride[]
+  batteryLevels         BatteryLevel[]
 }
 
 model Sensor {
@@ -114,5 +115,14 @@ model NotificationOverride {
   hubId     Int
   hub       Hub      @relation(fields: [hubId], references: [id], onDelete: Cascade)
   isMuted   Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model BatteryLevel {
+  id        Int      @id @default(autoincrement())
+  volts     Float
+  percent   Float
+  hubId     Int?
+  hub       Hub?     @relation(fields: [hubId], references: [id], onDelete: SetNull)
   createdAt DateTime @default(now())
 }

@@ -7,7 +7,15 @@ export default objectType({
         t.model.id()
         t.model.name()
         t.model.isCharging()
-        t.model.batteryLevel()
+        t.field('batteryLevel', {
+            type: 'Float',
+            description: 'Battery level from 0 - 100',
+            resolve: async (hub, _args, { prisma }: IAuthContext) => {
+                const batteryLevels = await prisma.batteryLevel.findMany({ where: { hubId: hub.id }, orderBy: { createdAt: "desc" }, take: 1 })
+                if(!batteryLevels.length) return null;
+                return batteryLevels[0].percent;
+            }
+        })
         t.model.isArmed()
         t.model.ownerId()
         t.model.owner()

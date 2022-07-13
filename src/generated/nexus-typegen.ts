@@ -67,7 +67,6 @@ export interface NexusGenObjects {
     propagatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
   }
   Hub: { // root type
-    batteryLevel?: number | null; // Int
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     id: number; // Int!
     isArmed: boolean; // Boolean!
@@ -147,7 +146,7 @@ export interface NexusGenFieldTypes {
     sensor: NexusGenRootTypes['Sensor']; // Sensor!
   }
   Hub: { // field return type
-    batteryLevel: number | null; // Int
+    batteryLevel: number | null; // Float
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     events: NexusGenRootTypes['Event'][]; // [Event!]!
     id: number; // Int!
@@ -194,6 +193,7 @@ export interface NexusGenFieldTypes {
     requestNetworkMembership: NexusGenRootTypes['NetworkMember'] | null; // NetworkMember
     seedUser: NexusGenRootTypes['User'] | null; // User
     updateHub: NexusGenRootTypes['Hub'] | null; // Hub
+    updateHubBatteryLevel: NexusGenRootTypes['Hub'] | null; // Hub
     updateNetworkMember: NexusGenRootTypes['NetworkMember'] | null; // NetworkMember
     updateNotificationOverride: NexusGenRootTypes['NotificationOverride'] | null; // NotificationOverride
     updateSensor: NexusGenRootTypes['Sensor'] | null; // Sensor
@@ -273,7 +273,7 @@ export interface NexusGenFieldTypeNames {
     sensor: 'Sensor'
   }
   Hub: { // field return type name
-    batteryLevel: 'Int'
+    batteryLevel: 'Float'
     createdAt: 'DateTime'
     events: 'Event'
     id: 'Int'
@@ -320,6 +320,7 @@ export interface NexusGenFieldTypeNames {
     requestNetworkMembership: 'NetworkMember'
     seedUser: 'User'
     updateHub: 'Hub'
+    updateHubBatteryLevel: 'Hub'
     updateNetworkMember: 'NetworkMember'
     updateNotificationOverride: 'NotificationOverride'
     updateSensor: 'Sensor'
@@ -489,6 +490,10 @@ export interface NexusGenArgTypes {
       isArmed?: boolean | null; // Boolean
       isCharging?: boolean | null; // Boolean
       name?: string | null; // String
+    }
+    updateHubBatteryLevel: { // args
+      percent: number; // Float!
+      volts: number; // Float!
     }
     updateNetworkMember: { // args
       networkMemberId: number; // Int!

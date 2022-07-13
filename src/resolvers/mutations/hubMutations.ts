@@ -1,6 +1,6 @@
 import { Hub } from "@prisma/client";
 import { AuthenticationError, UserInputError, ForbiddenError } from "apollo-server-errors";
-import { GraphQLBoolean, GraphQLID, GraphQLInt, GraphQLNonNull, GraphQLString } from "graphql";
+import { GraphQLBoolean, GraphQLFloat, GraphQLID, GraphQLInt, GraphQLNonNull, GraphQLString } from "graphql";
 import { mutationField } from "nexus";
 import { IContext } from "../../context";
 
@@ -28,17 +28,9 @@ export default mutationField((t) => {
             const hubToDelete = await prisma.hub.findFirst({ where: { id }, include: { sensors: true } })
             if (!hubToDelete) throw new UserInputError("Hub doesn't exist")
             if (hubToDelete.ownerId !== user.id) throw new ForbiddenError("User does not have access")
-            // Because Cascade delete doesn't appear to work correctly
-            const sensorDels = hubToDelete.sensors.map(s => prisma.event.deleteMany({ where: { sensorId: s.id } }))
-
-            const transactionRet = await prisma.$transaction([
-                ...sensorDels,
-                prisma.sensor.deleteMany({ where: { hubId: id } }),
-                prisma.location.deleteMany({ where: { hubId: id } }),
-                prisma.hub.delete({ where: { id }, include: { sensors: true } }),
-            ])
-            const deletedHub = transactionRet[transactionRet.length - 1] as Hub
-            return deletedHub
+            // Because Cascade SetNull doesn't appear to work correctly
+            await prisma.batteryLevel.updateMany({ where: { hubId: id }, data: { hubId: null } })
+            return prisma.hub.delete({ where: { id }, include: { sensors: true } })
         }
     })
 
@@ -58,6 +50,22 @@ export default mutationField((t) => {
             const hubToUpdate = hub || await prisma.hub.findFirst({ where: { id: hubId, ownerId: user?.id } })
             if (!hubToUpdate) throw new UserInputError("Hub doesn't exist")
             return prisma.hub.update({ where: { id: hubToUpdate.id }, data: data as any })
+        }
+    })
+
+    t.field('updateHubBatteryLevel', {
+        type: "Hub",
+        description: "Volts should be between 0 - 1023, percent between 0 - 100",
+        args: {
+            volts: new GraphQLNonNull(GraphQLFloat),
+            percent: new GraphQLNonNull(GraphQLFloat),
+        },
+        async resolve(_root, args, { prisma, hub }: IContext) {
+            if (!hub) throw new AuthenticationError("No access")
+            await prisma.batteryLevel.create({
+                data: { ...args, hubId: hub.id }
+            })
+            return hub
         }
     })
 })
