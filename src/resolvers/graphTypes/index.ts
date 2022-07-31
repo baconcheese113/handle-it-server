@@ -7,6 +7,7 @@ import sensorGraphType from "./sensorGraphType";
 import userGraphType from "./userGraphType";
 import viewerGraphType from "./viewerGraphType";
 import notificationOverrideGraphType from "./notificationOverrideGraphType";
+import vehicleGraphType from "./vehicleGraphType";
 
 export {
     eventGraphType,
@@ -18,4 +19,5 @@ export {
     userGraphType,
     viewerGraphType,
     notificationOverrideGraphType,
+    vehicleGraphType,
 }

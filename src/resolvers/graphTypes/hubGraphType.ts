@@ -12,7 +12,7 @@ export default objectType({
             description: 'Battery level from 0 - 100',
             resolve: async (hub, _args, { prisma }: IAuthContext) => {
                 const batteryLevels = await prisma.batteryLevel.findMany({ where: { hubId: hub.id }, orderBy: { createdAt: "desc" }, take: 1 })
-                if(!batteryLevels.length) return null;
+                if (!batteryLevels.length) return null;
                 return batteryLevels[0].percent;
             }
         })
@@ -25,6 +25,7 @@ export default objectType({
             resolve: () => Number.parseInt(process.env.HUB_CURRENT_FIRMWARE_VERSION ?? "1")
         })
         t.model.createdAt()
+        t.model.vehicle()
         t.model.sensors()
         t.model.locations()
         t.nonNull.list.nonNull.field('events', {

@@ -43,6 +43,7 @@ model Hub {
   locations             Location[]
   notificationOverrides NotificationOverride[]
   batteryLevels         BatteryLevel[]
+  vehicle               Vehicle?
 }
 
 model Sensor {
@@ -125,4 +126,19 @@ model BatteryLevel {
   hubId     Int?
   hub       Hub?     @relation(fields: [hubId], references: [id], onDelete: SetNull)
   createdAt DateTime @default(now())
+}
+
+model Vehicle {
+  id         Int      @id @default(autoincrement())
+  carQueryId String
+  year       Int
+  makeId     String
+  modelName  String
+  modelTrim  String
+  modelBody  String
+  color      String?
+  notes      String?
+  hubId      Int      @unique
+  hub        Hub      @relation(fields: [hubId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
 }

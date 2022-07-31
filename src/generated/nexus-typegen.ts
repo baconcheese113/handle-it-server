@@ -125,6 +125,18 @@ export interface NexusGenObjects {
     id: number; // Int!
     lastName?: string | null; // String
   }
+  Vehicle: { // root type
+    carQueryId: string; // String!
+    color?: string | null; // String
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
+    id: number; // Int!
+    makeId: string; // String!
+    modelBody: string; // String!
+    modelName: string; // String!
+    modelTrim: string; // String!
+    notes?: string | null; // String
+    year: number; // Int!
+  }
   Viewer: {};
 }
 
@@ -161,6 +173,7 @@ export interface NexusGenFieldTypes {
     ownerId: number; // Int!
     sensors: NexusGenRootTypes['Sensor'][]; // [Sensor!]!
     serial: string; // String!
+    vehicle: NexusGenRootTypes['Vehicle'] | null; // Vehicle
   }
   Location: { // field return type
     age: number; // Int!
@@ -182,10 +195,12 @@ export interface NexusGenFieldTypes {
     createNetwork: NexusGenRootTypes['Network'] | null; // Network
     createNetworkMember: NexusGenRootTypes['NetworkMember'] | null; // NetworkMember
     createSensor: NexusGenRootTypes['Sensor'] | null; // Sensor
+    createVehicle: NexusGenRootTypes['Vehicle'] | null; // Vehicle
     declineNetworkMembership: NexusGenRootTypes['Network'] | null; // Network
     deleteHub: NexusGenRootTypes['Hub'] | null; // Hub
     deleteNetwork: NexusGenRootTypes['Network'] | null; // Network
     deleteNetworkMember: NexusGenRootTypes['Network'] | null; // Network
+    deleteVehicle: NexusGenRootTypes['Vehicle'] | null; // Vehicle
     loginAsHub: string | null; // String
     loginWithPassword: string | null; // String
     propagateEventToNetworks: NexusGenRootTypes['Event'] | null; // Event
@@ -198,6 +213,7 @@ export interface NexusGenFieldTypes {
     updateNotificationOverride: NexusGenRootTypes['NotificationOverride'] | null; // NotificationOverride
     updateSensor: NexusGenRootTypes['Sensor'] | null; // Sensor
     updateUser: NexusGenRootTypes['User'] | null; // User
+    updateVehicle: NexusGenRootTypes['Vehicle'] | null; // Vehicle
   }
   Network: { // field return type
     createdAt: NexusGenScalars['DateTime']; // DateTime!
@@ -257,6 +273,19 @@ export interface NexusGenFieldTypes {
     networkMemberships: NexusGenRootTypes['NetworkMember'][]; // [NetworkMember!]!
     notificationOverrides: NexusGenRootTypes['NotificationOverride'][]; // [NotificationOverride!]!
   }
+  Vehicle: { // field return type
+    carQueryId: string; // String!
+    color: string | null; // String
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
+    hub: NexusGenRootTypes['Hub']; // Hub!
+    id: number; // Int!
+    makeId: string; // String!
+    modelBody: string; // String!
+    modelName: string; // String!
+    modelTrim: string; // String!
+    notes: string | null; // String
+    year: number; // Int!
+  }
   Viewer: { // field return type
     hubs: NexusGenRootTypes['Hub'][]; // [Hub!]!
     latestSensorVersion: string; // String!
@@ -288,6 +317,7 @@ export interface NexusGenFieldTypeNames {
     ownerId: 'Int'
     sensors: 'Sensor'
     serial: 'String'
+    vehicle: 'Vehicle'
   }
   Location: { // field return type name
     age: 'Int'
@@ -309,10 +339,12 @@ export interface NexusGenFieldTypeNames {
     createNetwork: 'Network'
     createNetworkMember: 'NetworkMember'
     createSensor: 'Sensor'
+    createVehicle: 'Vehicle'
     declineNetworkMembership: 'Network'
     deleteHub: 'Hub'
     deleteNetwork: 'Network'
     deleteNetworkMember: 'Network'
+    deleteVehicle: 'Vehicle'
     loginAsHub: 'String'
     loginWithPassword: 'String'
     propagateEventToNetworks: 'Event'
@@ -325,6 +357,7 @@ export interface NexusGenFieldTypeNames {
     updateNotificationOverride: 'NotificationOverride'
     updateSensor: 'Sensor'
     updateUser: 'User'
+    updateVehicle: 'Vehicle'
   }
   Network: { // field return type name
     createdAt: 'DateTime'
@@ -383,6 +416,19 @@ export interface NexusGenFieldTypeNames {
     lastName: 'String'
     networkMemberships: 'NetworkMember'
     notificationOverrides: 'NotificationOverride'
+  }
+  Vehicle: { // field return type name
+    carQueryId: 'String'
+    color: 'String'
+    createdAt: 'DateTime'
+    hub: 'Hub'
+    id: 'Int'
+    makeId: 'String'
+    modelBody: 'String'
+    modelName: 'String'
+    modelTrim: 'String'
+    notes: 'String'
+    year: 'Int'
   }
   Viewer: { // field return type name
     hubs: 'Hub'
@@ -443,6 +489,15 @@ export interface NexusGenArgTypes {
       isOpen?: boolean | null; // Boolean
       serial: string; // ID!
     }
+    createVehicle: { // args
+      carQueryId: string; // String!
+      hubId: string; // ID!
+      makeId: string; // String!
+      modelBody: string; // String!
+      modelName: string; // String!
+      modelTrim: string; // String!
+      year: number; // Int!
+    }
     declineNetworkMembership: { // args
       networkMemberId: number; // Int!
     }
@@ -454,6 +509,9 @@ export interface NexusGenArgTypes {
     }
     deleteNetworkMember: { // args
       networkMemberId: number; // Int!
+    }
+    deleteVehicle: { // args
+      id: string; // ID!
     }
     loginAsHub: { // args
       imei: string; // String!
@@ -511,6 +569,11 @@ export interface NexusGenArgTypes {
       defaultFullNotification?: boolean | null; // Boolean
       firstName?: string | null; // String
       lastName?: string | null; // String
+    }
+    updateVehicle: { // args
+      color?: string | null; // String
+      id: string; // ID!
+      notes?: string | null; // String
     }
   }
   Network: {

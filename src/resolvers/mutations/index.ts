@@ -6,6 +6,8 @@ import eventMutations from "./eventMutations";
 import userMutations from "./userMutations";
 import networkMutations from "./networkMutations";
 import notificationOverrideMutations from "./notificationOverrideMutations";
+import vehicleMutations from "./vehicleMutations";
+
 export {
     authMutations,
     hubMutations,
@@ -15,4 +17,5 @@ export {
     userMutations,
     networkMutations,
     notificationOverrideMutations,
+    vehicleMutations,
 }
