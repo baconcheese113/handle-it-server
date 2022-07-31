@@ -14,7 +14,8 @@ export default mutationField((t) => {
         },
         resolve(_root, args, { prisma, user }: IContext) {
             if (!user) throw new AuthenticationError("User does not have access")
-            return prisma.hub.create({ data: { ...args, ownerId: user.id } })
+            const name = args.name.trim()
+            return prisma.hub.create({ data: { ...args, name, ownerId: user.id } })
         }
     })
     t.field('deleteHub', {
@@ -46,10 +47,11 @@ export default mutationField((t) => {
         async resolve(_root, args, { prisma, hub, user }: IContext) {
             if (!hub && !user) throw new AuthenticationError("No access")
             const { id, ...data } = args
+            const name = args.name?.trim()
             const hubId = Number.parseInt(id);
             const hubToUpdate = hub || await prisma.hub.findFirst({ where: { id: hubId, ownerId: user?.id } })
             if (!hubToUpdate) throw new UserInputError("Hub doesn't exist")
-            return prisma.hub.update({ where: { id: hubToUpdate.id }, data: data as any })
+            return prisma.hub.update({ where: { id: hubToUpdate.id }, data: { ...data, name } as any })
         }
     })
 

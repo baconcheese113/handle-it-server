@@ -16,11 +16,16 @@ export default mutationField((t) => {
             lastName: GraphQLString,
         },
         async resolve(_root, args, { prisma, user }: IContext) {
-            if (user) return jwt.sign(`User:${user.id}`, process.env.JWT_SECRET!);
-            const { password, ...otherArgs } = args
-            const hashedPassword = await bcrypt.hash(password, 10)
-            console.log('hashedPassword', hashedPassword)
-            const newUser = await prisma.user.create({ data: { ...otherArgs, password: hashedPassword, activatedAt: new Date() } })
+            if (user) return jwt.sign(`User:${user.id}`, process.env.JWT_SECRET!)
+            const data = {
+                ...args,
+                password: await bcrypt.hash(args.password, 10),
+                email: args.email.trim(),
+                firstName: args.firstName?.trim(),
+                lastName: args.lastName?.trim(),
+                activatedAt: new Date()
+            }
+            const newUser = await prisma.user.create({ data })
 
             return jwt.sign(`User:${newUser.id}`, process.env.JWT_SECRET!)
         }

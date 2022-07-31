@@ -14,7 +14,11 @@ export default mutationField((t) => {
         },
         async resolve(_root, args, { prisma, user }: IContext) {
             if (!user) throw new AuthenticationError("User does not have access")
-            const data: any = args
+            const data: any = {
+                ...args,
+                firstName: args.firstName?.trim(),
+                lastName: args.lastName?.trim(),
+            }
             return prisma.user.update({ where: { id: user.id }, data })
         }
     })
@@ -29,10 +33,11 @@ export default mutationField((t) => {
         },
         async resolve(_root, args, { prisma, user }: IContext) {
             if (!user?.isAdmin) throw new AuthenticationError("User does not have access")
-            const { email, lat, lng } = args
+            const { lat, lng } = args
+            const email = args.email.trim()
             const existingUser = await prisma.user.findFirst({ where: { email } })
             if (!existingUser) throw new UserInputError(`User for ${email} doesn't exist`)
-            const firstName = existingUser.firstName ?? args.firstName
+            const firstName = existingUser.firstName ?? args.firstName?.trim()
             if (!firstName) throw new UserInputError(`FirstName not provided and hasn't been set`)
 
             const password = await bcrypt.hash("password", 10)

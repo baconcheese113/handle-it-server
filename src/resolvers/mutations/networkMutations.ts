@@ -12,11 +12,12 @@ export default mutationField((t) => {
         },
         async resolve(_root, args, { prisma, user }: IContext) {
             if (!user) throw new AuthenticationError("User does not have access")
-            const existingNetwork = await prisma.network.findFirst({ where: { ...args, createdById: user.id } });
+            const name = args.name.trim()
+            const existingNetwork = await prisma.network.findFirst({ where: { name, createdById: user.id } });
             if (existingNetwork) throw new UserInputError("Network with name already exists")
             return await prisma.network.create({
                 data: {
-                    ...args,
+                    name,
                     createdById: user.id,
                     members: {
                         create: {
@@ -59,7 +60,8 @@ export default mutationField((t) => {
         },
         async resolve(_root, args, { prisma, user }: IContext) {
             if (!user) throw new AuthenticationError("User does not have access")
-            const { email, networkId, role } = args
+            const { networkId, role } = args
+            const email = args.email.trim()
             let existingUser = await prisma.user.findFirst({ where: { email } })
             if (!existingUser) existingUser = await prisma.user.create({ data: { email } })
 
@@ -201,7 +203,7 @@ export default mutationField((t) => {
         },
         async resolve(_root, args, { prisma, user }: IContext) {
             if (!user) throw new AuthenticationError("User does not have access")
-            const { networkName } = args
+            const networkName = args.networkName.trim()
             const network = await prisma.network.findFirst({ where: { name: networkName } })
             if (!network) throw new UserInputError("Network doesn't exist")
             const existingMember = await prisma.networkMember.findFirst({ where: { network: { id: network.id }, userId: user.id } })
