@@ -1,16 +1,14 @@
-import { AuthenticationError } from "apollo-server-errors";
-import { GraphQLNonNull, GraphQLInt, GraphQLBoolean } from "graphql";
-import { mutationField } from "nexus";
-import { IContext } from "../../context";
+import { AuthenticationError } from "apollo-server-errors"
+import { builder } from "../../builder"
 
-export default mutationField((t) => {
-    t.field('updateNotificationOverride', {
+builder.mutationFields((t) => ({
+    updateNotificationOverride: t.prismaField({
         type: "NotificationOverride",
         args: {
-            hubId: new GraphQLNonNull(GraphQLInt),
-            shouldMute: new GraphQLNonNull(GraphQLBoolean),
+            hubId: t.arg.int({ required: true }),
+            shouldMute: t.arg.boolean({ required: true }),
         },
-        async resolve(_root, args, { prisma, user }: IContext) {
+        resolve: async (query, _root, args, { prisma, user }) => {
             if (!user) throw new AuthenticationError("User does not have access")
             const { hubId, shouldMute } = args
             const existingSetting = await prisma.notificationOverride.findFirst({ where: { userId: user.id, hubId } })
@@ -19,8 +17,8 @@ export default mutationField((t) => {
             if (existingSetting) {
                 return prisma.notificationOverride.update({ where: { id: existingSetting.id }, data })
             }
-            return prisma.notificationOverride.create({ data })
+            return prisma.notificationOverride.create({ ...query, data })
 
         }
-    })
-})
+    }),
+}))

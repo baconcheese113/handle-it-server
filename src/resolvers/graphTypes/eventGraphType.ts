@@ -1,11 +1,13 @@
-import { objectType } from "nexus";
+import { builder } from '../../builder'
 
-export default objectType({
-    name: "Event",
-    definition(t) {
-        t.model.id()
-        t.model.sensor()
-        t.model.propagatedAt()
-        t.model.createdAt()
-    }
+builder.prismaObject('Event', {
+    fields: (t) => ({
+        id: t.exposeInt('id'),
+        sensor: t.relation('sensor'),
+        propagatedAt: t.expose('propagatedAt', {
+            type: 'DateTime',
+            nullable: true,
+        }),
+        createdAt: t.expose('createdAt', { type: 'DateTime' }),
+    })
 })

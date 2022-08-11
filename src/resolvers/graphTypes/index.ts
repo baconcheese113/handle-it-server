@@ -1,23 +1,10 @@
-import eventGraphType from "./eventGraphType";
-import hubGraphType from "./hubGraphType";
-import locationGraphType from "./locationGraphType";
-import networkGraphType from "./networkGraphType";
-import networkMemberGraphType from "./networkMemberGraphType";
-import sensorGraphType from "./sensorGraphType";
-import userGraphType from "./userGraphType";
-import viewerGraphType from "./viewerGraphType";
-import notificationOverrideGraphType from "./notificationOverrideGraphType";
-import vehicleGraphType from "./vehicleGraphType";
-
-export {
-    eventGraphType,
-    hubGraphType,
-    locationGraphType,
-    networkGraphType,
-    networkMemberGraphType,
-    sensorGraphType,
-    userGraphType,
-    viewerGraphType,
-    notificationOverrideGraphType,
-    vehicleGraphType,
-}
+import "./eventGraphType";
+import "./hubGraphType";
+import "./locationGraphType";
+import "./networkGraphType";
+import "./networkMemberGraphType";
+import "./sensorGraphType";
+import "./userGraphType";
+import "./viewerGraphType";
+import "./notificationOverrideGraphType";
+import "./vehicleGraphType";

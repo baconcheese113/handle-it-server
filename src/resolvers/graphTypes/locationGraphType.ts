@@ -1,20 +1,20 @@
-import { objectType } from "nexus";
+import { builder } from "../../builder"
 
-export default objectType({
-    name: 'Location',
-    definition(t) {
-        t.model.id()
-        t.model.lat({ description: "Latitude (in degrees)" })
-        t.model.lng({ description: "Longitude (in degrees)" })
-        t.model.hdop({ description: "Horizontal diminution of precision (in meters)" })
-        t.model.speed({ description: "Speed in KMPH (always slight movement)" })
-        t.model.age({ description: "Age of this location (in ms)" })
-        t.model.course({ description: "Ground course (in degrees)" })
-        t.model.createdAt()
-        t.field('fixedAt', {
+builder.prismaObject('Location', {
+    fields: (t) => ({
+        id: t.exposeInt('id'),
+        lat: t.exposeFloat('lat'),
+        lng: t.exposeFloat('lng'),
+        hdop: t.exposeFloat('hdop'),
+        speed: t.exposeFloat('speed'),
+        age: t.exposeInt('age'),
+        course: t.exposeFloat('course'),
+        createdAt: t.expose('createdAt', { type: 'DateTime' }),
+        fixedAt: t.field({
             type: 'DateTime',
-            resolve: (location) => new Date(location.createdAt - location.age)
-        })
-        t.model.hub()
-    }
+            nullable: true,
+            resolve: (location) => new Date(location.createdAt.getTime() - location.age)
+        }),
+        hub: t.relation('hub'),
+    }),
 })

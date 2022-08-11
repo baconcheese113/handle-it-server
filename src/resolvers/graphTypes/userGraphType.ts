@@ -1,33 +1,32 @@
-import { objectType } from "nexus";
-import { IAuthContext } from "../../context";
+import { builder } from "../../builder"
 
-export default objectType({
-    name: "User",
-    definition(t) {
-        t.model.id()
-        t.model.email()
-        t.model.firstName()
-        t.model.lastName()
-        t.model.defaultFullNotification()
-        t.model.activatedAt()
+builder.prismaObject('User', {
+    fields: (t) => ({
+        id: t.exposeInt('id'),
+        email: t.exposeString('email'),
+        firstName: t.exposeString('firstName', { nullable: true }),
+        lastName: t.exposeString('lastName', { nullable: true }),
+        defaultFullNotification: t.exposeBoolean('defaultFullNotification'),
+        activatedAt: t.expose('activatedAt', {
+            type: 'DateTime',
+            nullable: true,
+        }),
         // TODO filter this down to only relationships this member can view
-        t.model.networkMemberships()
-        t.nonNull.field('isMe', {
-            type: "Boolean",
-            resolve: (u, _args, { user }: IAuthContext) => {
+        networkMemberships: t.relation('networkMemberships'),
+        isMe: t.withAuth({ loggedIn: true }).boolean({
+            resolve: (u, _args, { user }) => {
                 return u.id === user.id
             }
-        })
-        t.nonNull.field('displayName', {
-            type: "String",
+        }),
+        displayName: t.string({
             resolve: (user) => {
                 if (user.firstName || user.lastName) {
                     return [user.firstName, user.lastName].join(' ')
                 }
                 return user.email
             }
-        })
-        t.model.hubs()
-        t.model.notificationOverrides()
-    }
+        }),
+        hubs: t.relation('hubs'),
+        notificationOverrides: t.relation('notificationOverrides'),
+    })
 })

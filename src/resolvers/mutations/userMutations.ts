@@ -1,37 +1,34 @@
 import { AuthenticationError, UserInputError } from "apollo-server-errors"
-import { GraphQLString, GraphQLBoolean, GraphQLNonNull, GraphQLFloat } from "graphql"
-import { mutationField } from "nexus"
 import bcrypt from 'bcrypt'
-import { IContext } from "../../context"
+import { builder } from "../../builder"
 
-export default mutationField((t) => {
-    t.field('updateUser', {
+builder.mutationFields((t) => ({
+    updateUser: t.prismaField({
         type: 'User',
         args: {
-            firstName: GraphQLString,
-            lastName: GraphQLString,
-            defaultFullNotification: GraphQLBoolean,
+            firstName: t.arg.string(),
+            lastName: t.arg.string(),
+            defaultFullNotification: t.arg.boolean(),
         },
-        async resolve(_root, args, { prisma, user }: IContext) {
+        resolve: async (query, _root, args, { prisma, user }) => {
             if (!user) throw new AuthenticationError("User does not have access")
             const data: any = {
                 ...args,
                 firstName: args.firstName?.trim(),
                 lastName: args.lastName?.trim(),
             }
-            return prisma.user.update({ where: { id: user.id }, data })
+            return prisma.user.update({ ...query, where: { id: user.id }, data })
         }
-    })
-
-    t.field('seedUser', {
+    }),
+    seedUser: t.prismaField({
         type: 'User',
         args: {
-            email: new GraphQLNonNull(GraphQLString),
-            firstName: GraphQLString,
-            lat: new GraphQLNonNull(GraphQLFloat),
-            lng: new GraphQLNonNull(GraphQLFloat),
+            email: t.arg.string({ required: true }),
+            firstName: t.arg.string(),
+            lat: t.arg.float({ required: true }),
+            lng: t.arg.float({ required: true }),
         },
-        async resolve(_root, args, { prisma, user }: IContext) {
+        resolve: async (query, _root, args, { prisma, user }) => {
             if (!user?.isAdmin) throw new AuthenticationError("User does not have access")
             const { lat, lng } = args
             const email = args.email.trim()
@@ -43,6 +40,7 @@ export default mutationField((t) => {
             const password = await bcrypt.hash("password", 10)
 
             const seededUser = await prisma.user.update({
+                ...query,
                 where: { email },
                 data: {
                     hubs: {
@@ -189,5 +187,5 @@ export default mutationField((t) => {
             })
             return seededUser
         }
-    })
-})
+    }),
+}))

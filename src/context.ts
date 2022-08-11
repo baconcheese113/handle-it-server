@@ -1,28 +1,28 @@
 import { Hub, PrismaClient, User } from '@prisma/client'
 import jwt from 'jsonwebtoken'
 
-const prisma = new PrismaClient()
+export const prisma = new PrismaClient()
 
 function fromGlobalId(token: string): { id: number; type: string; } {
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET!) as string
-    const [type, stringId] = decodedToken.split(':');
-    return {id: Number.parseInt(stringId), type }
+    const [type, stringId] = decodedToken.split(':')
+    return { id: Number.parseInt(stringId), type }
 }
 async function getUser(authorization: string): Promise<User | null> {
-    const splitAuthorization = authorization.split('Bearer ');
-    if(splitAuthorization.length !== 2) return null
-    const { type, id } = fromGlobalId(splitAuthorization[1]);
-    if(type !== "User") return null
-    return prisma.user.findFirst({ where: { id }});
-} 
+    const splitAuthorization = authorization.split('Bearer ')
+    if (splitAuthorization.length !== 2) return null
+    const { type, id } = fromGlobalId(splitAuthorization[1])
+    if (type !== "User") return null
+    return prisma.user.findFirst({ where: { id } })
+}
 
 async function getHub(authorization: string): Promise<Hub | null> {
-    const splitAuthorization = authorization.split('Bearer ');
-    if(splitAuthorization.length !== 2) return null
-    const { type, id } = fromGlobalId(splitAuthorization[1]);
-    if(type !== "Hub") return null
-    return prisma.hub.findFirst({ where: { id }});
-} 
+    const splitAuthorization = authorization.split('Bearer ')
+    if (splitAuthorization.length !== 2) return null
+    const { type, id } = fromGlobalId(splitAuthorization[1])
+    if (type !== "Hub") return null
+    return prisma.hub.findFirst({ where: { id } })
+}
 
 export interface IContext {
     prisma: PrismaClient,

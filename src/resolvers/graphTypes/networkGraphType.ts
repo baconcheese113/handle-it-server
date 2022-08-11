@@ -1,24 +1,23 @@
-import { Hub } from "@prisma/client";
-import { objectType } from "nexus";
-import { IAuthContext } from "../../context";
+import { Hub } from "@prisma/client"
+import { builder } from "../../builder"
 
-export default objectType({
-    name: 'Network',
-    definition(t) {
-        t.model.id()
-        t.model.name()
-        t.model.members()
-        t.model.createdById()
-        t.model.createdAt()
-        t.nonNull.list.nonNull.field('hubs', {
-            type: "Hub",
-            resolve: async (network, _args, { prisma, user }: IAuthContext) => {
+builder.prismaObject('Network', {
+    fields: (t) => ({
+        id: t.exposeInt('id'),
+        name: t.exposeString('name'),
+        members: t.relation('members'),
+        createdById: t.exposeInt('createdById'),
+        createdAt: t.expose('createdAt', { type: 'DateTime' }),
+        hubs: t.withAuth({ loggedIn: true }).prismaField({
+            type: ['Hub'],
+            resolve: async (query, network, _args, { prisma, user }) => {
                 const members = await prisma.networkMember.findMany({
+                    ...query,
                     where: {
                         networkId: network.id,
                         NOT: [{ inviteeAcceptedAt: null }, { inviterAcceptedAt: null }],
                     },
-                    include: { user: { include: { hubs: true }}}
+                    include: { user: { include: { hubs: true } } }
                 })
                 // TODO make sure user is part of this network
                 const canAccess = members.some(m => m.userId === user.id)
@@ -26,5 +25,5 @@ export default objectType({
                 return canAccess ? hubs : []
             }
         })
-    }
+    }),
 })

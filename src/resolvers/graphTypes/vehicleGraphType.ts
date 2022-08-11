@@ -1,18 +1,17 @@
-import { objectType } from "nexus";
+import { builder } from "../../builder"
 
-export default objectType({
-    name: "Vehicle",
-    definition(t) {
-        t.model.id()
-        t.model.carQueryId()
-        t.model.year()
-        t.model.makeId()
-        t.model.modelName()
-        t.model.modelTrim()
-        t.model.modelBody()
-        t.model.color()
-        t.model.notes()
-        t.model.hub()
-        t.model.createdAt()
-    }
+builder.prismaObject('Vehicle', {
+    fields: (t) => ({
+        id: t.exposeInt('id'),
+        carQueryId: t.exposeString('carQueryId'),
+        year: t.exposeInt('year'),
+        makeId: t.exposeString('makeId'),
+        modelName: t.exposeString('modelName'),
+        modelTrim: t.exposeString('modelTrim'),
+        modelBody: t.exposeString('modelBody'),
+        color: t.exposeString('color', { nullable: true }),
+        notes: t.exposeString('notes', { nullable: true }),
+        hub: t.relation('hub'),
+        createdAt: t.expose('createdAt', { type: 'DateTime' }),
+    })
 })

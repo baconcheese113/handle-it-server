@@ -1,21 +1,20 @@
-import { RoleType } from "@prisma/client";
-import { AuthenticationError, UserInputError } from "apollo-server-errors";
-import { GraphQLInt, GraphQLNonNull, GraphQLString } from "graphql";
-import { mutationField, nonNull } from "nexus";
-import { IContext } from "../../context";
+import { RoleType } from "@prisma/client"
+import { AuthenticationError, UserInputError } from "apollo-server-errors"
+import { builder } from "../../builder"
 
-export default mutationField((t) => {
-    t.field('createNetwork', {
+builder.mutationFields((t) => ({
+    createNetwork: t.prismaField({
         type: "Network",
         args: {
-            name: new GraphQLNonNull(GraphQLString),
+            name: t.arg.string({ required: true }),
         },
-        async resolve(_root, args, { prisma, user }: IContext) {
+        resolve: async (query, _root, args, { prisma, user }) => {
             if (!user) throw new AuthenticationError("User does not have access")
             const name = args.name.trim()
-            const existingNetwork = await prisma.network.findFirst({ where: { name, createdById: user.id } });
+            const existingNetwork = await prisma.network.findFirst({ where: { name, createdById: user.id } })
             if (existingNetwork) throw new UserInputError("Network with name already exists")
             return await prisma.network.create({
+                ...query,
                 data: {
                     name,
                     createdById: user.id,
@@ -30,14 +29,13 @@ export default mutationField((t) => {
                 }
             })
         }
-    })
-
-    t.field('deleteNetwork', {
+    }),
+    deleteNetwork: t.prismaField({
         type: "Network",
         args: {
-            networkId: new GraphQLNonNull(GraphQLInt),
+            networkId: t.arg.int({ required: true }),
         },
-        async resolve(_root, args, { prisma, user }: IContext) {
+        resolve: async (query, _root, args, { prisma, user }) => {
             if (!user) throw new AuthenticationError("User does not have access")
             const { networkId } = args
             const networkToDelete = await prisma.network.findFirst({
@@ -47,18 +45,17 @@ export default mutationField((t) => {
                 }
             })
             if (!networkToDelete) throw new UserInputError("User is not an owner of a network with specified networkId")
-            return prisma.network.delete({ where: { id: networkId } })
+            return prisma.network.delete({ ...query, where: { id: networkId } })
         }
-    })
-
-    t.field('createNetworkMember', {
+    }),
+    createNetworkMember: t.prismaField({
         type: "NetworkMember",
         args: {
-            networkId: new GraphQLNonNull(GraphQLInt),
-            email: new GraphQLNonNull(GraphQLString),
-            role: nonNull("RoleType"),
+            networkId: t.arg.int({ required: true }),
+            email: t.arg.string({ required: true }),
+            role: t.arg({ type: RoleType, required: true }),
         },
-        async resolve(_root, args, { prisma, user }: IContext) {
+        resolve: async (query, _root, args, { prisma, user }) => {
             if (!user) throw new AuthenticationError("User does not have access")
             const { networkId, role } = args
             const email = args.email.trim()
@@ -66,19 +63,18 @@ export default mutationField((t) => {
             if (!existingUser) existingUser = await prisma.user.create({ data: { email } })
 
             const existingMember = await prisma.networkMember.findFirst({ where: { networkId, user: { email: existingUser.email } } })
-            const inviterAcceptedAt = existingMember?.inviterAcceptedAt ?? new Date().toISOString();
+            const inviterAcceptedAt = existingMember?.inviterAcceptedAt ?? new Date().toISOString()
             if (existingMember) return prisma.networkMember.update({ where: { id: existingMember.id }, data: { role, inviterAcceptedAt } })
 
-            return prisma.networkMember.create({ data: { networkId, role, userId: existingUser.id, inviterAcceptedAt } })
+            return prisma.networkMember.create({ ...query, data: { networkId, role, userId: existingUser.id, inviterAcceptedAt } })
         }
-    })
-
-    t.field('deleteNetworkMember', {
+    }),
+    deleteNetworkMember: t.prismaField({
         type: "Network",
         args: {
-            networkMemberId: new GraphQLNonNull(GraphQLInt),
+            networkMemberId: t.arg.int({ required: true }),
         },
-        async resolve(_root, args, { prisma, user }: IContext) {
+        resolve: async (query, _root, args, { prisma, user }) => {
             if (!user) throw new AuthenticationError("User does not have access")
             const { networkMemberId } = args
             const member = await prisma.networkMember.findFirst({
@@ -110,16 +106,15 @@ export default mutationField((t) => {
             })
             if (numOtherOwners === 0) throw new UserInputError("Unable to delete membership if only Owner")
             await prisma.networkMember.delete({ where: { id: networkMemberId } })
-            return prisma.network.findFirst({ where: { id: member.networkId } })
+            return prisma.network.findFirst({ ...query, rejectOnNotFound: true, where: { id: member.networkId } })
         }
-    })
-
-    t.field('declineNetworkMembership', {
+    }),
+    declineNetworkMembership: t.prismaField({
         type: "Network",
         args: {
-            networkMemberId: new GraphQLNonNull(GraphQLInt),
+            networkMemberId: t.arg.int({ required: true }),
         },
-        async resolve(_root, args, { prisma, user }: IContext) {
+        resolve: async (query, _root, args, { prisma, user }) => {
             // Can be called by the invitee if they were invited or the inviter if the user requested 
             if (!user) throw new AuthenticationError("User does not have access")
             const { networkMemberId } = args
@@ -148,16 +143,15 @@ export default mutationField((t) => {
             })
             if (!member) throw new UserInputError("No network membership for this id is pending for this user")
             await prisma.networkMember.delete({ where: { id: member.id } })
-            return prisma.network.findFirst({ where: { id: member.networkId } })
+            return prisma.network.findFirst({ ...query, rejectOnNotFound: true, where: { id: member.networkId } })
         }
-    })
-
-    t.field('acceptNetworkMembership', {
+    }),
+    acceptNetworkMembership: t.prismaField({
         type: "Network",
         args: {
-            networkMemberId: new GraphQLNonNull(GraphQLInt),
+            networkMemberId: t.arg.int({ required: true }),
         },
-        async resolve(_root, args, { prisma, user }: IContext) {
+        resolve: async (query, _root, args, { prisma, user }) => {
             // Can be called by the invitee if they were invited or the inviter if the user requested 
             if (!user) throw new AuthenticationError("User does not have access")
             const { networkMemberId } = args
@@ -192,16 +186,15 @@ export default mutationField((t) => {
                     inviterAcceptedAt: member.inviterAcceptedAt ? undefined : new Date(),
                 }
             })
-            return prisma.network.findFirst({ where: { id: member.networkId } })
+            return prisma.network.findFirst({ ...query, rejectOnNotFound: true, where: { id: member.networkId } })
         }
-    })
-
-    t.field('requestNetworkMembership', {
+    }),
+    requestNetworkMembership: t.prismaField({
         type: "NetworkMember",
         args: {
-            networkName: new GraphQLNonNull(GraphQLString),
+            networkName: t.arg.string({ required: true }),
         },
-        async resolve(_root, args, { prisma, user }: IContext) {
+        resolve: async (query, _root, args, { prisma, user }) => {
             if (!user) throw new AuthenticationError("User does not have access")
             const networkName = args.networkName.trim()
             const network = await prisma.network.findFirst({ where: { name: networkName } })
@@ -209,17 +202,16 @@ export default mutationField((t) => {
             const existingMember = await prisma.networkMember.findFirst({ where: { network: { id: network.id }, userId: user.id } })
             if (existingMember) throw new UserInputError("Membership already pending or active in this network")
 
-            return prisma.networkMember.create({ data: { inviteeAcceptedAt: new Date(), userId: user.id, networkId: network.id } })
+            return prisma.networkMember.create({ ...query, data: { inviteeAcceptedAt: new Date(), userId: user.id, networkId: network.id } })
         }
-    })
-
-    t.field('updateNetworkMember', {
+    }),
+    updateNetworkMember: t.prismaField({
         type: "NetworkMember",
         args: {
-            networkMemberId: new GraphQLNonNull(GraphQLInt),
-            role: "RoleType",
+            networkMemberId: t.arg.int({ required: true }),
+            role: t.arg({ type: RoleType }),
         },
-        async resolve(_root, args, { prisma, user }: IContext) {
+        resolve: async (query, _root, args, { prisma, user }) => {
             if (!user) throw new AuthenticationError("User does not have access")
             const { networkMemberId, role } = args
             const member = await prisma.networkMember.findFirst({
@@ -232,7 +224,7 @@ export default mutationField((t) => {
             const data = {
                 role: role ?? undefined
             }
-            return prisma.networkMember.update({ where: { id: networkMemberId }, data })
+            return prisma.networkMember.update({ ...query, where: { id: networkMemberId }, data })
         }
-    })
-})
+    }),
+}))

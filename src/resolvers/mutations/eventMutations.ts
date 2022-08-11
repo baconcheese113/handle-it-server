@@ -1,23 +1,21 @@
-import { AuthenticationError, UserInputError } from "apollo-server-errors";
-import { GraphQLInt, GraphQLNonNull, GraphQLString } from "graphql";
-import { mutationField } from "nexus";
-import { IContext } from "../../context";
-import * as admin from 'firebase-admin';
+import { AuthenticationError, UserInputError } from "apollo-server-errors"
+import * as admin from 'firebase-admin'
+import { builder } from "../../builder"
 
-export default mutationField((t) => {
-    t.field('createEvent', {
+builder.mutationFields((t) => ({
+    createEvent: t.prismaField({
         type: "Event",
         args: {
-            serial: new GraphQLNonNull(GraphQLString),
+            serial: t.arg.string({ required: true }),
         },
-        async resolve(_root, args, { prisma, hub }: IContext) {
+        resolve: async (query, _root, args, { prisma, hub }) => {
             if (!hub) throw new AuthenticationError("Hub does not have access")
             const { serial } = args
-            const sensor = await prisma.sensor.findFirst({ where: { serial, hubId: hub.id } });
+            const sensor = await prisma.sensor.findFirst({ where: { serial, hubId: hub.id } })
             if (!sensor) throw new UserInputError("Sensor doesn't exist")
             const owner = await prisma.user.findFirst({ where: { id: hub.ownerId } })
             if (!owner) throw new Error("Hub doesn't have an owner")
-            const createdEvent = await prisma.event.create({ data: { sensorId: sensor.id } })
+            const createdEvent = await prisma.event.create({ ...query, data: { sensorId: sensor.id } })
             if (owner.defaultFullNotification && hub.isArmed) {
                 try {
                     const msgId = await admin.messaging().send({
@@ -40,14 +38,13 @@ export default mutationField((t) => {
             }
             return createdEvent
         }
-    })
-
-    t.field('propagateEventToNetworks', {
+    }),
+    propagateEventToNetworks: t.prismaField({
         type: "Event",
         args: {
-            eventId: new GraphQLNonNull(GraphQLInt),
+            eventId: t.arg.int({ required: true }),
         },
-        async resolve(_root, args, { prisma, user }: IContext) {
+        resolve: async (query, _root, args, { prisma, user }) => {
             if (!user) throw new AuthenticationError("User does not have access")
             const { eventId } = args
             const event = await prisma.event.findFirst({
@@ -75,7 +72,7 @@ export default mutationField((t) => {
                 },
                 include: { networkMemberships: { include: { network: true } } }
             })
-            const userNetworkIdsSet = new Set(userNetworkIds);
+            const userNetworkIdsSet = new Set(userNetworkIds)
             const ownerName = user.firstName || user.email
             for await (const u of usersToNotify) {
                 if (u.defaultFullNotification) {
@@ -101,7 +98,7 @@ export default mutationField((t) => {
                     }
                 }
             }
-            return prisma.event.update({ where: { id: event.id }, data: { propagatedAt: new Date() } })
+            return prisma.event.update({ where: { id: event.id }, data: { ...query, propagatedAt: new Date() } })
         }
-    })
-})
+    }),
+}))

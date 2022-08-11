@@ -1,22 +1,22 @@
-import {ApolloServer} from 'apollo-server'
+import { ApolloServer } from 'apollo-server'
 import { schema } from './schema'
 import { createContext } from './context'
 
-export const server = new ApolloServer({ 
-    schema, 
+export const server = new ApolloServer({
+    schema,
     context: createContext,
     cache: 'bounded',
     plugins: [
         { // BasicLogging plugin
-            async requestDidStart({request}) {
-                console.log("query: ", request.query);
-                console.log("variables: ", request.variables);
+            async requestDidStart({ request }) {
+                console.log("query: ", request.query)
+                console.log("variables: ", request.variables)
                 return {
-                    async willSendResponse({response}) {
-                        console.log("response: ", JSON.stringify(response, null, 2));
+                    async willSendResponse({ response }) {
+                        console.log("response: ", JSON.stringify(response, null, 2))
                     },
                     async didEncounterErrors() {
-                        console.log("Errors encountered");
+                        console.log("Errors encountered")
                     }
                 }
             }

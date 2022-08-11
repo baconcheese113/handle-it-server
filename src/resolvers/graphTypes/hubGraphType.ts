@@ -1,43 +1,43 @@
-import { objectType } from "nexus";
-import { IAuthContext } from "../../context";
+import { builder } from "../../builder"
 
-export default objectType({
-    name: 'Hub',
-    definition(t) {
-        t.model.id()
-        t.model.name()
-        t.model.isCharging()
-        t.field('batteryLevel', {
-            type: 'Float',
+builder.prismaObject('Hub', {
+    fields: (t) => ({
+        id: t.exposeInt('id'),
+        name: t.exposeString('name'),
+        isCharging: t.exposeBoolean('isCharging', { nullable: true }),
+        batteryLevel: t.float({
+            nullable: true,
             description: 'Battery level from 0 - 100',
-            resolve: async (hub, _args, { prisma }: IAuthContext) => {
-                const batteryLevels = await prisma.batteryLevel.findMany({ where: { hubId: hub.id }, orderBy: { createdAt: "desc" }, take: 1 })
-                if (!batteryLevels.length) return null;
-                return batteryLevels[0].percent;
-            }
-        })
-        t.model.isArmed()
-        t.model.ownerId()
-        t.model.owner()
-        t.model.serial()
-        t.nonNull.field('latestVersion', {
-            type: 'Int',
+            select: {
+                batteryLevels: {
+                    orderBy: { createdAt: 'desc' },
+                    take: 1,
+                }
+            },
+            resolve: (hub) => hub.batteryLevels?.at(0)?.percent,
+        }),
+        isArmed: t.exposeBoolean('isArmed'),
+        ownerId: t.exposeInt('ownerId'),
+        owner: t.relation('owner'),
+        serial: t.exposeString('serial'),
+        latestVersion: t.int({
             resolve: () => Number.parseInt(process.env.HUB_CURRENT_FIRMWARE_VERSION ?? "1")
-        })
-        t.model.createdAt()
-        t.model.vehicle()
-        t.model.sensors()
-        t.model.locations()
-        t.nonNull.list.nonNull.field('events', {
-            type: "Event",
-            resolve: (hub, _args, { prisma }: IAuthContext) => {
-                return prisma.event.findMany({ where: { sensor: { hubId: hub.id } } })
-            }
-        })
-        t.nonNull.list.nonNull.field('networks', {
-            type: "Network",
-            resolve: async (hub, _args, { prisma, user }: IAuthContext) => {
+        }),
+        createdAt: t.expose('createdAt', { type: 'DateTime' }),
+        vehicle: t.relation('vehicle', { nullable: true }),
+        sensors: t.relation('sensors'),
+        locations: t.relation('locations'),
+        events: t.withAuth({ loggedIn: true }).prismaField({
+            type: ["Event"],
+            resolve: (query, hub, _args, { prisma }) => {
+                return prisma.event.findMany({ ...query, where: { sensor: { hubId: hub.id } } })
+            },
+        }),
+        networks: t.withAuth({ loggedIn: true }).prismaField({
+            type: ["Network"],
+            resolve: async (query, hub, _args, { prisma, user }) => {
                 const networkMemberships = await prisma.networkMember.findMany({
+                    ...query,
                     where: {
                         userId: hub.ownerId,
                         NOT: [{ inviteeAcceptedAt: null }, { inviterAcceptedAt: null }],
@@ -56,12 +56,13 @@ export default objectType({
                 // Only return networks I can see
                 return theirHubNetworks.filter(n => userNetworkIds.has(n.id))
             }
-        })
-        t.field('notificationOverride', {
+        }),
+        notificationOverride: t.withAuth({ loggedIn: true }).prismaField({
             type: "NotificationOverride",
-            resolve: (hub, _args, { prisma, user }: IAuthContext) => {
-                return prisma.notificationOverride.findFirst({ where: { userId: user.id, hubId: hub.id } })
+            nullable: true,
+            resolve: (query, hub, _args, { prisma, user }) => {
+                return prisma.notificationOverride.findFirst({ ...query, where: { userId: user.id, hubId: hub.id } })
             }
-        })
-    }
+        }),
+    }),
 })

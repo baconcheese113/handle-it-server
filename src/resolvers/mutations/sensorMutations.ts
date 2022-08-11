@@ -1,54 +1,55 @@
-import { AuthenticationError, UserInputError } from "apollo-server-errors";
-import { GraphQLNonNull, GraphQLInt, GraphQLID, GraphQLBoolean } from "graphql";
-import { mutationField } from "nexus";
+import { AuthenticationError, UserInputError } from "apollo-server-errors"
 import * as admin from 'firebase-admin'
-import { IContext } from "../../context";
+import { builder } from "../../builder"
 
-export default mutationField((t) => {
-    t.field('createSensor', {
+builder.mutationFields((t) => ({
+    createSensor: t.prismaField({
         type: "Sensor",
         args: {
-            doorColumn: new GraphQLNonNull(GraphQLInt),
-            doorRow: new GraphQLNonNull(GraphQLInt),
-            serial: new GraphQLNonNull(GraphQLID),
-            isConnected: GraphQLBoolean,
-            isOpen: GraphQLBoolean,
-            batteryLevel: GraphQLInt,
+            doorColumn: t.arg.int({ required: true }),
+            doorRow: t.arg.int({ required: true }),
+            serial: t.arg.id({ required: true }),
+            isConnected: t.arg.boolean(),
+            isOpen: t.arg.boolean(),
+            batteryLevel: t.arg.int(),
         },
-        async resolve(_root, args, { prisma, hub }: IContext) {
+        resolve: async (query, _root, args, { prisma, hub }) => {
             if (!hub) throw new AuthenticationError("Hub does not have access")
-            const { isConnected, isOpen, ...otherArgs } = args
+            const { isConnected, isOpen, serial, ...otherArgs } = args
             // TODO ensure sensors only linked to a single hub
             // const serialSensor = await prisma.sensor.findFirst({ where: { serial: args.serial }})
             // if(serialSensor) throw new UserInputError("Sensor already added")
             return prisma.sensor.upsert({
+                ...query,
                 create: {
                     hubId: hub.id,
                     isConnected: !!isConnected,
                     isOpen: !!isOpen,
+                    serial: serial as string,
                     ...otherArgs
                 },
                 update: {
                     isConnected: !!isConnected,
                     isOpen: !!isOpen,
+                    serial: serial as string,
                     ...otherArgs
                 },
                 where: {
-                    serial: args.serial,
+                    serial: args.serial as string,
                 }
             })
         }
-    })
-    t.field('updateSensor', {
+    }),
+    updateSensor: t.prismaField({
         type: "Sensor",
         args: {
-            id: new GraphQLNonNull(GraphQLID),
-            isOpen: GraphQLBoolean,
+            id: t.arg.id({ required: true }),
+            isOpen: t.arg.boolean(),
         },
-        async resolve(_root, args, { prisma, hub }: IContext) {
+        resolve: async (query, _root, args, { prisma, hub }) => {
             if (!hub) throw new AuthenticationError("Hub does not have access")
-            const id = Number.parseInt(args.id)
-            const isOpen = args.isOpen ?? undefined;
+            const id = Number.parseInt(args.id as string)
+            const isOpen = args.isOpen ?? undefined
             const sensorToUpdate = await prisma.sensor.findFirst({ where: { id, hubId: hub.id } })
             if (!sensorToUpdate) throw new UserInputError("Sensor doesn't exist")
             if (sensorToUpdate.isOpen === isOpen) return sensorToUpdate
@@ -75,7 +76,7 @@ export default mutationField((t) => {
                     }
                 }
             }
-            return prisma.sensor.update({ where: { id }, data: { ...sensorToUpdate, isOpen } })
+            return prisma.sensor.update({ ...query, where: { id }, data: { ...sensorToUpdate, isOpen } })
         }
-    })
-})
+    }),
+}))

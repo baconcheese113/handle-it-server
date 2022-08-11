@@ -1,16 +1,19 @@
-import { objectType } from "nexus";
+import { builder } from "../../builder"
 
-export default objectType({
-    name: "Sensor",
-    definition(t) {
-        t.model.id()
-        t.model.serial()
-        t.model.batteryLevel()
-        t.model.isOpen()
-        t.model.isConnected()
-        t.model.doorColumn()
-        t.model.doorRow()
-        t.model.hub()
-        t.model.events({ordering: { createdAt: true } })
-    }
+builder.prismaObject('Sensor', {
+    fields: (t) => ({
+        id: t.exposeInt('id'),
+        serial: t.exposeString('serial'),
+        batteryLevel: t.exposeInt('batteryLevel', { nullable: true }),
+        isOpen: t.exposeBoolean('isOpen'),
+        isConnected: t.exposeBoolean('isConnected'),
+        doorColumn: t.exposeInt('doorColumn'),
+        doorRow: t.exposeInt('doorRow'),
+        hub: t.relation('hub'),
+        events: t.relation('events', {
+            query: {
+                orderBy: [{ createdAt: 'desc' }],
+            },
+        })
+    })
 })

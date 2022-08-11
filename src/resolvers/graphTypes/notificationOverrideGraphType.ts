@@ -1,14 +1,13 @@
-import { objectType } from "nexus";
+import { builder } from "../../builder"
 
-export default objectType({
-    name: "NotificationOverride",
-    definition(t) {
-        t.model.id()
-        t.model.userId()
-        t.model.user()
-        t.model.hubId()
-        t.model.hub()
-        t.model.isMuted()
-        t.model.createdAt()
-    },
+builder.prismaObject('NotificationOverride', {
+    fields: (t) => ({
+        id: t.exposeInt('id'),
+        userId: t.exposeInt('userId'),
+        user: t.relation('user'),
+        hubId: t.exposeInt('hubId'),
+        hub: t.relation('hub'),
+        isMuted: t.exposeBoolean('isMuted'),
+        createdAt: t.expose('createdAt', { type: 'DateTime' }),
+    })
 })

@@ -1,44 +1,41 @@
-import { objectType } from 'nexus'
-import { IAuthContext } from '../../context'
 import { Prisma } from '@prisma/client'
+import { builder } from "../../builder"
+import { NetworkMemberStatus } from "./networkMemberGraphType"
 
-export default objectType({
-    name: 'Viewer',
-    definition(t) {
-        t.nonNull.field('user', {
+export const Viewer = builder.objectRef<{}>('Viewer').implement({
+    fields: (t) => ({
+        user: t.withAuth({ loggedIn: true }).prismaField({
             type: "User",
-            resolve: (_root, _args, { user }: IAuthContext) => {
+            resolve: (_query, _root, _args, { user }) => {
                 return user
             },
-        })
-        t.nonNull.list.nonNull.field('hubs', {
-            type: "Hub",
-            resolve: (_root, _args, { prisma, user }: IAuthContext) => {
-                return prisma.hub.findMany({ where: { ownerId: user.id } })
+        }),
+        hubs: t.withAuth({ loggedIn: true }).prismaField({
+            type: ["Hub"],
+            resolve: (query, _root, _args, { prisma, user }) => {
+                return prisma.hub.findMany({ ...query, where: { ownerId: user.id } })
             }
-        })
-        t.nonNull.list.nonNull.field('networks', {
-            type: "Network",
+        }),
+        networks: t.withAuth({ loggedIn: true }).prismaField({
+            type: ["Network"],
             args: {
-                status: "NetworkMemberStatus",
+                status: t.arg({ type: NetworkMemberStatus }),
             },
-            resolve: async (_root, args, { prisma, user }: IAuthContext) => {
+            resolve: async (query, _root, args, { prisma, user }) => {
                 const { status } = args
                 let additionalArgs: Prisma.NetworkMemberWhereInput = {}
-                if (status == "active") {
+                if (status == NetworkMemberStatus.active) {
                     additionalArgs = { NOT: [{ inviteeAcceptedAt: null }, { inviterAcceptedAt: null }] }
-                } else if (status == "invited") {
+                } else if (status == NetworkMemberStatus.invited) {
                     additionalArgs = { inviteeAcceptedAt: null, NOT: { inviterAcceptedAt: null } }
-                } else if (status == "requested") {
+                } else if (status == NetworkMemberStatus.requested) {
                     additionalArgs = { NOT: { inviteeAcceptedAt: null }, inviterAcceptedAt: null }
                 }
-                return prisma.network.findMany({ where: { members: { some: { userId: user.id, ...additionalArgs } } } })
+                return prisma.network.findMany({ ...query, where: { members: { some: { userId: user.id, ...additionalArgs } } } })
             }
-        })
-        t.nonNull.field('latestSensorVersion', {
-            type: 'String',
+        }),
+        latestSensorVersion: t.string({
             resolve: () => process.env.SENSOR_CURRENT_FIRMWARE_VERSION ?? "0.0.0"
-        })
-
-    }
+        }),
+    })
 })

@@ -1,23 +1,21 @@
-import { AuthenticationError, UserInputError } from "apollo-server-errors";
-import { GraphQLID, GraphQLInt, GraphQLNonNull, GraphQLString } from "graphql";
-import { mutationField } from "nexus";
-import { IContext } from "../../context";
+import { AuthenticationError, UserInputError } from "apollo-server-errors"
+import { builder } from "../../builder"
 
-export default mutationField((t) => {
-    t.field('createVehicle', {
+builder.mutationFields((t) => ({
+    createVehicle: t.prismaField({
         type: "Vehicle",
         args: {
-            hubId: new GraphQLNonNull(GraphQLID),
-            carQueryId: new GraphQLNonNull(GraphQLString),
-            year: new GraphQLNonNull(GraphQLInt),
-            makeId: new GraphQLNonNull(GraphQLString),
-            modelName: new GraphQLNonNull(GraphQLString),
-            modelTrim: new GraphQLNonNull(GraphQLString),
-            modelBody: new GraphQLNonNull(GraphQLString),
+            hubId: t.arg.id({ required: true }),
+            carQueryId: t.arg.string({ required: true }),
+            year: t.arg.int({ required: true }),
+            makeId: t.arg.string({ required: true }),
+            modelName: t.arg.string({ required: true }),
+            modelTrim: t.arg.string({ required: true }),
+            modelBody: t.arg.string({ required: true }),
         },
-        async resolve(_root, args, { prisma, user }: IContext) {
+        resolve: async (query, _root, args, { prisma, user }) => {
             if (!user) throw new AuthenticationError("User does not have access")
-            const hubId = Number.parseInt(args.hubId)
+            const hubId = Number.parseInt(args.hubId as string)
             const existingVehicle = await prisma.vehicle.findFirst({
                 where: {
                     hubId,
@@ -25,21 +23,20 @@ export default mutationField((t) => {
                 }
             })
             if (existingVehicle) throw new UserInputError("Vehicle already exists for hub")
-            return prisma.vehicle.create({ data: { ...args, hubId } })
+            return prisma.vehicle.create({ ...query, data: { ...args, hubId } })
         }
-    })
-
-    t.field('updateVehicle', {
+    }),
+    updateVehicle: t.prismaField({
         type: "Vehicle",
         args: {
-            id: new GraphQLNonNull(GraphQLID),
-            color: GraphQLString,
-            notes: GraphQLString,
+            id: t.arg.id({ required: true }),
+            color: t.arg.string(),
+            notes: t.arg.string(),
         },
-        async resolve(_root, args, { prisma, user }: IContext) {
+        resolve: async (query, _root, args, { prisma, user }) => {
             if (!user) throw new AuthenticationError("User does not have access")
             const { id: rawId, ...data } = args
-            const id = Number.parseInt(rawId)
+            const id = Number.parseInt(rawId as string)
             const existingVehicle = await prisma.vehicle.findFirst({
                 where: {
                     id,
@@ -47,18 +44,17 @@ export default mutationField((t) => {
                 }
             })
             if (!existingVehicle) throw new UserInputError("Vehicle doesn't exist")
-            return prisma.vehicle.update({ where: { id }, data })
+            return prisma.vehicle.update({ ...query, where: { id }, data })
         }
-    })
-
-    t.field('deleteVehicle', {
+    }),
+    deleteVehicle: t.prismaField({
         type: "Vehicle",
         args: {
-            id: new GraphQLNonNull(GraphQLID),
+            id: t.arg.id({ required: true }),
         },
-        async resolve(_root, args, { prisma, user }: IContext) {
+        resolve: async (query, _root, args, { prisma, user }) => {
             if (!user) throw new AuthenticationError("User does not have access")
-            const id = Number.parseInt(args.id)
+            const id = Number.parseInt(args.id as string)
             const existingVehicle = await prisma.vehicle.findFirst({
                 where: {
                     id,
@@ -66,8 +62,7 @@ export default mutationField((t) => {
                 }
             })
             if (!existingVehicle) throw new UserInputError("Vehicle doesn't exist")
-            return prisma.vehicle.delete({ where: { id } })
+            return prisma.vehicle.delete({ ...query, where: { id } })
         }
-    })
-
-})
+    }),
+}))
