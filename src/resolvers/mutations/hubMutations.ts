@@ -26,8 +26,6 @@ builder.mutationFields((t) => ({
       const hubToDelete = await prisma.hub.findFirst({ where: { id }, include: { sensors: true } });
       if (!hubToDelete) throw new UserInputError("Hub doesn't exist");
       if (hubToDelete.ownerId !== user.id) throw new ForbiddenError('User does not have access');
-      // Because Cascade SetNull doesn't appear to work correctly
-      await prisma.batteryLevel.updateMany({ where: { hubId: id }, data: { hubId: null } });
       return prisma.hub.delete({ ...query, where: { id }, include: { sensors: true } });
     },
   }),
