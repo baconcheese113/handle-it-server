@@ -20,8 +20,8 @@ builder.prismaObject('Hub', {
     ownerId: t.exposeInt('ownerId'),
     owner: t.relation('owner'),
     serial: t.exposeString('serial'),
-    latestVersion: t.int({
-      resolve: () => Number.parseInt(process.env.HUB_CURRENT_FIRMWARE_VERSION ?? '1'),
+    latestVersion: t.string({
+      resolve: () => process.env.HUB_CURRENT_FIRMWARE_VERSION ?? '0.1.0',
     }),
     createdAt: t.expose('createdAt', { type: 'DateTime' }),
     vehicle: t.relation('vehicle', { nullable: true }),
