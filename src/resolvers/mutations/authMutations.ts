@@ -14,6 +14,8 @@ builder.mutationFields((t) => ({
     },
     resolve: async (_root, args, { prisma, user }) => {
       if (user) return jwt.sign(`User:${user.id}`, process.env.JWT_SECRET!);
+      const email = args.email.trim();
+      const unregisteredUser = await prisma.user.findFirst({ where: { email, password: null } });
       const data = {
         ...args,
         password: await bcrypt.hash(args.password, 10),
@@ -22,7 +24,10 @@ builder.mutationFields((t) => ({
         lastName: args.lastName?.trim(),
         activatedAt: new Date(),
       };
-      const newUser = await prisma.user.create({ data });
+
+      const newUser = unregisteredUser
+        ? await prisma.user.update({ where: { email }, data })
+        : await prisma.user.create({ data });
 
       return jwt.sign(`User:${newUser.id}`, process.env.JWT_SECRET!);
     },
