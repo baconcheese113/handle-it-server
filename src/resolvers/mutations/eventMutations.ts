@@ -14,7 +14,7 @@ builder.mutationFields((t) => ({
       const sensor = await prisma.sensor.findFirst({ where: { serial, hubId: hub.id } });
       if (!sensor) throw new UserInputError("Sensor doesn't exist");
       const owner = await prisma.user.findFirst({ where: { id: hub.ownerId } });
-      if (!owner) throw new Error("Hub doesn't have an owner");
+      if (!owner?.fcmToken) throw new Error("Hub doesn't have an owner with valid fcmToken");
       const createdEvent = await prisma.event.create({ ...query, data: { sensorId: sensor.id } });
       if (owner.defaultFullNotification && hub.isArmed) {
         try {
@@ -29,7 +29,7 @@ builder.mutationFields((t) => ({
             android: {
               priority: 'high',
             },
-            token: owner.fcmToken!,
+            token: owner.fcmToken,
           });
           console.log('Successfully sent message: ', msgId);
         } catch (err) {
