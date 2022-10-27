@@ -1,0 +1,32 @@
+# Name of your workflow.
+name: main
+
+# Trigger the workflow manually or after push a commit
+on: [push, workflow_dispatch]
+
+env:
+  NODE_VERSION: 18.7.0
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest # or macos-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - id: 'auth'
+      name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v0'
+      with:
+        workload_identity_provider: 'projects/847955048569/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
+        service_account: 'my-service-account@my-project.iam.gserviceaccount.com'
+
+    - id: 'deploy'
+      uses: 'google-github-actions/deploy-cloudrun@v0'
+      with:
+        service: 'handle-it-server'
+        image: 'gcr.io/handleit-349522/handle-it-server:latest'
+
+    - name: 'Use output'
+      run: 'curl "${{ steps.deploy.outputs.url }}"'
