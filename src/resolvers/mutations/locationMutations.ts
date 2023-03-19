@@ -1,4 +1,4 @@
-import { AuthenticationError } from 'apollo-server-errors';
+import { GraphQLError } from 'graphql';
 
 import { builder } from '../../builder';
 
@@ -14,7 +14,7 @@ builder.mutationFields((t) => ({
       course: t.arg.float({ required: true }),
     },
     resolve: (query, _root, args, { prisma, hub }) => {
-      if (!hub) throw new AuthenticationError('Hub does not have access');
+      if (!hub) throw new GraphQLError('Hub does not have access');
       const data = { ...args, hubId: hub.id };
       return prisma.location.create({ ...query, data });
     },

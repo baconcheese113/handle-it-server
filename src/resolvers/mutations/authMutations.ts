@@ -1,5 +1,5 @@
-import { AuthenticationError } from 'apollo-server-errors';
 import bcrypt from 'bcrypt';
+import { GraphQLError } from 'graphql';
 import jwt from 'jsonwebtoken';
 
 import { builder } from '../../builder';
@@ -45,9 +45,9 @@ builder.mutationFields((t) => ({
       const hashedPassword = await bcrypt.hash(password, 10);
       console.log('hashedPassword', hashedPassword);
       const foundUser = await prisma.user.findFirst({ where: { email, NOT: { password: null } } });
-      if (!foundUser?.password) throw new AuthenticationError('User not found, unable to login');
+      if (!foundUser?.password) throw new GraphQLError('User not found, unable to login');
       const isCorrectPwd = await bcrypt.compare(password, foundUser.password);
-      if (!isCorrectPwd) throw new AuthenticationError('Password incorrect, unable to login');
+      if (!isCorrectPwd) throw new GraphQLError('Password incorrect, unable to login');
       await prisma.user.update({ where: { email }, data: { fcmToken } });
 
       return jwt.sign(`User:${foundUser.id}`, process.env.JWT_SECRET!);

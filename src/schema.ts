@@ -1,8 +1,8 @@
 import './resolvers/graphTypes';
 import './resolvers/mutations';
 
-import { AuthenticationError } from 'apollo-server-errors';
 import * as admin from 'firebase-admin';
+import { GraphQLError } from 'graphql';
 
 import { builder } from './builder';
 import { Viewer } from './resolvers/graphTypes/viewerGraphType';
@@ -26,7 +26,7 @@ builder.queryType({
         id: t.arg.int({ required: true }),
       },
       resolve: async (query, _root, args, { prisma, user }) => {
-        if (!user) throw new AuthenticationError('User does not have permission');
+        if (!user) throw new GraphQLError('User does not have permission');
         const { id } = args;
         const hub = await prisma.hub.findFirst({
           ...query,
@@ -41,7 +41,7 @@ builder.queryType({
           include: { networkMemberships: true },
         });
         const theyShareANetwork = myUser?.networkMemberships.some((netMem) =>
-          hubNetworkIds.has(netMem.networkId),
+          hubNetworkIds.has(netMem.networkId)
         );
         return theyShareANetwork ? hub : null;
       },
@@ -49,14 +49,14 @@ builder.queryType({
     viewer: t.field({
       type: Viewer,
       resolve: (_root, _args, { user }) => {
-        if (!user) throw new AuthenticationError('User does not have permission');
+        if (!user) throw new GraphQLError('User does not have permission');
         return {};
       },
     }),
     hubViewer: t.prismaField({
       type: 'Hub',
       resolve: (_query, _root, _args, { hub }) => {
-        if (!hub) throw new AuthenticationError('Hub does not have permission');
+        if (!hub) throw new GraphQLError('Hub does not have permission');
         return hub;
       },
     }),

@@ -1,8 +1,18 @@
+import { startStandaloneServer } from '@apollo/server/standalone';
+
+import { createContext } from './src/context';
 import { server } from './src/server';
 
 const path = '/graphql';
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || '8080';
 
-server.listen({ port, path }, () =>
-  console.log(`🚀  Server ready at http://localhost:${port}${server.graphqlPath}`)
-);
+async function startServer() {
+  const { url } = await startStandaloneServer(server, {
+    context: createContext,
+    listen: { path, port: Number.parseInt(port) },
+  });
+
+  console.log(`🚀  Server ready at ${url}`);
+}
+
+startServer();

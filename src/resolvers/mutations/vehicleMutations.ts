@@ -1,4 +1,4 @@
-import { AuthenticationError, UserInputError } from 'apollo-server-errors';
+import { GraphQLError } from 'graphql';
 
 import { builder } from '../../builder';
 
@@ -15,7 +15,7 @@ builder.mutationFields((t) => ({
       modelBody: t.arg.string({ required: true }),
     },
     resolve: async (query, _root, args, { prisma, user }) => {
-      if (!user) throw new AuthenticationError('User does not have access');
+      if (!user) throw new GraphQLError('User does not have access');
       const hubId = Number.parseInt(args.hubId as string);
       const existingVehicle = await prisma.vehicle.findFirst({
         where: {
@@ -23,7 +23,7 @@ builder.mutationFields((t) => ({
           hub: { ownerId: user.id },
         },
       });
-      if (existingVehicle) throw new UserInputError('Vehicle already exists for hub');
+      if (existingVehicle) throw new GraphQLError('Vehicle already exists for hub');
       return prisma.vehicle.create({ ...query, data: { ...args, hubId } });
     },
   }),
@@ -35,7 +35,7 @@ builder.mutationFields((t) => ({
       notes: t.arg.string(),
     },
     resolve: async (query, _root, args, { prisma, user }) => {
-      if (!user) throw new AuthenticationError('User does not have access');
+      if (!user) throw new GraphQLError('User does not have access');
       const { id: rawId, ...data } = args;
       const id = Number.parseInt(rawId as string);
       const existingVehicle = await prisma.vehicle.findFirst({
@@ -44,7 +44,7 @@ builder.mutationFields((t) => ({
           hub: { ownerId: user.id },
         },
       });
-      if (!existingVehicle) throw new UserInputError("Vehicle doesn't exist");
+      if (!existingVehicle) throw new GraphQLError("Vehicle doesn't exist");
       return prisma.vehicle.update({ ...query, where: { id }, data });
     },
   }),
@@ -54,7 +54,7 @@ builder.mutationFields((t) => ({
       id: t.arg.id({ required: true }),
     },
     resolve: async (query, _root, args, { prisma, user }) => {
-      if (!user) throw new AuthenticationError('User does not have access');
+      if (!user) throw new GraphQLError('User does not have access');
       const id = Number.parseInt(args.id as string);
       const existingVehicle = await prisma.vehicle.findFirst({
         where: {
@@ -62,7 +62,7 @@ builder.mutationFields((t) => ({
           hub: { ownerId: user.id },
         },
       });
-      if (!existingVehicle) throw new UserInputError("Vehicle doesn't exist");
+      if (!existingVehicle) throw new GraphQLError("Vehicle doesn't exist");
       return prisma.vehicle.delete({ ...query, where: { id } });
     },
   }),

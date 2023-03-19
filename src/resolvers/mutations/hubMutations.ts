@@ -1,4 +1,4 @@
-import { AuthenticationError, ForbiddenError, UserInputError } from 'apollo-server-errors';
+import { GraphQLError } from 'graphql';
 
 import { builder } from '../../builder';
 
@@ -11,7 +11,7 @@ builder.mutationFields((t) => ({
       imei: t.arg.string({ required: true }),
     },
     resolve: async (query, _root, args, { prisma, user }) => {
-      if (!user) throw new AuthenticationError('User does not have access');
+      if (!user) throw new GraphQLError('User does not have access');
       const name = args.name.trim();
       return prisma.hub.create({ data: { ...query, ...args, name, ownerId: user.id } });
     },
@@ -22,11 +22,11 @@ builder.mutationFields((t) => ({
       id: t.arg.id({ required: true }),
     },
     resolve: async (query, _root, args, { prisma, user }) => {
-      if (!user) throw new AuthenticationError('User does not have access');
+      if (!user) throw new GraphQLError('User does not have access');
       const id = Number.parseInt(args.id as string);
       const hubToDelete = await prisma.hub.findFirst({ where: { id }, include: { sensors: true } });
-      if (!hubToDelete) throw new UserInputError("Hub doesn't exist");
-      if (hubToDelete.ownerId !== user.id) throw new ForbiddenError('User does not have access');
+      if (!hubToDelete) throw new GraphQLError("Hub doesn't exist");
+      if (hubToDelete.ownerId !== user.id) throw new GraphQLError('User does not have access');
       return prisma.hub.delete({ ...query, where: { id }, include: { sensors: true } });
     },
   }),
@@ -40,7 +40,7 @@ builder.mutationFields((t) => ({
       isArmed: t.arg.boolean(),
     },
     resolve: async (query, _root, args, { prisma, hub, user }) => {
-      if (!hub && !user) throw new AuthenticationError('No access');
+      if (!hub && !user) throw new GraphQLError('No access');
       const { id, ...data } = args;
       const isCharging = args.isCharging ?? undefined;
       const isArmed = args.isArmed ?? undefined;
@@ -48,7 +48,7 @@ builder.mutationFields((t) => ({
       const hubId = Number.parseInt(id as string);
       const hubToUpdate =
         hub || (await prisma.hub.findFirst({ where: { id: hubId, ownerId: user?.id } }));
-      if (!hubToUpdate) throw new UserInputError("Hub doesn't exist");
+      if (!hubToUpdate) throw new GraphQLError("Hub doesn't exist");
       return prisma.hub.update({
         ...query,
         where: { id: hubToUpdate.id },
@@ -64,7 +64,7 @@ builder.mutationFields((t) => ({
       percent: t.arg.float({ required: true }),
     },
     resolve: async (_query, _root, args, { prisma, hub }) => {
-      if (!hub) throw new AuthenticationError('No access');
+      if (!hub) throw new GraphQLError('No access');
       await prisma.batteryLevel.create({
         data: { ...args, hubId: hub.id },
       });

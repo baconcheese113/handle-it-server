@@ -1,5 +1,5 @@
 import { RoleType } from '@prisma/client';
-import { AuthenticationError, UserInputError } from 'apollo-server-errors';
+import { GraphQLError } from 'graphql';
 
 import { builder } from '../../builder';
 
@@ -10,12 +10,12 @@ builder.mutationFields((t) => ({
       name: t.arg.string({ required: true }),
     },
     resolve: async (query, _root, args, { prisma, user }) => {
-      if (!user) throw new AuthenticationError('User does not have access');
+      if (!user) throw new GraphQLError('User does not have access');
       const name = args.name.trim();
       const existingNetwork = await prisma.network.findFirst({
         where: { name, createdById: user.id },
       });
-      if (existingNetwork) throw new UserInputError('Network with name already exists');
+      if (existingNetwork) throw new GraphQLError('Network with name already exists');
       return await prisma.network.create({
         ...query,
         data: {
@@ -39,7 +39,7 @@ builder.mutationFields((t) => ({
       networkId: t.arg.int({ required: true }),
     },
     resolve: async (query, _root, args, { prisma, user }) => {
-      if (!user) throw new AuthenticationError('User does not have access');
+      if (!user) throw new GraphQLError('User does not have access');
       const { networkId } = args;
       const networkToDelete = await prisma.network.findFirst({
         where: {
@@ -48,7 +48,7 @@ builder.mutationFields((t) => ({
         },
       });
       if (!networkToDelete)
-        throw new UserInputError('User is not an owner of a network with specified networkId');
+        throw new GraphQLError('User is not an owner of a network with specified networkId');
       return prisma.network.delete({ ...query, where: { id: networkId } });
     },
   }),
@@ -60,7 +60,7 @@ builder.mutationFields((t) => ({
       role: t.arg({ type: RoleType, required: true }),
     },
     resolve: async (query, _root, args, { prisma, user }) => {
-      if (!user) throw new AuthenticationError('User does not have access');
+      if (!user) throw new GraphQLError('User does not have access');
       const { networkId, role } = args;
       const email = args.email.trim();
       let existingUser = await prisma.user.findFirst({ where: { email } });
@@ -88,7 +88,7 @@ builder.mutationFields((t) => ({
       networkMemberId: t.arg.int({ required: true }),
     },
     resolve: async (query, _root, args, { prisma, user }) => {
-      if (!user) throw new AuthenticationError('User does not have access');
+      if (!user) throw new GraphQLError('User does not have access');
       const { networkMemberId } = args;
       const member = await prisma.networkMember.findFirst({
         where: {
@@ -110,8 +110,8 @@ builder.mutationFields((t) => ({
         },
       });
       if (!member)
-        throw new UserInputError(
-          'No active member at specified id in a network where requestor has Owner role',
+        throw new GraphQLError(
+          'No active member at specified id in a network where requestor has Owner role'
         );
       const numOtherOwners = await prisma.networkMember.count({
         where: {
@@ -120,8 +120,7 @@ builder.mutationFields((t) => ({
           NOT: { id: networkMemberId },
         },
       });
-      if (numOtherOwners === 0)
-        throw new UserInputError('Unable to delete membership if only Owner');
+      if (numOtherOwners === 0) throw new GraphQLError('Unable to delete membership if only Owner');
       await prisma.networkMember.delete({ where: { id: networkMemberId } });
       return prisma.network.findFirst({
         ...query,
@@ -137,7 +136,7 @@ builder.mutationFields((t) => ({
     },
     resolve: async (query, _root, args, { prisma, user }) => {
       // Can be called by the invitee if they were invited or the inviter if the user requested
-      if (!user) throw new AuthenticationError('User does not have access');
+      if (!user) throw new GraphQLError('User does not have access');
       const { networkMemberId } = args;
       const member = await prisma.networkMember.findFirst({
         where: {
@@ -163,7 +162,7 @@ builder.mutationFields((t) => ({
         },
       });
       if (!member)
-        throw new UserInputError('No network membership for this id is pending for this user');
+        throw new GraphQLError('No network membership for this id is pending for this user');
       await prisma.networkMember.delete({ where: { id: member.id } });
       return prisma.network.findFirst({
         ...query,
@@ -179,7 +178,7 @@ builder.mutationFields((t) => ({
     },
     resolve: async (query, _root, args, { prisma, user }) => {
       // Can be called by the invitee if they were invited or the inviter if the user requested
-      if (!user) throw new AuthenticationError('User does not have access');
+      if (!user) throw new GraphQLError('User does not have access');
       const { networkMemberId } = args;
       const member = await prisma.networkMember.findFirst({
         where: {
@@ -205,8 +204,8 @@ builder.mutationFields((t) => ({
         },
       });
       if (!member)
-        throw new UserInputError(
-          'No network membership for this id is pending for this user or no access',
+        throw new GraphQLError(
+          'No network membership for this id is pending for this user or no access'
         );
 
       await prisma.networkMember.update({
@@ -229,15 +228,15 @@ builder.mutationFields((t) => ({
       networkName: t.arg.string({ required: true }),
     },
     resolve: async (query, _root, args, { prisma, user }) => {
-      if (!user) throw new AuthenticationError('User does not have access');
+      if (!user) throw new GraphQLError('User does not have access');
       const networkName = args.networkName.trim();
       const network = await prisma.network.findFirst({ where: { name: networkName } });
-      if (!network) throw new UserInputError("Network doesn't exist");
+      if (!network) throw new GraphQLError("Network doesn't exist");
       const existingMember = await prisma.networkMember.findFirst({
         where: { network: { id: network.id }, userId: user.id },
       });
       if (existingMember)
-        throw new UserInputError('Membership already pending or active in this network');
+        throw new GraphQLError('Membership already pending or active in this network');
 
       return prisma.networkMember.create({
         ...query,
@@ -252,7 +251,7 @@ builder.mutationFields((t) => ({
       role: t.arg({ type: RoleType }),
     },
     resolve: async (query, _root, args, { prisma, user }) => {
-      if (!user) throw new AuthenticationError('User does not have access');
+      if (!user) throw new GraphQLError('User does not have access');
       const { networkMemberId, role } = args;
       const member = await prisma.networkMember.findFirst({
         where: {
@@ -261,7 +260,7 @@ builder.mutationFields((t) => ({
         },
       });
       if (!member)
-        throw new UserInputError('No member with this ID in a network where user is owner');
+        throw new GraphQLError('No member with this ID in a network where user is owner');
       const data = {
         role: role ?? undefined,
       };

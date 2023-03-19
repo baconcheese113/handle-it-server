@@ -1,5 +1,5 @@
-import { AuthenticationError, UserInputError } from 'apollo-server-errors';
 import * as admin from 'firebase-admin';
+import { GraphQLError } from 'graphql';
 
 import { builder } from '../../builder';
 
@@ -15,11 +15,11 @@ builder.mutationFields((t) => ({
       batteryLevel: t.arg.int(),
     },
     resolve: async (query, _root, args, { prisma, hub }) => {
-      if (!hub) throw new AuthenticationError('Hub does not have access');
+      if (!hub) throw new GraphQLError('Hub does not have access');
       const { isConnected, isOpen, serial, ...otherArgs } = args;
       // TODO ensure sensors only linked to a single hub
       // const serialSensor = await prisma.sensor.findFirst({ where: { serial: args.serial }})
-      // if(serialSensor) throw new UserInputError("Sensor already added")
+      // if(serialSensor) throw new GraphQLError("Sensor already added")
       return prisma.sensor.upsert({
         ...query,
         create: {
@@ -48,11 +48,11 @@ builder.mutationFields((t) => ({
       isOpen: t.arg.boolean(),
     },
     resolve: async (query, _root, args, { prisma, hub }) => {
-      if (!hub) throw new AuthenticationError('Hub does not have access');
+      if (!hub) throw new GraphQLError('Hub does not have access');
       const id = Number.parseInt(args.id as string);
       const isOpen = args.isOpen ?? undefined;
       const sensorToUpdate = await prisma.sensor.findFirst({ where: { id, hubId: hub.id } });
-      if (!sensorToUpdate) throw new UserInputError("Sensor doesn't exist");
+      if (!sensorToUpdate) throw new GraphQLError("Sensor doesn't exist");
       if (sensorToUpdate.isOpen === isOpen) return sensorToUpdate;
       if (isOpen) {
         const owner = await prisma.user.findFirst({ where: { id: hub.ownerId } });

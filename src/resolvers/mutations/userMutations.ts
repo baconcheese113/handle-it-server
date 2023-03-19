@@ -1,5 +1,5 @@
-import { AuthenticationError, UserInputError } from 'apollo-server-errors';
 import bcrypt from 'bcrypt';
+import { GraphQLError } from 'graphql';
 
 import { builder } from '../../builder';
 
@@ -12,7 +12,7 @@ builder.mutationFields((t) => ({
       defaultFullNotification: t.arg.boolean(),
     },
     resolve: async (query, _root, args, { prisma, user }) => {
-      if (!user) throw new AuthenticationError('User does not have access');
+      if (!user) throw new GraphQLError('User does not have access');
       const data: any = {
         ...args,
         firstName: args.firstName?.trim(),
@@ -30,13 +30,13 @@ builder.mutationFields((t) => ({
       lng: t.arg.float({ required: true }),
     },
     resolve: async (query, _root, args, { prisma, user }) => {
-      if (!user?.isAdmin) throw new AuthenticationError('User does not have access');
+      if (!user?.isAdmin) throw new GraphQLError('User does not have access');
       const { lat, lng } = args;
       const email = args.email.trim();
       const existingUser = await prisma.user.findFirst({ where: { email } });
-      if (!existingUser) throw new UserInputError(`User for ${email} doesn't exist`);
+      if (!existingUser) throw new GraphQLError(`User for ${email} doesn't exist`);
       const firstName = existingUser.firstName ?? args.firstName?.trim();
-      if (!firstName) throw new UserInputError(`FirstName not provided and hasn't been set`);
+      if (!firstName) throw new GraphQLError(`FirstName not provided and hasn't been set`);
 
       const password = await bcrypt.hash('password', 10);
 

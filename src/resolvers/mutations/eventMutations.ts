@@ -1,5 +1,5 @@
-import { AuthenticationError, UserInputError } from 'apollo-server-errors';
 import * as admin from 'firebase-admin';
+import { GraphQLError } from 'graphql';
 
 import { builder } from '../../builder';
 
@@ -10,10 +10,10 @@ builder.mutationFields((t) => ({
       serial: t.arg.string({ required: true }),
     },
     resolve: async (query, _root, args, { prisma, hub }) => {
-      if (!hub) throw new AuthenticationError('Hub does not have access');
+      if (!hub) throw new GraphQLError('Hub does not have access');
       const { serial } = args;
       const sensor = await prisma.sensor.findFirst({ where: { serial, hubId: hub.id } });
-      if (!sensor) throw new UserInputError("Sensor doesn't exist");
+      if (!sensor) throw new GraphQLError("Sensor doesn't exist");
       const owner = await prisma.user.findFirst({ where: { id: hub.ownerId } });
       if (!owner?.fcmToken) throw new Error("Hub doesn't have an owner with valid fcmToken");
       const createdEvent = await prisma.event.create({ ...query, data: { sensorId: sensor.id } });
@@ -46,14 +46,14 @@ builder.mutationFields((t) => ({
       eventId: t.arg.int({ required: true }),
     },
     resolve: async (query, _root, args, { prisma, user }) => {
-      if (!user) throw new AuthenticationError('User does not have access');
+      if (!user) throw new GraphQLError('User does not have access');
       const { eventId } = args;
       const event = await prisma.event.findFirst({
         where: { id: eventId, sensor: { hub: { ownerId: user.id } } },
         include: { sensor: { include: { hub: true } } },
       });
-      if (!event) throw new UserInputError("User doesn't have access to event or doesn't exist");
-      if (event.propagatedAt) throw new UserInputError('Event already propagated to networks');
+      if (!event) throw new GraphQLError("User doesn't have access to event or doesn't exist");
+      if (event.propagatedAt) throw new GraphQLError('Event already propagated to networks');
       const userNetworks = await prisma.network.findMany({
         where: {
           members: {

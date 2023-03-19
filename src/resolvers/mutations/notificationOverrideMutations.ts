@@ -1,4 +1,4 @@
-import { AuthenticationError } from 'apollo-server-errors';
+import { GraphQLError } from 'graphql';
 
 import { builder } from '../../builder';
 
@@ -10,7 +10,7 @@ builder.mutationFields((t) => ({
       shouldMute: t.arg.boolean({ required: true }),
     },
     resolve: async (query, _root, args, { prisma, user }) => {
-      if (!user) throw new AuthenticationError('User does not have access');
+      if (!user) throw new GraphQLError('User does not have access');
       const { hubId, shouldMute } = args;
       const existingSetting = await prisma.notificationOverride.findFirst({
         where: { userId: user.id, hubId },
