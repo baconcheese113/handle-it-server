@@ -1,6 +1,7 @@
 import { AuthenticationError } from 'apollo-server-errors';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+
 import { builder } from '../../builder';
 
 builder.mutationFields((t) => ({

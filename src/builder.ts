@@ -1,9 +1,10 @@
 import SchemaBuilder from '@pothos/core';
 import PrismaPlugin from '@pothos/plugin-prisma';
-import PrismaTypes from './generated/pothos-types';
 import ScopeAuth from '@pothos/plugin-scope-auth';
-import { IAuthContext, IContext, prisma } from './context';
 import { GraphQLDateTime } from 'graphql-scalars';
+
+import { IAuthContext, IContext, prisma } from './context';
+import PrismaTypes from './generated/pothos-types';
 
 export const builder = new SchemaBuilder<{
   Context: IContext;

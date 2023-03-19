@@ -1,4 +1,5 @@
 import { Hub } from '@prisma/client';
+
 import { builder } from '../../builder';
 
 builder.prismaObject('Network', {

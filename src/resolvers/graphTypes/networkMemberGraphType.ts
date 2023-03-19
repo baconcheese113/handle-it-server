@@ -1,4 +1,5 @@
 import { RoleType } from '@prisma/client';
+
 import { builder } from '../../builder';
 
 export enum NetworkMemberStatus {

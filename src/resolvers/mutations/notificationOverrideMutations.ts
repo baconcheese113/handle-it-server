@@ -1,4 +1,5 @@
 import { AuthenticationError } from 'apollo-server-errors';
+
 import { builder } from '../../builder';
 
 builder.mutationFields((t) => ({

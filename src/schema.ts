@@ -1,9 +1,11 @@
-import * as admin from 'firebase-admin';
-import { AuthenticationError } from 'apollo-server-errors';
-import { Viewer } from './resolvers/graphTypes/viewerGraphType';
 import './resolvers/graphTypes';
 import './resolvers/mutations';
+
+import { AuthenticationError } from 'apollo-server-errors';
+import * as admin from 'firebase-admin';
+
 import { builder } from './builder';
+import { Viewer } from './resolvers/graphTypes/viewerGraphType';
 
 admin.initializeApp({
   credential: admin.credential.cert({
@@ -39,7 +41,7 @@ builder.queryType({
           include: { networkMemberships: true },
         });
         const theyShareANetwork = myUser?.networkMemberships.some((netMem) =>
-          hubNetworkIds.has(netMem.networkId)
+          hubNetworkIds.has(netMem.networkId),
         );
         return theyShareANetwork ? hub : null;
       },

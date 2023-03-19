@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client';
+
 import { builder } from '../../builder';
 import { NetworkMemberStatus } from './networkMemberGraphType';
 

@@ -1,5 +1,6 @@
 import { RoleType } from '@prisma/client';
 import { AuthenticationError, UserInputError } from 'apollo-server-errors';
+
 import { builder } from '../../builder';
 
 builder.mutationFields((t) => ({
@@ -110,7 +111,7 @@ builder.mutationFields((t) => ({
       });
       if (!member)
         throw new UserInputError(
-          'No active member at specified id in a network where requestor has Owner role'
+          'No active member at specified id in a network where requestor has Owner role',
         );
       const numOtherOwners = await prisma.networkMember.count({
         where: {
@@ -205,7 +206,7 @@ builder.mutationFields((t) => ({
       });
       if (!member)
         throw new UserInputError(
-          'No network membership for this id is pending for this user or no access'
+          'No network membership for this id is pending for this user or no access',
         );
 
       await prisma.networkMember.update({

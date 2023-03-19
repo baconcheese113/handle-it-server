@@ -1,4 +1,5 @@
-import { AuthenticationError, UserInputError, ForbiddenError } from 'apollo-server-errors';
+import { AuthenticationError, ForbiddenError, UserInputError } from 'apollo-server-errors';
+
 import { builder } from '../../builder';
 
 builder.mutationFields((t) => ({

@@ -1,5 +1,6 @@
 import { AuthenticationError, UserInputError } from 'apollo-server-errors';
 import * as admin from 'firebase-admin';
+
 import { builder } from '../../builder';
 
 builder.mutationFields((t) => ({

@@ -1,5 +1,6 @@
 import { AuthenticationError, UserInputError } from 'apollo-server-errors';
 import bcrypt from 'bcrypt';
+
 import { builder } from '../../builder';
 
 builder.mutationFields((t) => ({
