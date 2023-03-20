@@ -52,7 +52,8 @@ describe('basic entrypoint checks', () => {
   });
 
   it('can access viewer', async () => {
-    const user = await prisma.user.findFirst({ where: { email: 'test@user.com' } });
+    const email = 'test@user.com';
+    const user = await prisma.user.findFirst({ where: { email } });
     const { body } = await server.executeOperation<TestUserViewerQuery>(
       {
         query: graphql(`
@@ -75,6 +76,6 @@ describe('basic entrypoint checks', () => {
     const { data } = body.singleResult;
     assert(!!data);
     expect(data.viewer).toBeDefined();
-    expect(data.viewer.user.email).toBe('my@guy.com');
+    expect(data.viewer.user.email).toBe(email);
   });
 });
