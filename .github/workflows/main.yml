@@ -5,7 +5,7 @@ name: main
 on: [push, workflow_dispatch]
 
 env:
-  NODE_VERSION: 18.7.0
+  NODE_VERSION: 18.12.1
 
 jobs:
   deploy:
@@ -41,7 +41,7 @@ jobs:
       - name: Push Schema and Seed DB
         run: |
           npm run push-db:test
-          npm run seed
+          npm run seed:test
 
       - name: Run tests
         run: |
