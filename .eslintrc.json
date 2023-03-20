@@ -33,5 +33,12 @@
       }
     ],
     "unused-imports/no-unused-imports": "error"
-  }
+  },
+  "ignorePatterns": [
+    "node_modules/",
+    "dist/",
+    "build/",
+    "gql/",
+    "src/generated/"
+  ]
 }
