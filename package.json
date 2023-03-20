@@ -13,7 +13,7 @@
     "lint": "eslint --ignore-path .prettierignore --ext .js,.ts .",
     "lint-fix": "eslint --ignore-path .prettierignore --ext .js,.ts --fix .",
     "test": "env-cmd -f ./.env.testing jest --config jest.config.ts ./__tests__",
-    "test-watch": "env-cmd -f ./.env.testing jest --config jest.config.ts --watch ./__tests__",
+    "test-watch": "npm run test -- --watch",
     "push-db": "npm run push-db:test && npm run push-db:dev && npm run push-db:prod",
     "push-db:prod": "env-cmd -f ./.env.production prisma db push",
     "push-db:test": "env-cmd -f ./.env.testing prisma db push",
