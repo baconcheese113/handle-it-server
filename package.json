@@ -23,7 +23,7 @@
     "seed:test": "env-cmd -f ./.env.testing ts-node prisma/seed.ts",
     "migrate-reset:prod": "env-cmd -f ./.env.production prisma migrate reset",
     "migrate-reset:test": "env-cmd -f ./.env.testing prisma migrate reset",
-    "build": "npm -s run generate && tsc",
+    "build": "npm -s run generate && tsc --build tsconfig.json",
     "generate": "prisma generate",
     "prisma:format": "prisma format"
   },
