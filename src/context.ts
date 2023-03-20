@@ -1,10 +1,16 @@
+import { StandaloneServerContextFunctionArgument } from '@apollo/server/standalone';
 import { Hub, PrismaClient, User } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 
 export const prisma = new PrismaClient();
 
+export function getJwt(): string {
+  if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET not set');
+  return process.env.JWT_SECRET;
+}
+
 function fromGlobalId(token: string): { id: number; type: string } {
-  const decodedToken = jwt.verify(token, process.env.JWT_SECRET!) as string;
+  const decodedToken = jwt.verify(token, getJwt()) as string;
   const [type, stringId] = decodedToken.split(':');
   return { id: Number.parseInt(stringId), type };
 }
@@ -34,7 +40,9 @@ export interface IAuthContext extends IContext {
   user: User;
 }
 
-export async function createContext({ req }: any): Promise<IContext> {
+export async function createContext({
+  req,
+}: StandaloneServerContextFunctionArgument): Promise<IContext> {
   const authorization = req.headers.authorization;
   console.log('authorization', req.headers);
   const user = authorization ? await getUser(authorization) : null;

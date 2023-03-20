@@ -1,3 +1,4 @@
+import assert from 'assert';
 import * as admin from 'firebase-admin';
 import { GraphQLError } from 'graphql';
 
@@ -82,6 +83,7 @@ builder.mutationFields((t) => ({
             .map((m) => m.network.name);
           const sharedNetworkStr = (sharedNetworks.length > 1 ? 's ' : ' ') + sharedNetworks.join();
           try {
+            assert(u.fcmToken);
             const msgId = await admin.messaging().send({
               data: {
                 type: 'alert',
@@ -91,7 +93,7 @@ builder.mutationFields((t) => ({
               android: {
                 priority: 'high',
               },
-              token: u.fcmToken!,
+              token: u.fcmToken,
             });
             console.log('Successfully sent message: ', msgId);
           } catch (err) {

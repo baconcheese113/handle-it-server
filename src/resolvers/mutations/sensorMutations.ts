@@ -1,3 +1,4 @@
+import assert from 'assert';
 import * as admin from 'firebase-admin';
 import { GraphQLError } from 'graphql';
 
@@ -57,6 +58,7 @@ builder.mutationFields((t) => ({
       if (isOpen) {
         const owner = await prisma.user.findFirst({ where: { id: hub.ownerId } });
         if (!owner) throw new Error("Hub doesn't have an owner");
+        assert(owner.fcmToken, 'User does not have an FCM token');
         await prisma.event.create({ data: { sensorId: id } });
         if (owner.defaultFullNotification && hub.isArmed) {
           try {
@@ -69,7 +71,7 @@ builder.mutationFields((t) => ({
               android: {
                 priority: 'high',
               },
-              token: owner.fcmToken!,
+              token: owner.fcmToken,
             });
             console.log('Successfully sent message: ', msgId);
           } catch (err) {
