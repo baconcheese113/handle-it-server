@@ -36,6 +36,7 @@ jobs:
           echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/test?schema=public" >> .env.testing
           echo "JWT_SECRET=test_secret" >> .env.testing
           npm install
+          npx graphql-codegen
           npm run build
 
       - name: Push Schema and Seed DB

@@ -1,8 +1,9 @@
 import { ApolloServer } from '@apollo/server';
 
+import { IContext } from './context';
 import { schema } from './schema';
 
-export const server = new ApolloServer({
+export const server = new ApolloServer<IContext>({
   schema,
   cache: 'bounded',
   plugins: [

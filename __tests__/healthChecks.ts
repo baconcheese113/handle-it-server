@@ -1,9 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import assert from 'assert';
-import { gql } from 'graphql-tag';
 
 import { seedDb } from '../prisma/seedService';
 import { server } from '../src/server';
+import { graphql } from './gql';
+import { RegisterWithPasswordMutation, TestUserViewerQuery } from './gql/graphql';
 
 let prisma: PrismaClient;
 
@@ -31,18 +32,49 @@ afterAll(async () => {
   await prisma.$disconnect();
 });
 
-it('registers a new user', async () => {
-  const { body } = await server.executeOperation(
-    {
-      query: gql`
-        mutation registerWithPassword {
-          registerWithPassword(email: "my@guy.com", password: "password", fcmToken: "token")
-        }
-      `,
-    },
-    { contextValue: { prisma } }
-  );
+describe('basic entrypoint checks', () => {
+  it('registers a new user', async () => {
+    const { body } = await server.executeOperation<RegisterWithPasswordMutation>(
+      {
+        query: graphql(`
+          mutation registerWithPassword {
+            registerWithPassword(email: "my@guy.com", password: "password", fcmToken: "token")
+          }
+        `),
+      },
+      { contextValue: { prisma, user: null, hub: null } }
+    );
 
-  assert(body.kind === 'single');
-  expect(body.singleResult.data?.registerWithPassword).toBeDefined();
+    assert(body.kind === 'single');
+    const { data } = body.singleResult;
+    assert(!!data);
+    expect(data.registerWithPassword).toBeDefined();
+  });
+
+  it('can access viewer', async () => {
+    const user = await prisma.user.findFirst({ where: { email: 'test@user.com' } });
+    const { body } = await server.executeOperation<TestUserViewerQuery>(
+      {
+        query: graphql(`
+          query testUserViewer {
+            viewer {
+              user {
+                id
+                email
+              }
+            }
+          }
+        `),
+      },
+      {
+        contextValue: { prisma, user, hub: null },
+      }
+    );
+
+    assert(body.kind === 'single');
+    const { data } = body.singleResult;
+    assert(!!data);
+    expect(data.viewer).toBeDefined();
+    expect(data.viewer.user.email).toBe('my@guy.com');
+  });
 });
