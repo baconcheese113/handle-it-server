@@ -3,6 +3,7 @@ import { GraphQLError } from 'graphql';
 import jwt from 'jsonwebtoken';
 
 import { builder } from '../../builder';
+import { getJwt } from '../../context';
 
 builder.mutationFields((t) => ({
   registerWithPassword: t.string({
@@ -14,7 +15,7 @@ builder.mutationFields((t) => ({
       lastName: t.arg.string(),
     },
     resolve: async (_root, args, { prisma, user }) => {
-      if (user) return jwt.sign(`User:${user.id}`, process.env.JWT_SECRET!);
+      if (user) return jwt.sign(`User:${user.id}`, getJwt());
       const email = args.email.trim();
       const unregisteredUser = await prisma.user.findFirst({ where: { email, password: null } });
       const data = {
@@ -30,7 +31,7 @@ builder.mutationFields((t) => ({
         ? await prisma.user.update({ where: { email }, data })
         : await prisma.user.create({ data });
 
-      return jwt.sign(`User:${newUser.id}`, process.env.JWT_SECRET!);
+      return jwt.sign(`User:${newUser.id}`, getJwt());
     },
   }),
   loginWithPassword: t.string({
@@ -40,7 +41,7 @@ builder.mutationFields((t) => ({
       fcmToken: t.arg.string({ required: true }),
     },
     resolve: async (_root, args, { prisma, user }) => {
-      if (user) return jwt.sign(`User:${user.id}`, process.env.JWT_SECRET!);
+      if (user) return jwt.sign(`User:${user.id}`, getJwt());
       const { email, password, fcmToken } = args;
       const hashedPassword = await bcrypt.hash(password, 10);
       console.log('hashedPassword', hashedPassword);
@@ -50,7 +51,7 @@ builder.mutationFields((t) => ({
       if (!isCorrectPwd) throw new GraphQLError('Password incorrect, unable to login');
       await prisma.user.update({ where: { email }, data: { fcmToken } });
 
-      return jwt.sign(`User:${foundUser.id}`, process.env.JWT_SECRET!);
+      return jwt.sign(`User:${foundUser.id}`, getJwt());
     },
   }),
   loginAsHub: t.string({
@@ -60,7 +61,7 @@ builder.mutationFields((t) => ({
       imei: t.arg.string({ required: true }),
     },
     resolve: async (_root, args, { prisma, hub }) => {
-      if (hub) return jwt.sign(`Hub:${hub.id}`, process.env.JWT_SECRET!);
+      if (hub) return jwt.sign(`Hub:${hub.id}`, getJwt());
       const { serial, imei } = args;
       const userId = Number.parseInt(args.userId as string);
       if (!Number.isFinite(userId)) throw new Error('Invalid userId');
@@ -72,7 +73,7 @@ builder.mutationFields((t) => ({
       const connectedHub =
         serialHub ||
         (await prisma.hub.create({ data: { name: 'TempName', serial, imei, ownerId: userId } }));
-      return jwt.sign(`Hub:${connectedHub.id}`, process.env.JWT_SECRET!);
+      return jwt.sign(`Hub:${connectedHub.id}`, getJwt());
     },
   }),
 }));

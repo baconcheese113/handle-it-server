@@ -17,7 +17,7 @@ if (process.env.FIREBASE_PROJECT_ID) {
   });
 }
 
-builder.mutationType({});
+builder.mutationType();
 
 builder.queryType({
   fields: (t) => ({
@@ -65,4 +65,4 @@ builder.queryType({
   }),
 });
 
-export const schema = builder.toSchema({});
+export const schema = builder.toSchema();

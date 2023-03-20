@@ -8,12 +8,8 @@ env:
   NODE_VERSION: 18.12.1
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
-    permissions:
-      contents: "read"
-      id-token: "write"
-
     steps:
       - uses: ikalnytskyi/action-setup-postgres@v4
         with:
@@ -48,6 +44,14 @@ jobs:
         run: |
           npm run test
 
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: "read"
+      id-token: "write"
+    needs: test
+    if: github.ref == 'refs/heads/master'
+    steps:
       - id: "auth"
         name: "Authenticate to Google Cloud"
         uses: "google-github-actions/auth@v0"

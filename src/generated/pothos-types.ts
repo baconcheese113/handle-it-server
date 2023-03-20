@@ -1,3 +1,4 @@
+/* eslint-disable */
 import type { Prisma, User, Hub, Sensor, Event, Location, NetworkMember, Network, NotificationOverride, BatteryLevel, Vehicle } from "@prisma/client";
 export default interface PrismaTypes {
     User: {
@@ -5,22 +6,25 @@ export default interface PrismaTypes {
         Shape: User;
         Include: Prisma.UserInclude;
         Select: Prisma.UserSelect;
-        Where: Prisma.UserWhereUniqueInput;
-        Fields: "hubs" | "networkMemberships" | "notificationOverrides";
+        OrderBy: Prisma.UserOrderByWithRelationInput;
+        WhereUnique: Prisma.UserWhereUniqueInput;
+        Where: Prisma.UserWhereInput;
+        Create: {};
+        Update: {};
         RelationName: "hubs" | "networkMemberships" | "notificationOverrides";
         ListRelations: "hubs" | "networkMemberships" | "notificationOverrides";
         Relations: {
             hubs: {
                 Shape: Hub[];
-                Types: PrismaTypes["Hub"];
+                Name: "Hub";
             };
             networkMemberships: {
                 Shape: NetworkMember[];
-                Types: PrismaTypes["NetworkMember"];
+                Name: "NetworkMember";
             };
             notificationOverrides: {
                 Shape: NotificationOverride[];
-                Types: PrismaTypes["NotificationOverride"];
+                Name: "NotificationOverride";
             };
         };
     };
@@ -29,34 +33,37 @@ export default interface PrismaTypes {
         Shape: Hub;
         Include: Prisma.HubInclude;
         Select: Prisma.HubSelect;
-        Where: Prisma.HubWhereUniqueInput;
-        Fields: "owner" | "sensors" | "locations" | "notificationOverrides" | "batteryLevels" | "vehicle";
+        OrderBy: Prisma.HubOrderByWithRelationInput;
+        WhereUnique: Prisma.HubWhereUniqueInput;
+        Where: Prisma.HubWhereInput;
+        Create: {};
+        Update: {};
         RelationName: "owner" | "sensors" | "locations" | "notificationOverrides" | "batteryLevels" | "vehicle";
         ListRelations: "sensors" | "locations" | "notificationOverrides" | "batteryLevels";
         Relations: {
             owner: {
                 Shape: User;
-                Types: PrismaTypes["User"];
+                Name: "User";
             };
             sensors: {
                 Shape: Sensor[];
-                Types: PrismaTypes["Sensor"];
+                Name: "Sensor";
             };
             locations: {
                 Shape: Location[];
-                Types: PrismaTypes["Location"];
+                Name: "Location";
             };
             notificationOverrides: {
                 Shape: NotificationOverride[];
-                Types: PrismaTypes["NotificationOverride"];
+                Name: "NotificationOverride";
             };
             batteryLevels: {
                 Shape: BatteryLevel[];
-                Types: PrismaTypes["BatteryLevel"];
+                Name: "BatteryLevel";
             };
             vehicle: {
                 Shape: Vehicle | null;
-                Types: PrismaTypes["Vehicle"];
+                Name: "Vehicle";
             };
         };
     };
@@ -65,18 +72,21 @@ export default interface PrismaTypes {
         Shape: Sensor;
         Include: Prisma.SensorInclude;
         Select: Prisma.SensorSelect;
-        Where: Prisma.SensorWhereUniqueInput;
-        Fields: "hub" | "events";
+        OrderBy: Prisma.SensorOrderByWithRelationInput;
+        WhereUnique: Prisma.SensorWhereUniqueInput;
+        Where: Prisma.SensorWhereInput;
+        Create: {};
+        Update: {};
         RelationName: "hub" | "events";
         ListRelations: "events";
         Relations: {
             hub: {
                 Shape: Hub;
-                Types: PrismaTypes["Hub"];
+                Name: "Hub";
             };
             events: {
                 Shape: Event[];
-                Types: PrismaTypes["Event"];
+                Name: "Event";
             };
         };
     };
@@ -85,14 +95,17 @@ export default interface PrismaTypes {
         Shape: Event;
         Include: Prisma.EventInclude;
         Select: Prisma.EventSelect;
-        Where: Prisma.EventWhereUniqueInput;
-        Fields: "sensor";
+        OrderBy: Prisma.EventOrderByWithRelationInput;
+        WhereUnique: Prisma.EventWhereUniqueInput;
+        Where: Prisma.EventWhereInput;
+        Create: {};
+        Update: {};
         RelationName: "sensor";
         ListRelations: never;
         Relations: {
             sensor: {
                 Shape: Sensor;
-                Types: PrismaTypes["Sensor"];
+                Name: "Sensor";
             };
         };
     };
@@ -101,14 +114,17 @@ export default interface PrismaTypes {
         Shape: Location;
         Include: Prisma.LocationInclude;
         Select: Prisma.LocationSelect;
-        Where: Prisma.LocationWhereUniqueInput;
-        Fields: "hub";
+        OrderBy: Prisma.LocationOrderByWithRelationInput;
+        WhereUnique: Prisma.LocationWhereUniqueInput;
+        Where: Prisma.LocationWhereInput;
+        Create: {};
+        Update: {};
         RelationName: "hub";
         ListRelations: never;
         Relations: {
             hub: {
                 Shape: Hub;
-                Types: PrismaTypes["Hub"];
+                Name: "Hub";
             };
         };
     };
@@ -117,18 +133,21 @@ export default interface PrismaTypes {
         Shape: NetworkMember;
         Include: Prisma.NetworkMemberInclude;
         Select: Prisma.NetworkMemberSelect;
-        Where: Prisma.NetworkMemberWhereUniqueInput;
-        Fields: "user" | "network";
+        OrderBy: Prisma.NetworkMemberOrderByWithRelationInput;
+        WhereUnique: Prisma.NetworkMemberWhereUniqueInput;
+        Where: Prisma.NetworkMemberWhereInput;
+        Create: {};
+        Update: {};
         RelationName: "user" | "network";
         ListRelations: never;
         Relations: {
             user: {
                 Shape: User;
-                Types: PrismaTypes["User"];
+                Name: "User";
             };
             network: {
                 Shape: Network;
-                Types: PrismaTypes["Network"];
+                Name: "Network";
             };
         };
     };
@@ -137,14 +156,17 @@ export default interface PrismaTypes {
         Shape: Network;
         Include: Prisma.NetworkInclude;
         Select: Prisma.NetworkSelect;
-        Where: Prisma.NetworkWhereUniqueInput;
-        Fields: "members";
+        OrderBy: Prisma.NetworkOrderByWithRelationInput;
+        WhereUnique: Prisma.NetworkWhereUniqueInput;
+        Where: Prisma.NetworkWhereInput;
+        Create: {};
+        Update: {};
         RelationName: "members";
         ListRelations: "members";
         Relations: {
             members: {
                 Shape: NetworkMember[];
-                Types: PrismaTypes["NetworkMember"];
+                Name: "NetworkMember";
             };
         };
     };
@@ -153,18 +175,21 @@ export default interface PrismaTypes {
         Shape: NotificationOverride;
         Include: Prisma.NotificationOverrideInclude;
         Select: Prisma.NotificationOverrideSelect;
-        Where: Prisma.NotificationOverrideWhereUniqueInput;
-        Fields: "user" | "hub";
+        OrderBy: Prisma.NotificationOverrideOrderByWithRelationInput;
+        WhereUnique: Prisma.NotificationOverrideWhereUniqueInput;
+        Where: Prisma.NotificationOverrideWhereInput;
+        Create: {};
+        Update: {};
         RelationName: "user" | "hub";
         ListRelations: never;
         Relations: {
             user: {
                 Shape: User;
-                Types: PrismaTypes["User"];
+                Name: "User";
             };
             hub: {
                 Shape: Hub;
-                Types: PrismaTypes["Hub"];
+                Name: "Hub";
             };
         };
     };
@@ -173,14 +198,17 @@ export default interface PrismaTypes {
         Shape: BatteryLevel;
         Include: Prisma.BatteryLevelInclude;
         Select: Prisma.BatteryLevelSelect;
-        Where: Prisma.BatteryLevelWhereUniqueInput;
-        Fields: "hub";
+        OrderBy: Prisma.BatteryLevelOrderByWithRelationInput;
+        WhereUnique: Prisma.BatteryLevelWhereUniqueInput;
+        Where: Prisma.BatteryLevelWhereInput;
+        Create: {};
+        Update: {};
         RelationName: "hub";
         ListRelations: never;
         Relations: {
             hub: {
                 Shape: Hub | null;
-                Types: PrismaTypes["Hub"];
+                Name: "Hub";
             };
         };
     };
@@ -189,14 +217,17 @@ export default interface PrismaTypes {
         Shape: Vehicle;
         Include: Prisma.VehicleInclude;
         Select: Prisma.VehicleSelect;
-        Where: Prisma.VehicleWhereUniqueInput;
-        Fields: "hub";
+        OrderBy: Prisma.VehicleOrderByWithRelationInput;
+        WhereUnique: Prisma.VehicleWhereUniqueInput;
+        Where: Prisma.VehicleWhereInput;
+        Create: {};
+        Update: {};
         RelationName: "hub";
         ListRelations: never;
         Relations: {
             hub: {
                 Shape: Hub;
-                Types: PrismaTypes["Hub"];
+                Name: "Hub";
             };
         };
     };

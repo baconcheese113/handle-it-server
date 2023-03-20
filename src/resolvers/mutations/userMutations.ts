@@ -13,12 +13,15 @@ builder.mutationFields((t) => ({
     },
     resolve: async (query, _root, args, { prisma, user }) => {
       if (!user) throw new GraphQLError('User does not have access');
-      const data: any = {
-        ...args,
-        firstName: args.firstName?.trim(),
-        lastName: args.lastName?.trim(),
-      };
-      return prisma.user.update({ ...query, where: { id: user.id }, data });
+      return prisma.user.update({
+        ...query,
+        where: { id: user.id },
+        data: {
+          defaultFullNotification: args.defaultFullNotification ?? undefined,
+          firstName: args.firstName?.trim(),
+          lastName: args.lastName?.trim(),
+        },
+      });
     },
   }),
   seedUser: t.prismaField({
@@ -111,7 +114,9 @@ builder.mutationFields((t) => ({
         },
       });
 
-      const newNetwork = await prisma.network.findFirst({ where: { name: `${firstName}Net1` } });
+      const newNetwork = await prisma.network.findFirstOrThrow({
+        where: { name: `${firstName}Net1` },
+      });
 
       await prisma.user.create({
         data: {
@@ -141,7 +146,7 @@ builder.mutationFields((t) => ({
           },
           networkMemberships: {
             create: {
-              networkId: newNetwork!.id,
+              networkId: newNetwork.id,
               inviteeAcceptedAt: new Date(),
               inviterAcceptedAt: new Date(),
               role: 'owner',
@@ -178,7 +183,7 @@ builder.mutationFields((t) => ({
           },
           networkMemberships: {
             create: {
-              networkId: newNetwork!.id,
+              networkId: newNetwork.id,
               inviteeAcceptedAt: new Date(),
               inviterAcceptedAt: new Date(),
               role: 'member',
