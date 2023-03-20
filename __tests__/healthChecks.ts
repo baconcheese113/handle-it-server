@@ -53,7 +53,7 @@ describe('basic entrypoint checks', () => {
 
   it('can access viewer', async () => {
     const email = 'test@user.com';
-    const user = await prisma.user.findFirst({ where: { email } });
+    const user = await prisma.user.findFirstOrThrow({ where: { email } });
     const { body } = await server.executeOperation<TestUserViewerQuery>(
       {
         query: graphql(`
@@ -77,5 +77,26 @@ describe('basic entrypoint checks', () => {
     assert(!!data);
     expect(data.viewer).toBeDefined();
     expect(data.viewer.user.email).toBe(email);
+  });
+
+  it('can register a new hub', async () => {
+    const email = 'test@user.com';
+    const user = await prisma.user.findFirstOrThrow({ where: { email } });
+    const { body } = await server.executeOperation(
+      {
+        query: graphql(`
+          mutation loginAsHub($userId: ID!) {
+            loginAsHub(userId: $userId, serial: "someSerialNumber", imei: "someImeiNumber")
+          }
+        `),
+        variables: { userId: user.id },
+      },
+      { contextValue: { prisma, user: null, hub: null } }
+    );
+
+    assert(body.kind === 'single');
+    const { data } = body.singleResult;
+    assert(!!data);
+    expect(data.loginAsHub).toBeDefined();
   });
 });
