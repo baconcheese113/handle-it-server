@@ -122,9 +122,8 @@ builder.mutationFields((t) => ({
       });
       if (numOtherOwners === 0) throw new GraphQLError('Unable to delete membership if only Owner');
       await prisma.networkMember.delete({ where: { id: networkMemberId } });
-      return prisma.network.findFirst({
+      return prisma.network.findFirstOrThrow({
         ...query,
-        rejectOnNotFound: true,
         where: { id: member.networkId },
       });
     },
@@ -164,9 +163,8 @@ builder.mutationFields((t) => ({
       if (!member)
         throw new GraphQLError('No network membership for this id is pending for this user');
       await prisma.networkMember.delete({ where: { id: member.id } });
-      return prisma.network.findFirst({
+      return prisma.network.findFirstOrThrow({
         ...query,
-        rejectOnNotFound: true,
         where: { id: member.networkId },
       });
     },
@@ -215,9 +213,8 @@ builder.mutationFields((t) => ({
           inviterAcceptedAt: member.inviterAcceptedAt ? undefined : new Date(),
         },
       });
-      return prisma.network.findFirst({
+      return prisma.network.findFirstOrThrow({
         ...query,
-        rejectOnNotFound: true,
         where: { id: member.networkId },
       });
     },
