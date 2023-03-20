@@ -61,7 +61,7 @@
     "@pothos/plugin-scope-auth": "^3.11.2",
     "@prisma/client": "^4.2.1",
     "bcrypt": "^5.1.0",
-    "firebase-admin": "^11.2.0",
+    "firebase-admin": "^11.5.0",
     "graphql": "^16.6.0",
     "graphql-scalars": "^1.18.0",
     "jsonwebtoken": "^9.0.0"
