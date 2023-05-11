@@ -13,7 +13,7 @@ builder.mutationFields((t) => ({
     resolve: async (query, _root, args, { prisma, user }) => {
       if (!user) throw new GraphQLError('User does not have access');
       const name = args.name.trim();
-      return prisma.hub.create({ data: { ...query, ...args, name, ownerId: user.id } });
+      return prisma.hub.create({ ...query, data: { ...args, name, ownerId: user.id } });
     },
   }),
   deleteHub: t.prismaField({

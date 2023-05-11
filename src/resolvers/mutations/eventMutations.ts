@@ -102,8 +102,9 @@ builder.mutationFields((t) => ({
         }
       }
       return prisma.event.update({
+        ...query,
         where: { id: event.id },
-        data: { ...query, propagatedAt: new Date() },
+        data: { propagatedAt: new Date() },
       });
     },
   }),
