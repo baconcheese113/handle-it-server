@@ -9,14 +9,11 @@ env:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: macos-13
     steps:
-      - uses: ikalnytskyi/action-setup-postgres@v4
+      - uses: ankane/setup-postgres@v1
         with:
-          username: postgres
-          password: postgres
-          database: test
-          port: 5432
+          postgres-version: 15
 
       - uses: actions/checkout@v3.3.0
 
@@ -29,7 +26,7 @@ jobs:
       - name: Build and install
         run: |
           touch .env.testing
-          echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/test?schema=public" >> .env.testing
+          echo "DATABASE_URL=postgresql://$USER:@localhost:5432/postgres?schema=public" >> .env.testing
           echo "JWT_SECRET=test_secret" >> .env.testing
           npm install
           npm run build
@@ -44,27 +41,27 @@ jobs:
         run: |
           npm run test
 
-  deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: "read"
-      id-token: "write"
-    needs: test
-    if: github.ref == 'refs/heads/master'
-    steps:
-      - id: "auth"
-        name: "Authenticate to Google Cloud"
-        uses: "google-github-actions/auth@v0"
-        with:
-          workload_identity_provider: "projects/847955048569/locations/global/workloadIdentityPools/my-pool/providers/my-provider"
-          service_account: "my-service-account@handleit-349522.iam.gserviceaccount.com"
-          token_format: "access_token"
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: "read"
+  #     id-token: "write"
+  #   needs: test
+  #   if: github.ref == 'refs/heads/master'
+  #   steps:
+  #     - id: "auth"
+  #       name: "Authenticate to Google Cloud"
+  #       uses: "google-github-actions/auth@v0"
+  #       with:
+  #         workload_identity_provider: "projects/847955048569/locations/global/workloadIdentityPools/my-pool/providers/my-provider"
+  #         service_account: "my-service-account@handleit-349522.iam.gserviceaccount.com"
+  #         token_format: "access_token"
 
-      - id: "deploy"
-        uses: "google-github-actions/deploy-cloudrun@v0"
-        with:
-          service: "handle-it-server"
-          image: "gcr.io/handleit-349522/handle-it-server:latest"
+  #     - id: "deploy"
+  #       uses: "google-github-actions/deploy-cloudrun@v0"
+  #       with:
+  #         service: "handle-it-server"
+  #         image: "gcr.io/handleit-349522/handle-it-server:latest"
 
-      - name: "Use output"
-        run: 'curl "${{ steps.deploy.outputs.url }}"'
+  #     - name: "Use output"
+  #       run: 'curl "${{ steps.deploy.outputs.url }}"'
