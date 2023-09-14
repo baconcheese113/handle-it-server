@@ -18,10 +18,10 @@ jobs:
           database: test
           port: 5432
 
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4.0.0
 
       - name: Setup Nodejs
-        uses: actions/setup-node@v3.6.0
+        uses: actions/setup-node@v3.8.1
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
