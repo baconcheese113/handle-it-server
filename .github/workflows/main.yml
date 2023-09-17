@@ -65,7 +65,8 @@ jobs:
         uses: "google-github-actions/deploy-cloudrun@v0.10.1"
         with:
           service: "handle-it-server"
-          image: "gcr.io/handleit-349522/handle-it-server:latest"
+          # image: "gcr.io/handleit-349522/handle-it-server:latest"
+          source: ./
 
       - name: "Use output"
         run: 'curl "${{ steps.deploy.outputs.url }}"'
