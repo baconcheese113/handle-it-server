@@ -1,9 +1,26 @@
+import { Hub } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { GraphQLError } from 'graphql';
 import jwt from 'jsonwebtoken';
 
 import { builder } from '../../builder';
 import { getJwt } from '../../context';
+
+class LoginAndFetchHubPayload {
+  hub!: Hub;
+  token!: string;
+}
+
+builder.objectType(LoginAndFetchHubPayload, {
+  name: 'LoginAndFetchHubPayload',
+  fields: (t) => ({
+    hub: t.prismaField({
+      type: 'Hub',
+      resolve: (_query, root) => root.hub,
+    }),
+    token: t.string({ resolve: (root) => root.token }),
+  }),
+});
 
 builder.mutationFields((t) => ({
   registerWithPassword: t.string({
@@ -54,7 +71,32 @@ builder.mutationFields((t) => ({
       return jwt.sign(`User:${foundUser.id}`, getJwt());
     },
   }),
+  loginAndFetchHub: t.field({
+    type: LoginAndFetchHubPayload,
+    args: {
+      userId: t.arg.id({ required: true }),
+      serial: t.arg.string({ required: true }),
+      imei: t.arg.string({ required: true }),
+    },
+    resolve: async (_root, args, { prisma, hub }) => {
+      if (hub) return { hub, token: jwt.sign(`Hub:${hub.id}`, getJwt()) };
+      const { serial, imei } = args;
+      const userId = Number.parseInt(args.userId as string);
+      if (!Number.isFinite(userId)) throw new Error('Invalid userId');
+      const connectedUser = await prisma.user.findFirst({ where: { id: userId } });
+      if (!connectedUser) throw new Error('User does not exist');
+      const serialHub = await prisma.hub.findFirst({ where: { serial } });
+      // if(serialHub) throw new Error("Hub already registered")
+      // if(listOfValidSerials.contains(serial)) throw new Error("Invalid serial")
+      const connectedHub =
+        serialHub ??
+        (await prisma.hub.create({ data: { name: 'TempName', serial, imei, ownerId: userId } }));
+      const token = jwt.sign(`Hub:${connectedHub.id}`, getJwt());
+      return { hub: connectedHub, token };
+    },
+  }),
   loginAsHub: t.string({
+    deprecationReason: `9/17/23. Use loginAndFetchHub instead.`,
     args: {
       userId: t.arg.id({ required: true }),
       serial: t.arg.string({ required: true }),
