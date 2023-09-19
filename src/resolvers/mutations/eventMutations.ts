@@ -3,6 +3,7 @@ import * as admin from 'firebase-admin';
 import { GraphQLError } from 'graphql';
 
 import { builder } from '../../builder';
+import { unauthenticatedError } from '../errors';
 
 builder.mutationFields((t) => ({
   createEvent: t.prismaField({
@@ -11,7 +12,7 @@ builder.mutationFields((t) => ({
       serial: t.arg.string({ required: true }),
     },
     resolve: async (query, _root, args, { prisma, hub }) => {
-      if (!hub) throw new GraphQLError('Hub does not have access');
+      if (!hub) throw unauthenticatedError('Hub does not have access');
       const { serial } = args;
       const sensor = await prisma.sensor.findFirst({ where: { serial, hubId: hub.id } });
       if (!sensor) throw new GraphQLError("Sensor doesn't exist");
@@ -47,13 +48,13 @@ builder.mutationFields((t) => ({
       eventId: t.arg.int({ required: true }),
     },
     resolve: async (query, _root, args, { prisma, user }) => {
-      if (!user) throw new GraphQLError('User does not have access');
+      if (!user) throw unauthenticatedError('User does not have access');
       const { eventId } = args;
       const event = await prisma.event.findFirst({
         where: { id: eventId, sensor: { hub: { ownerId: user.id } } },
         include: { sensor: { include: { hub: true } } },
       });
-      if (!event) throw new GraphQLError("User doesn't have access to event or doesn't exist");
+      if (!event) throw unauthenticatedError("User doesn't have access to event or doesn't exist");
       if (event.propagatedAt) throw new GraphQLError('Event already propagated to networks');
       const userNetworks = await prisma.network.findMany({
         where: {

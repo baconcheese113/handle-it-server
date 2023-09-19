@@ -3,6 +3,7 @@ import * as admin from 'firebase-admin';
 import { GraphQLError } from 'graphql';
 
 import { builder } from '../../builder';
+import { unauthenticatedError } from '../errors';
 
 builder.mutationFields((t) => ({
   createSensor: t.prismaField({
@@ -16,7 +17,7 @@ builder.mutationFields((t) => ({
       batteryLevel: t.arg.int(),
     },
     resolve: async (query, _root, args, { prisma, hub }) => {
-      if (!hub) throw new GraphQLError('Hub does not have access');
+      if (!hub) throw unauthenticatedError('Hub does not have access');
       const { isConnected, isOpen, serial, ...otherArgs } = args;
       // TODO ensure sensors only linked to a single hub
       // const serialSensor = await prisma.sensor.findFirst({ where: { serial: args.serial }})
@@ -49,7 +50,7 @@ builder.mutationFields((t) => ({
       isOpen: t.arg.boolean(),
     },
     resolve: async (query, _root, args, { prisma, hub }) => {
-      if (!hub) throw new GraphQLError('Hub does not have access');
+      if (!hub) throw unauthenticatedError('Hub does not have access');
       const id = Number.parseInt(args.id as string);
       const isOpen = args.isOpen ?? undefined;
       const sensorToUpdate = await prisma.sensor.findFirst({ where: { id, hubId: hub.id } });

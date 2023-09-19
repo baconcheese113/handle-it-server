@@ -1,26 +1,20 @@
-import { Hub } from '@prisma/client';
+import { Hub as HubModel } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { GraphQLError } from 'graphql';
 import jwt from 'jsonwebtoken';
 
 import { builder } from '../../builder';
 import { getJwt } from '../../context';
+import { Hub } from '../graphTypes/hubGraphType';
 
-class LoginAndFetchHubPayload {
-  hub!: Hub;
-  token!: string;
-}
-
-builder.objectType(LoginAndFetchHubPayload, {
-  name: 'LoginAndFetchHubPayload',
-  fields: (t) => ({
-    hub: t.prismaField({
-      type: 'Hub',
-      resolve: (_query, root) => root.hub,
+const LoginAndFetchHubPayload = builder
+  .objectRef<{ hub: HubModel; token: string }>('LoginAndFetchHubPayload')
+  .implement({
+    fields: (t) => ({
+      hub: t.field({ type: Hub, resolve: (root) => root.hub }),
+      token: t.string({ resolve: (root) => root.token }),
     }),
-    token: t.string({ resolve: (root) => root.token }),
-  }),
-});
+  });
 
 builder.mutationFields((t) => ({
   registerWithPassword: t.string({

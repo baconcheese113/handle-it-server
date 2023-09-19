@@ -1,6 +1,6 @@
 import { builder } from '../../builder';
 
-builder.prismaObject('Hub', {
+export const Hub = builder.prismaObject('Hub', {
   fields: (t) => ({
     id: t.exposeInt('id'),
     name: t.exposeString('name'),

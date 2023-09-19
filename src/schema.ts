@@ -2,9 +2,9 @@ import './resolvers/graphTypes';
 import './resolvers/mutations';
 
 import * as admin from 'firebase-admin';
-import { GraphQLError } from 'graphql';
 
 import { builder } from './builder';
+import { unauthenticatedError } from './resolvers/errors';
 import { Viewer } from './resolvers/graphTypes/viewerGraphType';
 
 if (process.env.FIREBASE_PROJECT_ID) {
@@ -28,7 +28,7 @@ builder.queryType({
         id: t.arg.int({ required: true }),
       },
       resolve: async (query, _root, args, { prisma, user }) => {
-        if (!user) throw new GraphQLError('User does not have permission');
+        if (!user) throw unauthenticatedError('User does not have permission');
         const { id } = args;
         const hub = await prisma.hub.findFirst({
           ...query,
@@ -51,14 +51,15 @@ builder.queryType({
     viewer: t.field({
       type: Viewer,
       resolve: (_root, _args, { user }) => {
-        if (!user) throw new GraphQLError('User does not have permission');
+        if (!user) throw unauthenticatedError('User does not have permission');
         return {};
       },
     }),
     hubViewer: t.prismaField({
       type: 'Hub',
       resolve: (_query, _root, _args, { hub }) => {
-        if (!hub) throw new GraphQLError('Hub does not have permission');
+        console.log('resolving hub viewer');
+        if (!hub) throw unauthenticatedError('Hub does not have permission');
         return hub;
       },
     }),
