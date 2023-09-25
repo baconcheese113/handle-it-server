@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import assert from 'assert';
 import * as admin from 'firebase-admin';
 import { GraphQLError } from 'graphql';
@@ -10,10 +11,13 @@ builder.mutationFields((t) => ({
     type: 'Event',
     args: {
       serial: t.arg.string({ required: true }),
+      batteryLevel: t.arg.int(),
+      batteryVolts: t.arg.int(),
+      version: t.arg.string(),
     },
     resolve: async (query, _root, args, { prisma, hub }) => {
       if (!hub) throw unauthenticatedError('Hub does not have access');
-      const { serial } = args;
+      const { serial, batteryLevel, batteryVolts, version } = args;
       const sensor = await prisma.sensor.findFirst({ where: { serial, hubId: hub.id } });
       if (!sensor) throw new GraphQLError("Sensor doesn't exist");
       const owner = await prisma.user.findFirst({ where: { id: hub.ownerId } });
@@ -39,6 +43,25 @@ builder.mutationFields((t) => ({
           console.log('Error sending message: ', err);
         }
       }
+
+      const batteryLevels:
+        | Prisma.BatteryLevelUncheckedUpdateManyWithoutSensorNestedInput
+        | undefined =
+        batteryLevel && batteryVolts
+          ? {
+              create: {
+                volts: batteryVolts / 1000,
+                percent: batteryLevel,
+              },
+            }
+          : undefined;
+      await prisma.sensor.update({
+        where: { id: sensor.id },
+        data: {
+          version,
+          batteryLevels,
+        },
+      });
       return createdEvent;
     },
   }),

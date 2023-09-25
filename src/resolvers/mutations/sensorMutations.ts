@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import assert from 'assert';
 import * as admin from 'firebase-admin';
 import { GraphQLError } from 'graphql';
@@ -15,10 +16,21 @@ builder.mutationFields((t) => ({
       isConnected: t.arg.boolean(),
       isOpen: t.arg.boolean(),
       batteryLevel: t.arg.int(),
+      batteryVolts: t.arg.int(),
+      version: t.arg.string(),
     },
     resolve: async (query, _root, args, { prisma, hub }) => {
       if (!hub) throw unauthenticatedError('Hub does not have access');
-      const { isConnected, isOpen, serial, ...otherArgs } = args;
+      const { isConnected, isOpen, serial, batteryLevel, batteryVolts, ...otherArgs } = args;
+      const batteryLevels: Prisma.BatteryLevelCreateNestedManyWithoutSensorInput | undefined =
+        batteryLevel && batteryVolts
+          ? {
+              create: {
+                volts: batteryVolts / 1000,
+                percent: batteryLevel,
+              },
+            }
+          : undefined;
       // TODO ensure sensors only linked to a single hub
       // const serialSensor = await prisma.sensor.findFirst({ where: { serial: args.serial }})
       // if(serialSensor) throw new GraphQLError("Sensor already added")
@@ -29,12 +41,14 @@ builder.mutationFields((t) => ({
           isConnected: !!isConnected,
           isOpen: !!isOpen,
           serial: serial as string,
+          batteryLevels,
           ...otherArgs,
         },
         update: {
           isConnected: !!isConnected,
           isOpen: !!isOpen,
           serial: serial as string,
+          batteryLevels,
           ...otherArgs,
         },
         where: {

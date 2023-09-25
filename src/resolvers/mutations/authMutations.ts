@@ -71,10 +71,11 @@ builder.mutationFields((t) => ({
       userId: t.arg.id({ required: true }),
       serial: t.arg.string({ required: true }),
       imei: t.arg.string({ required: true }),
+      version: t.arg.string({ required: true }),
     },
     resolve: async (_root, args, { prisma, hub }) => {
       if (hub) return { hub, token: jwt.sign(`Hub:${hub.id}`, getJwt()) };
-      const { serial, imei } = args;
+      const { serial, imei, version } = args;
       const userId = Number.parseInt(args.userId as string);
       if (!Number.isFinite(userId)) throw new Error('Invalid userId');
       const connectedUser = await prisma.user.findFirst({ where: { id: userId } });
@@ -84,7 +85,9 @@ builder.mutationFields((t) => ({
       // if(listOfValidSerials.contains(serial)) throw new Error("Invalid serial")
       const connectedHub =
         serialHub ??
-        (await prisma.hub.create({ data: { name: 'TempName', serial, imei, ownerId: userId } }));
+        (await prisma.hub.create({
+          data: { name: 'TempName', serial, imei, version, ownerId: userId },
+        }));
       const token = jwt.sign(`Hub:${connectedHub.id}`, getJwt());
       return { hub: connectedHub, token };
     },

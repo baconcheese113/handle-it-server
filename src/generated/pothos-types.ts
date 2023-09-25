@@ -77,8 +77,8 @@ export default interface PrismaTypes {
         Where: Prisma.SensorWhereInput;
         Create: {};
         Update: {};
-        RelationName: "hub" | "events";
-        ListRelations: "events";
+        RelationName: "hub" | "events" | "batteryLevels";
+        ListRelations: "events" | "batteryLevels";
         Relations: {
             hub: {
                 Shape: Hub;
@@ -87,6 +87,10 @@ export default interface PrismaTypes {
             events: {
                 Shape: Event[];
                 Name: "Event";
+            };
+            batteryLevels: {
+                Shape: BatteryLevel[];
+                Name: "BatteryLevel";
             };
         };
     };
@@ -203,12 +207,16 @@ export default interface PrismaTypes {
         Where: Prisma.BatteryLevelWhereInput;
         Create: {};
         Update: {};
-        RelationName: "hub";
+        RelationName: "hub" | "sensor";
         ListRelations: never;
         Relations: {
             hub: {
                 Shape: Hub | null;
                 Name: "Hub";
+            };
+            sensor: {
+                Shape: Sensor | null;
+                Name: "Sensor";
             };
         };
     };

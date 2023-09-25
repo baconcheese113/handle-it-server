@@ -20,6 +20,7 @@ export const Hub = builder.prismaObject('Hub', {
     ownerId: t.exposeInt('ownerId'),
     owner: t.relation('owner'),
     serial: t.exposeString('serial'),
+    version: t.exposeString('version', { nullable: true }),
     latestVersion: t.string({
       resolve: () => process.env.HUB_CURRENT_FIRMWARE_VERSION ?? '0.1.0',
     }),

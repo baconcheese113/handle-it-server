@@ -39,6 +39,7 @@ builder.mutationFields((t) => ({
       batteryLevel: t.arg.int(),
       isCharging: t.arg.boolean(),
       isArmed: t.arg.boolean(),
+      version: t.arg.string(),
     },
     resolve: async (query, _root, args, { prisma, hub, user }) => {
       if (!hub && !user) throw unauthenticatedError('No access');
@@ -63,13 +64,16 @@ builder.mutationFields((t) => ({
     args: {
       volts: t.arg.float({ required: true }),
       percent: t.arg.float({ required: true }),
+      version: t.arg.string(),
     },
     resolve: async (_query, _root, args, { prisma, hub }) => {
       if (!hub) throw unauthenticatedError('No access');
-      await prisma.batteryLevel.create({
-        data: { ...args, hubId: hub.id },
+      const { version: rawVersion, ...create } = args;
+      const version = rawVersion ?? undefined;
+      return prisma.hub.update({
+        where: { id: hub.id },
+        data: { version, batteryLevels: { create } },
       });
-      return hub;
     },
   }),
 }));

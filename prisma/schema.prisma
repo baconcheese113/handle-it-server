@@ -43,6 +43,7 @@ model Hub {
   batteryLevel          Int?
   isCharging            Boolean?
   isArmed               Boolean                @default(false)
+  version               String?
   ownerId               Int
   owner                 User                   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   sensors               Sensor[]
@@ -53,18 +54,20 @@ model Hub {
 }
 
 model Sensor {
-  id           Int      @id @default(autoincrement())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @default(now()) @updatedAt
-  serial       String   @unique
-  batteryLevel Int?
-  isOpen       Boolean
-  isConnected  Boolean
-  doorColumn   Int
-  doorRow      Int
-  hubId        Int
-  hub          Hub      @relation(fields: [hubId], references: [id], onDelete: Cascade)
-  events       Event[]
+  id            Int            @id @default(autoincrement())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @default(now()) @updatedAt
+  serial        String         @unique
+  batteryLevel  Int?
+  isOpen        Boolean
+  isConnected   Boolean
+  doorColumn    Int
+  doorRow       Int
+  version       String?
+  hubId         Int
+  hub           Hub            @relation(fields: [hubId], references: [id], onDelete: Cascade)
+  events        Event[]
+  batteryLevels BatteryLevel[]
 }
 
 model Event {
@@ -135,9 +138,11 @@ model BatteryLevel {
   id        Int      @id @default(autoincrement())
   volts     Float
   percent   Float
+  createdAt DateTime @default(now())
   hubId     Int?
   hub       Hub?     @relation(fields: [hubId], references: [id], onDelete: SetNull)
-  createdAt DateTime @default(now())
+  sensorId  Int?
+  sensor    Sensor?  @relation(fields: [sensorId], references: [id], onDelete: SetNull)
 }
 
 model Vehicle {
