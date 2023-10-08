@@ -18,7 +18,7 @@ jobs:
           database: test
           port: 5432
 
-      - uses: actions/checkout@v4.0.0
+      - uses: actions/checkout@v4.1.0
 
       - name: Setup Nodejs
         uses: actions/setup-node@v3.8.1
@@ -52,7 +52,7 @@ jobs:
     needs: test
     if: github.ref == 'refs/heads/master'
     steps:
-      - uses: actions/checkout@v4.0.0
+      - uses: actions/checkout@v4.1.0
 
       - name: "Authenticate to Google Cloud"
         uses: "google-github-actions/auth@v1.1.1"
