@@ -1,10 +1,39 @@
-import { Prisma } from '@prisma/client';
+import { Hub, Prisma, PrismaClient, Sensor } from '@prisma/client';
 import assert from 'assert';
 import * as admin from 'firebase-admin';
 import { GraphQLError } from 'graphql';
 
 import { builder } from '../../builder';
 import { unauthenticatedError } from '../errors';
+import { sendBatteryNotification } from './hubMutations';
+
+async function maybeSendBatteryAlert(
+  prisma: PrismaClient,
+  hub: Hub,
+  sensor: Sensor,
+  newPercent: number,
+  threshold = 10
+) {
+  const owner = await prisma.user.findFirst({ where: { id: hub.ownerId } });
+  if (!owner?.fcmToken) {
+    console.error("Hub doesn't have an owner with valid fcmToken");
+    return;
+  }
+  const olderLevels = await prisma.batteryLevel.findMany({
+    where: { sensorId: sensor.id },
+    orderBy: { createdAt: 'desc' },
+    take: 2,
+  });
+  if (olderLevels.length < 2) return;
+  const newPercentIsFirstBelow =
+    newPercent <= threshold && olderLevels.every((l) => l.percent > threshold);
+  if (!newPercentIsFirstBelow) return;
+  const sensorLoc = `${sensor.doorRow ? 'rear' : 'front'} ${sensor.doorColumn ? 'right' : 'left'}`;
+  sendBatteryNotification(
+    owner.fcmToken,
+    `Your ${sensorLoc} sensor's battery has ${newPercent}% remaining. Please order replacements soon to continue monitoring!`
+  );
+}
 
 builder.mutationFields((t) => ({
   createEvent: t.prismaField({
@@ -55,6 +84,9 @@ builder.mutationFields((t) => ({
               },
             }
           : undefined;
+      if (batteryLevel) {
+        maybeSendBatteryAlert(prisma, hub, sensor, batteryLevel, 10);
+      }
       await prisma.sensor.update({
         where: { id: sensor.id },
         data: {

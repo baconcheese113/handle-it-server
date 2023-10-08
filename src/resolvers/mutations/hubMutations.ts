@@ -1,7 +1,47 @@
+import { Hub, PrismaClient } from '@prisma/client';
+import * as admin from 'firebase-admin';
 import { GraphQLError } from 'graphql';
 
 import { builder } from '../../builder';
 import { unauthenticatedError } from '../errors';
+
+export async function sendBatteryNotification(fcmToken: string, body: string) {
+  try {
+    const msgId = await admin.messaging().send({
+      notification: { title: 'Low Battery', body },
+      android: {
+        notification: { channelId: 'handleit_battery_channel' },
+      },
+      token: fcmToken,
+    });
+    console.log('Successfully sent message: ', msgId);
+  } catch (err) {
+    console.log('Error sending message: ', err);
+  }
+}
+
+async function maybeSendBatteryAlert(
+  prisma: PrismaClient,
+  hub: Hub,
+  newPercent: number,
+  threshold = 15
+) {
+  const owner = await prisma.user.findFirst({ where: { id: hub.ownerId } });
+  if (!owner?.fcmToken) {
+    console.error("Hub doesn't have an owner with valid fcmToken");
+    return;
+  }
+  const olderLevels = await prisma.batteryLevel.findMany({
+    where: { hubId: hub.id },
+    orderBy: { createdAt: 'desc' },
+    take: 2,
+  });
+  if (olderLevels.length < 2) return;
+  const newPercentIsFirstBelow =
+    newPercent <= threshold && olderLevels.every((l) => l.percent > threshold);
+  if (!newPercentIsFirstBelow) return;
+  sendBatteryNotification(owner.fcmToken, `Your Hub "${hub.name}"'s battery at ${newPercent}%`);
+}
 
 builder.mutationFields((t) => ({
   createHub: t.prismaField({
@@ -70,6 +110,8 @@ builder.mutationFields((t) => ({
       if (!hub) throw unauthenticatedError('No access');
       const { version: rawVersion, ...create } = args;
       const version = rawVersion ?? undefined;
+      maybeSendBatteryAlert(prisma, hub, args.percent, 15);
+      maybeSendBatteryAlert(prisma, hub, args.percent, 5);
       return prisma.hub.update({
         where: { id: hub.id },
         data: { version, batteryLevels: { create } },
