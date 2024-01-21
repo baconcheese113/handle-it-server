@@ -11,17 +11,17 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: ikalnytskyi/action-setup-postgres@v4
+      - uses: ikalnytskyi/action-setup-postgres@v5
         with:
           username: postgres
           password: postgres
           database: test
           port: 5432
 
-      - uses: actions/checkout@v4.0.0
+      - uses: actions/checkout@v4.1.1
 
       - name: Setup Nodejs
-        uses: actions/setup-node@v3.8.1
+        uses: actions/setup-node@v4.0.1
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
@@ -52,7 +52,7 @@ jobs:
     needs: test
     if: github.ref == 'refs/heads/master'
     steps:
-      - uses: actions/checkout@v4.0.0
+      - uses: actions/checkout@v4.1.1
 
       - name: "Authenticate to Google Cloud"
         uses: "google-github-actions/auth@v1.1.1"
